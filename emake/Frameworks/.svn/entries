@@ -1,0 +1,52 @@
+10
+
+dir
+4430
+svn://demo_zhang@svn.emake.cn/emake_app/emake/emake/Frameworks
+svn://demo_zhang@svn.emake.cn/emake_app
+
+
+
+2018-06-08T08:22:19.523512Z
+3690
+wei_gu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+cf8112e6-e50d-40cb-89d0-ada3cd2a3d99
+
+AipBase.framework
+dir
+
+UMMobClick.framework
+dir
+
+CloudPushSDK.framework
+dir
+
+UTDID.framework
+dir
+
+AlicloudUtils.framework
+dir
+
+AipOcrSdk.framework
+dir
+
+IdcardQuality.framework
+dir
+
+AliyunOSSiOS.framework
+dir
+

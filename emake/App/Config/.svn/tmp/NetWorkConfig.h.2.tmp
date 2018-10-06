@@ -1,0 +1,304 @@
+//
+//  NetWorkConfig.h
+//  emake
+//
+//  Created by 袁方 on 2017/7/24.
+//  Copyright © 2017年 emake. All rights reserved.
+//
+#ifndef NetWorkConfig_h
+#define NetWorkConfig_h
+//请求地址
+//#define CLOUD_URL(res)  [NSString stringWithFormat:@"https://api.emake.cn/%@",res]
+#define CLOUD_URL(res)  [NSString stringWithFormat:@"http://git.emake.cn:3000/%@",res]//测试服务器
+#define CLOUDTest_URL(res)  [NSString stringWithFormat:@"http://192.168.0.156:3000/%@",res]//本地地址
+
+//服务器统一返回字段
+#define RESPONSE_RESULT_CODE                    @"ResultCode"
+#define RESPONSE_RESULT_INFO                    @"ResultInfo"
+#define RESPONSE_RESULT_DATA                    @"Data"
+
+//错误信息提示
+#define Tips_RESULT_INFO                    @""
+
+//请求头字段
+#define Emake_App_Version            [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]
+#define HTTP_Header_Patameter        [NSString stringWithFormat:@"emake.ios.%@",Emake_App_Version]
+
+//生成合同URL
+#define CreatContractURL                         @"http://api.emake.cn"
+
+//合同展示URL
+//#define ContractDisplayURL                       @"http://www.emake.cn:5000/contract"
+//测试地址http://git.emake.cn:5000
+#define ContractDisplayURL                       @"http://git.emake.cn:5000/contract"
+
+//使用许可、用户隐私、服务条款
+#define RegisterProtcolURL                       @"https://price.emake.cn/servicepact/"
+#define InsurancesInstructionURL                 @"https://price.emake.cn/user/insurance/content/"
+
+//订购须知
+#define UserOrderinginfoURL                       @"https://price.emake.cn/orderinginfo"
+//订购流程
+#define UserOrderingproURL                      @"https://price.emake.cn/orderingpro"
+//使用说明
+#define UserInstructionURL                       @"https://price.emake.cn/usermanual"
+
+//合同pdf文件
+//#define UserContractPDFURL                       @"http://api.emake.cn/static/contractpdf"
+//测试环境
+#define UserContractPDFURL                       @"http://git.emake.cn:3000/static/contractpdf"
+
+//团队提成规则
+#define TeamActivtyInstructionURL                    @"https://price.emake.cn/redpacket"
+
+//当日售价 要拼接的地址
+//#define TodayPriceUrl                            @"http://www.emake.cn/serieslist"
+#define TodayPriceUrl                            @"http://price.emake.cn"
+
+//获取当日售价的token
+#define TodayPriceUrlToken                     CLOUD_URL(@"token")
+
+//资讯发现
+#define DiscoverUrl                            @"http://price.emake.cn/infor"
+
+/*--------------------------------------------接口---------------------------------------*/
+//修改手机号验证码
+#define URL_AppVersion   CLOUD_URL(@"app/version")
+
+//修改手机号验证码
+#define URL_UserVerificationcode   CLOUD_URL(@"user/verificationcode")
+
+//修改手机号
+#define URL_UserMobileNumber CLOUD_URL(@"user/mobilenumber")
+
+//用户名片扫描，APP端图片大小不得超过1.5MB,最好控制在1MB以内
+#define URL_UserCard CLOUD_URL(@"user/card")
+
+//用户性别
+#define URL_UserInfo CLOUD_URL(@"user/info")
+
+//获取用户资料
+#define URL_User CLOUD_URL(@"user")
+
+//修改密码
+#define URL_UserPassword  CLOUD_URL(@"user/password")
+
+//朋友圈接口
+#define URL_UserFriend    CLOUD_URL(@"user/friend")
+
+//baner宣传
+#define URL_UserAbout     CLOUD_URL(@"about")               
+
+//请求验证码URL
+#define URL_VerificationCode CLOUD_URL(@"verificationcode")
+
+//用户注册
+#define URL_UserRegist CLOUD_URL(@"user/regist")
+
+//用户设置密码
+#define URL_UserResetPassword CLOUD_URL(@"user/password")
+
+//用户忘记密码
+#define URL_UserForgetPassword CLOUD_URL(@"user/password/forget")
+
+//用户登录
+#define URL_UserLoginWithVerificationCode CLOUD_URL(@"user/login")
+
+//购物车
+#define URL_MainPageImage CLOUD_URL(@"home/banner")
+
+//购物车
+#define URL_UserFindingShoppingCart CLOUD_URL(@"user/shopping")
+
+//购物车删除
+#define URL_UserDeleteShoppingCart CLOUD_URL(@"user/shopping")
+
+//购物车数量改变
+#define URL_UserShoppingCartNumberChange CLOUD_URL(@"user/shopping")
+
+//订单
+#define URL_UserOrderManage CLOUD_URL(@"user/order")
+
+//产品参数
+#define URL_GoodsParams CLOUD_URL(@"goods/params")
+
+//产品系列
+#define URL_Goodsseries CLOUD_URL(@"shopping/good/seriescode")
+
+//产品系列code
+#define URL_GoodsseriesCode CLOUD_URL(@"goodsseries/SCBH15")
+
+//新增产品
+#define URL_NewProduct CLOUD_URL(@"goodsseries")
+
+//获取<产品系列CODE>下的所有可选属性名字，，，，下拉列表
+#define URL_PropertyProductName CLOUD_URL(@"shopping/good/params")//shopping/good/params
+#define URL_PropertyProduct CLOUD_URL(@"shopping/good/pulldown")
+#define URL_PropertyProductList CLOUD_URL(@"shopping/good/dropdown")
+#define URL_PropertyProductListName CLOUD_URL(@"shopping/good/menu")
+
+//增值服务
+#define URL_PropertyAddSevice CLOUD_URL(@"shopping/addservice")
+
+//商品详情
+#define URL_ShoppingDetail           CLOUD_URL(@"shopping/series/detail")
+
+//添加购物车
+#define URL_AddShopping              CLOUD_URL(@"user/shopping")
+
+//获取产品价格
+#define URL_ShoppingPrice            CLOUD_URL(@"shopping/price")
+
+//生成订单
+#define URL_ShoppingCartOder            CLOUD_URL(@"user/order")
+
+//合同是否签订
+#define URL_ContractIsSigh            CLOUD_URL(@"web/contract/chat")
+
+//获取订单数量
+#define URL_OrderNumber            CLOUD_URL(@"user/order/count")
+
+//用户（物流）地址接口
+#define URL_UserAdress            CLOUD_URL(@"user/address")
+
+//订单—物流—详情
+#define URL_LogisticsInfo            CLOUD_URL(@"user/contract/shipdetail")
+
+//开票类型 
+#define URL_InvoiceType            CLOUD_URL(@"user/params")
+
+//申请开票、开票记录
+#define URL_InvoiceApply            CLOUD_URL(@"user/invoice")
+
+//剩余开票金额
+#define URL_InvoiceRemainAmount            CLOUD_URL(@"user/remaininvoiceamount")
+
+//品牌
+#define URL_Brand            CLOUD_URL(@"brand")
+
+//保险
+#define URL_UserInsurance           CLOUD_URL(@"user/insurance")
+
+//首页获取购物车商品名称+数量+容量
+#define URL_ShoppingFormat            CLOUD_URL(@"user/shopping/format")
+
+//用户审核
+#define URL_InfoUpdate           CLOUD_URL(@"user/info/update")
+
+//用户审核
+#define URL_UserBusinessCategory           CLOUD_URL(@"user/business/category")
+
+//首页获取上周订单
+#define URL_LastWeekOrder           CLOUD_URL(@"user/lastweek/order")
+
+//生成订单
+#define URL_MakeOrder           CLOUD_URL(@"web/contract/sign")
+
+//首页-分类列表
+#define URL_ShoppingGoodCategories           CLOUD_URL(@"shopping/good/categories")
+
+//首页-抽奖
+#define URL_UserPrizedraw           CLOUD_URL(@"user/prizedraw")
+
+//首页-抽奖明细
+#define URL_UserPrizedrawInfo           CLOUD_URL(@"user/prizedraw/info")
+
+//(确认订单)团队贡献
+#define URL_MakeContributions           CLOUD_URL(@"user/offer/group")
+
+//开启任务
+#define URL_MakeTask           CLOUD_URL(@"task")
+
+//团队贡献
+#define URL_GetTask           CLOUD_URL(@"user/group")
+
+//团长贡献明细
+#define URL_MakeContributionsDetail           CLOUD_URL(@"group/info")
+
+//我的团队 经销
+#define URL_MakeContributionsGroup           CLOUD_URL(@"user/distributor/team")
+
+//团圆贡献明细
+#define URL_MakeMemberContributionsDetail           CLOUD_URL(@"user/group/info")
+
+//团长 Leader贡献 订单明细
+#define URL_MakeLeadersContributionsDetail           CLOUD_URL(@"user/market/contract")
+
+//团员 buddy贡献 订单明细
+#define URL_MakeMemberBuddyContributionsDetail           CLOUD_URL(@"user/buddy")
+
+//团长邀请团员
+#define URL_UserGroupInvite           CLOUD_URL(@"user/market/invite")
+
+//团长解散团队
+#define URL_UserGroup          CLOUD_URL(@"user/group")
+
+//账户信息
+#define URL_UserAccount          CLOUD_URL(@"user/account")
+
+//提现明细
+#define URL_UserCashOut         CLOUD_URL(@"user/cash/out")
+
+//加入团队
+#define URL_GroupInfo         CLOUD_URL(@"user/market/invite")
+
+//账户银行卡信息（post，get,delet）
+#define URL_UserBankInfo         CLOUD_URL(@"user/bank/card")
+
+//银行卡信息扫描
+#define URL_UserBankScanAPI     @"https://api.youtu.qq.com/youtu/ocrapi/creditcardocr"
+
+//邀请记录
+#define URL_UserGroupInviteLog    CLOUD_URL(@"user/group/invite/log")
+
+//（图片）上传本地服务器
+#define URL_UserUploadImage         CLOUD_URL(@"image/file")
+
+//（身份证图片）上传本地服务器
+#define URL_UserUploadIDImage         CLOUD_URL(@"image")
+
+//上传图片（get，post,delete）
+#define URL_UserUploadOrderImage         CLOUD_URL(@"user/contract/photo")
+
+//消息记录删除（get，post,delete）
+#define URL_UserMarketInviteLog         CLOUD_URL(@"user/market/invite/log")
+
+//企业服务列表
+#define URL_BusinessService        CLOUD_URL(@"business/service")
+
+//获取分配的客服工号
+#define URL_CustoCmerService        CLOUD_URL(@"customer/service")
+
+//首页banner
+#define URL_MainPageAd       CLOUD_URL(@"mainpagead")
+
+//首页分类
+#define URL_MainPageCategory       CLOUD_URL(@"mainpage/category")
+
+//开票列表
+#define URL_InvoiceManage       CLOUD_URL(@"user/invoice/manage")
+
+//访客
+#define URL_MainVisitorCategory       CLOUD_URL(@"user/business/category")
+
+
+//scan login
+#define URL_MainScanLogin       CLOUD_URL(@"qr/user/login")
+
+//“IsCheck”: '1'  已查看， ‘0’ 未查看  字符串
+#define URL_MineUserCheck       CLOUD_URL(@"user/check")
+
+//shi fou开票
+#define URL_Isincludetax       CLOUD_URL(@"user/isincludetax")
+
+//shi fou开票
+#define URL_userOrderInsurance       CLOUD_URL(@"web/insurance/photo")
+
+//shi fou开票
+#define URL_userInsurance       CLOUD_URL(@"user/insurance/content")
+
+//意见反馈
+#define URL_APPFeedBack       CLOUD_URL(@"app/feedback")
+
+
+#endif /* NetWorkConfig_h */

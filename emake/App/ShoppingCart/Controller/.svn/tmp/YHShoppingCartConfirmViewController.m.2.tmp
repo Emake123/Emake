@@ -1,0 +1,834 @@
+//
+//  YHShoppingCartConfirmViewController.m
+//  emake
+//
+//  Created by 谷伟 on 2017/11/13.
+//  Copyright © 2017年 emake. All rights reserved.
+//
+
+#import "YHShoppingCartConfirmViewController.h"
+#import "YHShoppingCartConfirmCell.h"
+#import "YHContractCreatViewController.h"
+#import "ChatNewViewController.h"
+#import "YHShoppingTeamOrderTableViewCell.h"
+#import "teamModel.h"
+#import "Tools.h"
+#import "YHShopAlertView.h"
+#import "YHOrderManageNewViewController.h"
+#import "YHShoppingInsranceViewController.h"
+#import "YHInsuranceSeviceViewController.h"
+@interface YHShoppingCartConfirmViewController ()<UITableViewDelegate,UITableViewDataSource>{
+    
+    UITableView * myTableView;
+    NSInteger recordSection;
+    BOOL isLeader;
+    NSString *groupID;
+    UIView *alertShow;
+    YHShopAlertView *alertshop;
+    BOOL isInvoice;
+    UIView *bottomView;
+    
+}
+@property (nonatomic,retain)UIButton *dicussBtn;
+@property (nonatomic,retain)UILabel *totalLabel;
+@property (nonatomic,retain)UILabel *priceFeeLabel;
+@property (nonatomic,retain)UILabel *insuranceFeeLabel;
+@property (nonatomic,retain)UILabel *insuranceMoneyLabel;
+
+@property(nonatomic,strong)NSArray *groupArr;
+@property(nonatomic,copy)NSString *recordTotalprice;
+@property(nonatomic,copy)NSString *recordFeeprice;
+@property(nonatomic,copy)NSString *recordTotalFeeprice;
+@property(nonatomic,copy)NSString *recordInsuranceMoney;
+
+@property(nonatomic,strong)NSMutableArray *totalArr;
+@property(nonatomic,assign)NSInteger recordNum;
+
+@end
+
+@implementation YHShoppingCartConfirmViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    if (self.isNeedHideBottomView) {
+        self.title =@"订单详情";
+    }else{
+        self.title =@"确认订单";
+    }
+    groupID = @"";
+    double price = 0 ;
+    double priceALL = 0 ;
+
+    _totalArr = [NSMutableArray array];
+    _recordNum = 0;
+    for (NSArray *class in self.selectArray) {
+        for (YHShoppingCartModel *item in class) {
+            
+            price  += item.GoodsPrice.doubleValue*item.GoodsTaxRate.doubleValue*item.GoodsNumber.integerValue;
+            priceALL += item.GoodsPrice.doubleValue*item.GoodsNumber.integerValue;
+            _recordNum += item.GoodsNumber.integerValue;
+            NSLog(@"price==%f",price);
+            [self.totalArr addObject:item];
+        }
+        
+    }
+    NSLog(@"price==%f",price);
+
+    self.recordFeeprice = [NSString stringWithFormat:@"%@",[Tools getHaveNum:price]];
+    
+    self.recordTotalprice = [Tools getHaveNum:priceALL];
+    
+self.recordTotalFeeprice = [NSString stringWithFormat:@"%@",[Tools getHaveNum:(price +self.totalPrice.doubleValue)]];
+    
+    NSInteger record = 0;
+    for (int i =0; i<self.selectArray.count; i++) {
+        NSArray *arry = [self.selectArray objectAtIndex:i];
+        if (arry.count > 0) {
+            record ++;
+        }
+    }
+    
+    self.recordInsuranceMoney = @"0";
+    recordSection = record;
+    [self configUI];
+    [self configBottomView];
+
+   
+
+    if (self.isNeedHideBottomView==NO) {
+
+    [self getData];
+    }
+}
+
+
+
+- (void)configUI{
+    CGFloat height = 0;
+    if (self.isNeedHideBottomView == YES) {//从聊天到确认订单
+        
+        if ([self.isCanInvoice isEqualToString:@"1"]) {//食品
+            
+            height = self.view.frame.size.height-(TOP_BAR_HEIGHT)+HeightRate(10)-HeightRate(60);
+
+        }else
+        {
+           height = self.view.frame.size.height-(TOP_BAR_HEIGHT)+HeightRate(10);
+        }
+    }else{//从购物车到确认订单
+        height = self.view.frame.size.height-(TOP_BAR_HEIGHT)+HeightRate(10)-HeightRate(80);
+    }
+    myTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, TOP_BAR_HEIGHT, self.view.frame.size.width, height) style:UITableViewStyleGrouped];
+    myTableView.delegate = self;
+    myTableView.dataSource = self;
+    myTableView.showsVerticalScrollIndicator = NO;
+    myTableView.showsVerticalScrollIndicator = NO;
+    myTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    myTableView.estimatedSectionHeaderHeight =0;
+    myTableView.estimatedSectionFooterHeight = 0;
+    myTableView.sectionHeaderHeight= TableViewHeaderNone;
+    myTableView.estimatedRowHeight = 200;
+    
+    myTableView.backgroundColor = TextColor_F5F5F5;
+    [self.view addSubview:myTableView];
+    
+}
+-(void)getData{//
+    NSString *catagary = [[NSUserDefaults standardUserDefaults] objectForKey:USERSELECCATEGORY];
+    [[YHJsonRequest shared] getIncludetaxInvoiceManage:catagary SuccessBlock:^(NSDictionary *dic) {
+
+        NSString *isTax = dic[@"IsCheck"];
+        self.isCanInvoice = isTax;
+        if ([isTax isEqualToString:@"1"]) {
+            [self alertIsInvoice];
+
+        }else
+        {
+            CGFloat height;
+            if ([catagary isEqualToString:@"001-001"]) {
+                height = self.view.frame.size.height-(TOP_BAR_HEIGHT)-HeightRate(110);
+                isInvoice = YES ;
+
+            }else
+            {
+                height = self.view.frame.size.height-(TOP_BAR_HEIGHT)-HeightRate(80);
+
+            }
+           myTableView.frame = CGRectMake(0, TOP_BAR_HEIGHT, ScreenWidth, height);
+        }
+
+    } fialureBlock:^(NSString *errorMessages) {
+        [self.view makeToast:errorMessages duration:1 position:CSToastPositionCenter];
+
+    }];
+
+}
+- (void)configBottomView{
+    
+    [bottomView removeFromSuperview];
+    bottomView = [[UIView alloc]initWithFrame:CGRectZero];
+    bottomView.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:bottomView];
+    
+    CGFloat bottomH = _isNeedHideBottomView == false?([self.isCanInvoice isEqualToString:@"1"]?80:110):80;
+    [bottomView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(WidthRate(0));
+        make.right.mas_equalTo(WidthRate(0));
+        make.bottom.mas_equalTo(WidthRate(0));
+        make.height.mas_equalTo(HeightRate(bottomH));
+    }];
+    UILabel *line = [[UILabel alloc]init];
+    line.backgroundColor = SepratorLineColor;
+    [bottomView addSubview:line];
+    [line mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(0);
+        make.left.mas_equalTo(0);
+        make.right.mas_equalTo(0);
+        make.height.mas_equalTo(HeightRate(0.5));
+    }];
+
+    
+        NSString *catogory = [[NSUserDefaults standardUserDefaults] objectForKey:USERSELECCATEGORY];
+        CGFloat invoiceViewH;
+        if ([catogory isEqualToString:@"001-001"]) {
+             invoiceViewH = 60;
+            
+        }else
+        {
+             invoiceViewH = 30;
+
+        }
+    UIView * invoiceView = [[UIView alloc] init];
+    [bottomView addSubview:invoiceView];
+    [invoiceView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(0);
+        make.left.mas_equalTo(0);
+        make.right.mas_equalTo(0);
+        make.height.mas_equalTo(HeightRate(invoiceViewH));
+    }];
+        UIButton *invoiceBtn;
+        if ([catogory isEqualToString:@"001-001"]) {
+            [self getFootView:invoiceView byItem:line totalPrice:self.insurancePrice.doubleValue];
+            
+        }else
+        {
+    
+       invoiceBtn   = [UIButton buttonWithType:UIButtonTypeCustom];
+       [invoiceBtn setTitle:@"开票" forState:UIControlStateNormal];
+       [invoiceBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+       invoiceBtn.titleLabel.font = [UIFont systemFontOfSize:AdaptFont(14)];
+       [invoiceBtn addTarget:self action:@selector(isCanInvoiceButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+
+       [invoiceBtn setImage:[UIImage imageNamed:@"shopping_cart_select_no"] forState:UIControlStateNormal];
+       [invoiceBtn setImage:[UIImage imageNamed:@"shopping_cart_select_yes"] forState:UIControlStateSelected];
+       [invoiceView addSubview:invoiceBtn];
+       [invoiceBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(WidthRate(12));
+        make.top.mas_equalTo(0);
+        make.width.mas_equalTo(WidthRate(60));
+        make.height.mas_equalTo(HeightRate(30));
+        
+        }];
+  
+      NSString *tipStr = @"含增值税（我的订单申请开票）";
+       NSMutableAttributedString *tipAtt =[[NSMutableAttributedString alloc] initWithString:tipStr];
+      [tipAtt addAttribute:NSForegroundColorAttributeName value:ColorWithHexString(InputTextColor) range:NSMakeRange(4, tipStr.length-4)];
+      UILabel *tipLb = [[UILabel alloc] init];
+      tipLb.font = [UIFont systemFontOfSize:AdaptFont(12)];
+      tipLb.textColor = ColorWithHexString(SymbolTopColor);
+      tipLb.attributedText = tipAtt;
+      [invoiceView addSubview:tipLb];
+      [tipLb mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(invoiceBtn.mas_right).offset(WidthRate(0));
+        make.top.mas_equalTo(0);
+        make.height.mas_equalTo(WidthRate(30));
+      }];
+       
+    }
+    
+    
+    UILabel *line2 = [[UILabel alloc]init];
+    line2.backgroundColor = SepratorLineColor;
+    [bottomView addSubview:line2];
+    
+    [line2 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(invoiceView.mas_bottom).offset(0);
+        make.left.mas_equalTo(0);
+        make.right.mas_equalTo(0);
+        make.height.mas_equalTo(HeightRate(0.5));
+    }];
+    
+   
+    self.dicussBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.dicussBtn addTarget:self action:@selector(dicussBtnClick) forControlEvents:UIControlEventTouchUpInside];
+    self.dicussBtn.titleLabel.font = SYSTEM_FONT(AdaptFont(14));
+    [self.dicussBtn setBackgroundColor:ColorWithHexString(APP_THEME_MAIN_COLOR)];
+    [self.dicussBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [bottomView addSubview:self.dicussBtn];
+    
+    [self.dicussBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(0);
+        make.top.mas_equalTo(line2.mas_bottom).offset(0);
+        make.bottom.mas_equalTo(0);
+        make.width.mas_equalTo(WidthRate(115));
+        make.height.mas_equalTo(HeightRate(50));
+    }];
+    
+    if (![catogory isEqualToString: @"001-001"]) {
+        
+        if (self.isNeedHideBottomView == false) {
+            
+        
+        if ([self.isCanInvoice isEqualToString:@"1"] ) {
+            
+            if (isInvoice== YES) {
+                //含税的总价格
+                self.totalPrice = self.recordTotalFeeprice;
+                invoiceBtn.selected = YES;
+                
+            }else{//不含税的总价格
+                
+                self.totalPrice = self.recordTotalprice ;
+                invoiceBtn.selected = false;
+                
+            }
+            
+            [self.dicussBtn setTitle:@"合同洽谈" forState:UIControlStateNormal];
+            
+        }else{
+            
+            [self.dicussBtn setTitle:@"合同洽谈" forState:UIControlStateNormal];
+            
+            
+        }
+            
+        }
+    }else
+    {
+      
+        self.totalPrice =[NSString stringWithFormat:@"%@",[Tools getHaveNum:(self.recordTotalprice.doubleValue+floorNumber(self.insurancePrice.doubleValue*0.005))]]   ;
+
+        [self.dicussBtn setTitle:@"合同洽谈" forState:UIControlStateNormal];
+
+        
+    }
+    
+    self.totalLabel = [[UILabel alloc]initWithFrame:CGRectZero];
+    self.totalLabel.textColor = ColorWithHexString(APP_THEME_MAIN_COLOR);
+    self.totalLabel.font = SYSTEM_FONT(AdaptFont(16));
+    [bottomView addSubview:self.totalLabel];
+    
+    [self.totalLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(self.dicussBtn.mas_left).offset(-WidthRate(19));
+        make.centerY.mas_equalTo(self.dicussBtn.mas_centerY).offset(HeightRate(0));
+        make.height.mas_equalTo(HeightRate(25));
+    }];
+    
+    UILabel *label =[[UILabel alloc]initWithFrame:CGRectZero];
+    label.font = SYSTEM_FONT(AdaptFont(14));
+    label.text = @"合计：";
+    [bottomView addSubview:label];
+    
+    [label mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(self.totalLabel.mas_left).offset(0);
+        make.centerY.mas_equalTo(self.dicussBtn.mas_centerY).offset(HeightRate(0));
+        make.height.mas_equalTo(HeightRate(25));
+    }];
+    if (_isNeedHideBottomView ==  YES) {
+
+
+            NSString *category = [[NSUserDefaults standardUserDefaults] objectForKey:USERSELECCATEGORY];
+            BOOL isinsurance = [category isEqualToString:@"001-001"];
+            if (isinsurance == YES) {
+                self.dicussBtn.hidden = YES ;
+                [self.dicussBtn mas_updateConstraints:^(MASConstraintMaker *make) {
+                    make.width.mas_equalTo(0.01);
+                }];
+                self.totalPrice = [NSString stringWithFormat:@"%@",[Tools getHaveNum:(self.recordTotalprice.doubleValue +_recordInsuranceMoney.doubleValue)]];
+                [bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
+                    make.height.mas_equalTo(HeightRate(110));
+                    
+                }];
+                self.totalPrice =[NSString stringWithFormat:@"%@",[Tools getHaveNum:(self.recordTotalprice.doubleValue+floorNumber(self.insurancePrice.doubleValue*0.005))]]   ;
+            }else
+            {
+                if ([self.isCanInvoice isEqualToString:@"0"] ) {
+                    
+                    [bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.height.mas_equalTo(HeightRate(50));
+                        
+                    }];
+                    self.dicussBtn.hidden = YES ;
+                    invoiceView.hidden = YES;
+                    self.totalLabel.hidden = YES;
+                    label.hidden = YES;
+                    bottomView.hidden = YES;
+                    [invoiceView mas_updateConstraints:^(MASConstraintMaker *make) {
+                        make.height.mas_equalTo(0.01);
+                    }];
+                    
+
+
+
+                }else{
+                self.dicussBtn.hidden = YES ;
+                invoiceView.hidden = YES;
+                [self.dicussBtn mas_updateConstraints:^(MASConstraintMaker *make) {
+                    make.width.mas_equalTo(0.01);
+                }];
+                self.totalLabel.hidden = YES;
+                label.hidden =  YES;
+                line2.hidden = YES;
+                [bottomView mas_updateConstraints:^(MASConstraintMaker *make) {
+                    make.height.mas_equalTo(HeightRate(50));
+                    
+                }];
+                NSString *priceStr = [NSString stringWithFormat:@"增值税：¥%@",self.recordFeeprice];
+                NSString *priceTotalStr = [NSString stringWithFormat:@"合计：¥%@",self.totalPrice];
+                
+                NSMutableAttributedString *att = [[NSMutableAttributedString alloc] initWithString:priceStr];
+                NSMutableAttributedString *totalatt = [[NSMutableAttributedString alloc] initWithString:priceTotalStr];
+                [att addAttribute:NSForegroundColorAttributeName value:ColorWithHexString(SymbolTopColor) range:NSMakeRange(priceStr.length-self.recordFeeprice.length-1, self.recordFeeprice.length+1)];
+                [totalatt addAttribute:NSForegroundColorAttributeName value:ColorWithHexString(StandardBlueColor) range:NSMakeRange(priceTotalStr.length-self.totalPrice.length-1, self.totalPrice.length+1)];
+                
+                
+                UILabel *label =[[UILabel alloc]initWithFrame:CGRectZero];
+                label.font = SYSTEM_FONT(AdaptFont(14));
+                label.textColor = ColorWithHexString(InputTextColor);
+                
+                label.attributedText = att;
+                
+                [bottomView addSubview:label];
+                
+                [label mas_makeConstraints:^(MASConstraintMaker *make) {
+                    make.right.mas_equalTo(WidthRate(-10));
+                    make.top.mas_equalTo(WidthRate(0));
+                    make.height.mas_equalTo(HeightRate(30));
+                }];
+                UILabel *labelTotal =[[UILabel alloc]initWithFrame:CGRectZero];
+                labelTotal.font = SYSTEM_FONT(AdaptFont(14));
+                labelTotal.textColor = ColorWithHexString(InputTextColor);
+                
+                labelTotal.attributedText = totalatt;
+                [bottomView addSubview:labelTotal];
+                
+                [labelTotal mas_makeConstraints:^(MASConstraintMaker *make) {
+                    make.right.mas_equalTo(WidthRate(-10));
+                    make.bottom.mas_equalTo(-0);
+                    make.height.mas_equalTo(HeightRate(30));
+                }];
+                }
+            }
+        
+
+
+    }
+    
+    self.totalLabel.text = [NSString stringWithFormat:@"¥ %@",self.totalPrice];
+
+}
+#pragma mark === UITableViewDelegate & UITableViewDataSources
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    
+    return self.totalArr.count;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return 100;
+}
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return UITableViewAutomaticDimension;
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    YHShoppingCartConfirmCell *cell = nil;
+    if (!cell) {
+        cell = [[YHShoppingCartConfirmCell alloc]init];
+    }
+    YHShoppingCartModel *model = self.totalArr[indexPath.row];
+  
+    [cell setData:model];
+    return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section{
+    return HeightRate(75);
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
+
+
+    return HeightRate(0.01);
+}
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section{
+    
+    
+    CGFloat bavkviewHeight = 78;
+    
+    double price = 0.00;
+    NSInteger number = 0;
+    NSArray *array = self.selectArray[section];
+    NSString *taxTips = @"";
+        for (YHShoppingCartModel *model in array) {
+            price = price + model.GoodsNumber.integerValue*round([model.GoodsPrice doubleValue]*100)/100;
+            number = number + model.GoodsNumber.integerValue;
+            taxTips = model.GoodsAddValue;
+
+    }
+    NSString *catagory = [[NSUserDefaults standardUserDefaults] objectForKey:USERSELECCATEGORY];
+    if ([catagory isEqualToString:@"001-001"]) {
+        taxTips =@"（含增值税，不含运费)";
+    }else{
+    }
+    YHShoppingCartModel *model = array[0];
+    model.totalPrice =[NSString stringWithFormat:@"¥%.2f",price];
+    UIView *backView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, ScreenWidth, HeightRate(bavkviewHeight))];
+    backView.backgroundColor = [UIColor whiteColor];
+    
+    UILabel *labelPrice = [[UILabel alloc]initWithFrame:CGRectMake(WidthRate(0), 0, ScreenWidth-WidthRate(5), HeightRate(48))];
+    labelPrice.backgroundColor = [UIColor whiteColor];
+    labelPrice.text = [NSString stringWithFormat:@"¥%@",self.recordTotalprice];
+    labelPrice.textAlignment = NSTextAlignmentRight;
+    labelPrice.font = SYSTEM_FONT(AdaptFont(15));
+    labelPrice.textColor = ColorWithHexString(APP_THEME_MAIN_COLOR);
+    [backView addSubview:labelPrice];
+    
+    [labelPrice mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(WidthRate(-6));
+        make.top.mas_equalTo(HeightRate(8));
+        make.height.mas_equalTo(HeightRate(30));
+    }];
+    
+    UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(WidthRate(0), 0, ScreenWidth-WidthRate(5), HeightRate(48))];
+    label.backgroundColor = [UIColor whiteColor];
+    label.text = [NSString stringWithFormat:@"共%ld件商品     合计：",(long)self.recordNum];
+    label.textAlignment = NSTextAlignmentRight;
+    label.font = SYSTEM_FONT(AdaptFont(12));
+    [backView addSubview:label];
+    
+    [label mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(labelPrice.mas_left);
+        make.top.mas_equalTo(HeightRate(8));
+        make.height.mas_equalTo(HeightRate(30));
+    }];
+    
+    UILabel *freight = [[UILabel alloc] init];
+    freight.textColor = ColorWithHexString(BASE_LINE_COLOR);
+    freight.translatesAutoresizingMaskIntoConstraints = NO;
+    freight.text = taxTips;
+    freight.textColor = ColorWithHexString(SymbolTopColor);
+
+    freight.font =[UIFont systemFontOfSize:AdaptFont(13)];
+    [backView addSubview:freight];
+    
+    [freight mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(WidthRate(-6));
+        make.top.mas_equalTo(HeightRate(34));
+        make.height.mas_equalTo(HeightRate(30));
+    }];
+    
+    UILabel *line = [[UILabel alloc] init];
+    line.backgroundColor = SepratorLineColor;
+    [backView addSubview:line];
+    [line mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(WidthRate(0));
+        make.height.mas_equalTo(HeightRate(1));
+        make.width.mas_equalTo(ScreenWidth);
+        make.top.mas_equalTo(freight.mas_bottom).offset(HeightRate(10));
+    }];
+   
+    return backView;
+}
+
+
+#pragma mark---button click
+-(void)isCanInvoiceButtonClick:(UIButton *)button{
+    button.selected = !button.selected;
+    isInvoice = button.selected;
+    if (isInvoice== YES) {
+        self.totalPrice = self.recordTotalFeeprice;
+        
+    }else{
+        self.totalPrice = self.recordTotalprice;
+        
+    }
+    self.totalLabel.text = [NSString stringWithFormat:@"¥ %@",self.totalPrice];
+
+}
+-(void)selectButtonClick:(UIButton *)button
+{
+    NSInteger row = button.tag-2000;
+    for ( int i=0;i< self.groupArr.count;i++) {
+        teamModel *model = self.groupArr[i];
+        if (row==i) {
+            model.isSelect = YES;
+        }else
+        {
+            model.isSelect = NO;
+        }
+        
+    }
+    
+    [myTableView reloadData];
+    
+    
+}
+- (void)dicussBtnClick{
+    [MobClick event:@"ContractNegotiation" label:@"合同洽谈"];
+    NSMutableArray *addArr = [NSMutableArray array];
+    NSMutableArray *addModelArr = [NSMutableArray array];
+    NSMutableArray *addKeysdicArr = [NSMutableArray array];
+    NSInteger num=0;
+    for (NSArray *class in self.selectArray) {
+        for (YHShoppingCartModel *item in class) {
+            if (item.isSelect == YES) {
+                [addArr addObject:item.OrderNo];
+                [addModelArr addObject:item];
+            }
+            
+            num  = num + item.GoodsNumber.intValue;
+            
+        }
+    }
+    for (NSArray *class in self.selectArray) {
+        for (YHShoppingCartModel *item in class) {
+          
+            item.totalNumber = num;
+            item.totalPrice = self.totalPrice;
+            
+        }
+        
+    }
+    for (NSArray *resultArr in self.selectArray) {
+        NSMutableArray *dictttt = [NSMutableArray array];
+        dictttt =  [YHShoppingCartModel mj_keyValuesArrayWithObjectArray:resultArr];
+        [addKeysdicArr addObject:dictttt];
+    }
+    
+    NSMutableArray *firstArr = addKeysdicArr[0];
+     NSMutableArray *arrM3 = [NSMutableArray arrayWithArray:firstArr];
+    for (int i= 1; i < addKeysdicArr.count; i ++) {
+        NSArray *secondArr = addKeysdicArr[i];
+      [arrM3 addObjectsFromArray:secondArr];
+    }
+    
+    NSString *catogory = [[NSUserDefaults standardUserDefaults] objectForKey:USERSELECCATEGORY];
+    NSString * price;
+    if ([catogory isEqualToString:@"001-001"]) {
+        price = self.recordInsuranceMoney;
+        
+    }else
+    {
+        price = @"0";
+        self.recordInsuranceMoney = @"0";
+    }
+    NSString *invoice  =[NSString stringWithFormat:@"%d",isInvoice];
+    NSDictionary *dic = @{@"OrderNo":addArr,@"GroupId":groupID,@"IsIncludeTax":invoice,@"InsurdAmount":self.recordInsuranceMoney};//InsurdAmount 保额
+    [self.view showWait:@"合同生成中..." viewType:CurrentView];
+    
+   
+    [[YHJsonRequest shared] makeShoppingCartOderParams:dic SuccessBlock:^(NSDictionary *successMessage) {
+        [self.view hideWait:CurrentView];
+        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Chat" bundle:nil];
+        ChatNewViewController *vc = [storyboard instantiateViewControllerWithIdentifier:@"Chat"];
+        vc.isFromCartConfirm = YES;
+        if ([successMessage objectForKey:@"OrderNo"]) {
+            vc.contractNo = [successMessage objectForKey:@"OrderNo"];
+        }
+      
+        NSString *jsonstr = [@{@"Data":arrM3,@"Contract":successMessage[@"OrderNo"],@"totalNumber":@(num),@"totalPrice":self.totalPrice,@"IsIncludeTax":invoice,@"InsurdAmount":price} mj_JSONString];
+        if (successMessage.count>2) {
+            vc.serversID = successMessage[@"ServiceId"];
+
+        }
+        vc.isPostOrder = true;
+        vc.orderArray = self.selectArray;
+        vc.jsonStr = jsonstr;
+        vc.hidesBottomBarWhenPushed = YES;
+
+        [self.navigationController pushViewController:vc animated:YES];
+        
+    } fialureBlock:^(NSString *errorMessages) {
+
+        [self.view hideWait:CurrentView];
+        [self.view makeToast:errorMessages duration:1 position:CSToastPositionCenter];
+
+    }];
+}
+
+-(void)alertIsInvoice
+{
+
+    alertshop = [[YHShopAlertView alloc] initWithShoppingCartprice:_totalPrice pirceFee:self.recordFeeprice pirceTotalFee:self.recordTotalFeeprice];
+    [alertshop.sureBtn addTarget:self action:@selector(rightSureBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+    [alertshop.falseBtn addTarget:self action:@selector(rightSureBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+
+    [alertshop showAnimated];
+}
+
+
+-(void)rightSureBtnClick:(UIButton *)button
+{
+    [alertshop closeAnimated];
+    
+    isInvoice =[button.currentTitle isEqualToString:@"是"];
+    [self configBottomView];
+  
+    
+}
+-(UILabel *)getItem:(UIView *)item ByItem:(id)byitem topSpace:(CGFloat)topspace lableTitle:( NSString*)title titleColor:(NSString *)titlecolor price:(NSString *)price priceColor:(NSString *)priceColor
+{
+    UILabel *lable = [[UILabel alloc] init];
+    lable.translatesAutoresizingMaskIntoConstraints = NO;
+    lable.text  =  title;
+    lable.font = [UIFont systemFontOfSize:AdaptFont(14)];
+    lable.textColor = ColorWithHexString(titlecolor);
+    [item addSubview:lable];
+    [lable PSSetSize:WidthRate(135) Height:HeightRate(35)];
+    [lable PSSetLeft:WidthRate(40)];
+    [lable PSSetBottomAtItem:byitem Length:HeightRate(topspace)];
+
+    
+    UILabel *lable1 = [[UILabel alloc] init];
+    lable1.translatesAutoresizingMaskIntoConstraints = NO;
+    lable1.text  =  price;
+    lable1.textAlignment = NSTextAlignmentRight;
+    lable1.font = [UIFont systemFontOfSize:AdaptFont(14)];
+    lable1.textColor = ColorWithHexString(priceColor);
+    [item addSubview:lable1];
+    [lable1 PSSetSize:WidthRate(135) Height:HeightRate(35)];
+    [lable1 PSSetCenterHorizontalAtItem:lable];
+    [lable1 PSSetRight:WidthRate(40)];
+    if ([title isEqualToString:@"增值税:"]) {
+        UILabel *lineLable = [[UILabel alloc] init];
+        lineLable.translatesAutoresizingMaskIntoConstraints = NO;
+        lineLable.backgroundColor = SepratorLineColor;
+        [item addSubview:lineLable];
+        [lineLable PSSetLeft:WidthRate(40)];
+        [lineLable PSSetRight:WidthRate(40)];
+        [lineLable PSSetHeight:HeightRate(1)];
+        [lineLable PSSetBottomAtItem:lable1 Length:2];
+    }
+    
+    
+    return lable;
+    
+}
+
+-(void)getFootView:(UIView *)footView byItem:(UILabel *)item totalPrice:(CGFloat)price
+{
+    UIButton *leftTipImage = [[UIButton alloc] init];
+    [leftTipImage setImage:[UIImage imageNamed:@"bangzhu1"] forState:UIControlStateNormal];
+    [leftTipImage addTarget:self action:@selector(nextVC) forControlEvents:UIControlEventTouchUpInside];
+    [footView addSubview:leftTipImage];
+    [leftTipImage mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(WidthRate(10));
+        make.height.mas_equalTo(HeightRate(40));
+        make.width.mas_equalTo(WidthRate(34));
+        make.top.mas_equalTo(item.mas_bottom).offset(HeightRate(5));
+    }];
+    
+    
+    UIButton *addInsuranceBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    addInsuranceBtn.layer.borderWidth = 1;
+    addInsuranceBtn.layer.borderColor =ColorWithHexString(StandardBlueColor).CGColor;
+    [addInsuranceBtn setTitleColor:ColorWithHexString(@"999999") forState:UIControlStateNormal];
+    addInsuranceBtn.layer.masksToBounds = YES;
+    addInsuranceBtn.layer.cornerRadius = HeightRate(15);
+    addInsuranceBtn.titleLabel.font = [UIFont systemFontOfSize:AdaptFont(13)];
+    [addInsuranceBtn setTitle:@"增加投保额" forState:UIControlStateNormal];
+    [addInsuranceBtn addTarget:self action:@selector(addInsuranceBtnClick) forControlEvents:UIControlEventTouchUpInside];
+    [footView addSubview:addInsuranceBtn];
+    [addInsuranceBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(WidthRate(-10));
+        make.height.mas_equalTo(HeightRate(30));
+        make.top.mas_equalTo(item.mas_bottom).offset(HeightRate(5));
+        make.width.mas_equalTo(WidthRate(100));
+        
+    }];
+    
+    UILabel *insureFee = [[UILabel alloc] init];
+    insureFee.textColor = ColorWithHexString(@"5792F0") ;
+//    [Tools getHaveNum:(price*0.005)]
+    insureFee.text = [NSString stringWithFormat:@"人保保费0.5%%：¥%.2lf",floorNumber(price*0.005)];
+    insureFee.font = [UIFont systemFontOfSize:AdaptFont(13)];
+    insureFee.textAlignment = NSTextAlignmentRight;
+    [footView addSubview:insureFee];
+    [insureFee mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(addInsuranceBtn.mas_left).offset(WidthRate(-10));
+        make.height.mas_equalTo(HeightRate(40));
+        //        make.width.mas_equalTo(WidthRate(15));
+        make.centerY.mas_equalTo(addInsuranceBtn.mas_centerY).offset(HeightRate(0));
+    }];
+    self.insuranceFeeLabel = insureFee;
+    
+    if (_isNeedHideBottomView  == YES) {
+        addInsuranceBtn.hidden = YES;
+    }
+    
+    UILabel *tipLable = [[UILabel alloc] init];
+    tipLable.textColor = ColorWithHexString(SymbolTopColor) ;
+    tipLable.text = @"(由易智造代收代付)";
+    tipLable.font = [UIFont systemFontOfSize:AdaptFont(12)];
+    
+    [footView addSubview:tipLable];
+    [tipLable mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(WidthRate(-10));
+        make.height.mas_equalTo(HeightRate(20));
+        //        make.width.mas_equalTo(WidthRate(15));
+        make.top.mas_equalTo(addInsuranceBtn.mas_bottom).offset(HeightRate(2));
+    }];
+    
+    UILabel *insureMoney = [[UILabel alloc] init];
+    insureMoney.textColor = ColorWithHexString(@"999999") ;
+    insureMoney.text = [NSString stringWithFormat:@"投保金额：¥%@",[Tools getHaveNum:(price)]];
+    insureMoney.font = [UIFont systemFontOfSize:AdaptFont(12)];
+    insureMoney.textAlignment = NSTextAlignmentRight;
+    [footView addSubview:insureMoney];
+    [insureMoney mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(tipLable.mas_left).offset(WidthRate(-5));
+        make.height.mas_equalTo(HeightRate(20));
+        make.top.mas_equalTo(addInsuranceBtn.mas_bottom).offset(HeightRate(2));
+    }];
+    self.insuranceMoneyLabel = insureMoney;
+    
+    self.recordInsuranceMoney = [Tools getHaveNum:(price)];
+}
+
+-(void)nextVC
+{
+    YHInsuranceSeviceViewController *insurance = [[YHInsuranceSeviceViewController alloc] init];
+    insurance.hidesBottomBarWhenPushed = YES;
+    [self.navigationController  pushViewController:insurance animated:YES];
+    
+}
+-(void)addInsuranceBtnClick
+{
+    YHShoppingInsranceViewController *vc = [[YHShoppingInsranceViewController alloc] init];
+    vc.myInsurance = ^(NSString *myinsurancefee, NSString *myinsuranceMoney) {
+ 
+        _recordInsuranceMoney = myinsuranceMoney;
+        _insuranceFeeLabel.text =myinsurancefee;
+        _insuranceMoneyLabel.text = [NSString stringWithFormat:@"投保金额：%@",[Tools getHaveNum:(myinsuranceMoney.doubleValue)]];;
+        _totalPrice =[NSString stringWithFormat:@"%@",[Tools getHaveNum:(self.recordTotalprice.doubleValue+floorNumber(myinsuranceMoney.doubleValue*0.005))]];
+
+        _totalLabel.text = _totalPrice;
+    };
+    vc.totalPrice = self.recordTotalprice;
+    vc.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

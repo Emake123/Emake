@@ -1,0 +1,670 @@
+//
+//  AppDelegate.m
+//  emake
+//
+//  Created by chenyi on 2017/7/11.
+//  Copyright © 2017年 emake. All rights reserved.
+//
+#import "AppDelegate.h"
+#import "YHLoginViewController.h"
+#import "YHTabBarViewController.h"
+#import <ShareSDK/ShareSDK.h>
+#import <ShareSDKConnector/ShareSDKConnector.h>
+#import <CloudPushSDK/CloudPushSDK.h>
+#import <UserNotifications/UserNotifications.h>
+#import "WXApi.h"
+#import <TencentOpenAPI/TencentOAuth.h>
+#import <TencentOpenAPI/QQApiInterface.h>
+#import "YHMQTTClient.h"
+#import <UMMobClick/MobClick.h>
+#import "YHCertificationStateOriginalViewController.h"
+#import "YHCertificationStateViewController.h"
+#import "YHOrderManageNewViewController.h"
+#import "YHShoppingCartNewViewController.h"
+#import "ChatNewViewController.h"
+#import "YHSendFileTipsView.h"
+#import "YHGuidePageViewController.h"
+#import <Bugly/Bugly.h>
+static NSString *lastTime;
+@interface AppDelegate ()<UITabBarControllerDelegate,YHSendFileTipsViewDelegete,UNUserNotificationCenterDelegate>{
+    // iOS 10通知中心
+    UNUserNotificationCenter *_notificationCenter;
+    NSTimer *_timer;
+    int aa;
+    __block UIBackgroundTaskIdentifier _backIden;
+}
+@end
+
+@implementation AppDelegate
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+ 
+    //注册通知
+    [[JZUserNotification sharedNotification] registerNotification];
+    
+    //监测网络连接状态
+    [[YHAFNetWorkingRequset sharedRequset] monitorNetworkStatus];
+    
+    //shareSDK
+    [self registerShareSDK];
+    
+    //友盟统计
+    UMConfigInstance.appKey = UMMobClikAPPKey;
+    UMConfigInstance.channelId = @"App Store";
+    [MobClick startWithConfigure:UMConfigInstance];
+    
+    //Bugly
+    [Bugly startWithAppId:EmakeAppleID];
+    
+    
+    /*----------   阿里Push  -----------*/
+    // APNs注册，获取deviceToken并上报
+    [self registerAPNS:application];
+    // 初始化SDK
+    [self initALIPushSDK];
+    // 监听推送通道打开动作
+    [self listenerOnChannelOpened];
+    // 监听推送消息到达
+    [self registerMessageReceive];
+    [CloudPushSDK sendNotificationAck:launchOptions];
+    
+    //MQTT
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERID]) {
+        NSString *ClientId = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERID];
+        NSString *topic = [NSString stringWithFormat:@"user/%@",ClientId];
+        [[YHMQTTClient sharedClient] connectToHost:MQTT_IP Port:MQTT_PORT ClientId:topic andSubcriceTopic:topic];
+    }
+    NSInteger EventCount = [[NSUserDefaults standardUserDefaults] integerForKey:APPTerminatedEventCount];
+    [YHMQTTClient sharedClient].EventCount = EventCount;
+    NSInteger messageCount = [[NSUserDefaults standardUserDefaults] integerForKey:APPTerminatedMessageCount];
+    [YHMQTTClient sharedClient].MessageCount = messageCount;
+    
+    
+    //注册通知 阿里云消息推送
+    [[JZUserNotification sharedNotification] registerNotification];
+    
+    /*----------    分割线    -----------*/
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window.backgroundColor = [UIColor whiteColor];
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:ISFRISTLOGIN]) {
+        YHGuidePageViewController *vc = [[YHGuidePageViewController alloc]init];
+        vc.block = ^{
+            YHTabBarViewController *tab = [[YHTabBarViewController alloc] init];
+            tab.delegate = self;
+            self.window.rootViewController = tab;
+        };
+        self.window.rootViewController = vc;
+    }else{
+        YHTabBarViewController *tab = [[YHTabBarViewController alloc] init];
+        tab.delegate = self;
+        self.window.rootViewController = tab;
+    }
+    [self.window makeKeyAndVisible];
+    return YES;
+}
+- (void)applicationWillResignActive:(UIApplication *)application {
+    
+    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
+    // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
+    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+    
+    [self beginTask];
+    aa =0;
+    _timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(go:) userInfo:nil repeats:YES];
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+    // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    
+    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+//    [self getAppVersion];
+}
+- (void)applicationWillTerminate:(UIApplication *)application {
+    
+    // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    //app中断消息个数存储
+    NSInteger messageCount = [YHMQTTClient sharedClient].MessageCount;
+    NSInteger EventCount = [YHMQTTClient sharedClient].EventCount;
+    [[NSUserDefaults standardUserDefaults] setInteger:messageCount forKey:APPTerminatedMessageCount];
+    [[NSUserDefaults standardUserDefaults] setInteger:EventCount forKey:APPTerminatedEventCount];
+}
+// 禁止横屏
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+    
+    return UIInterfaceOrientationMaskPortrait;
+    
+}
+//scheme打开APP调用
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+    if ([url.absoluteString containsString:@"emakeNice"]) {
+        NSArray * array = [url.absoluteString componentsSeparatedByString:@"?"];
+        if (array[0]) {
+            NSArray * items = [array[1] componentsSeparatedByString:@"="];
+            YHLoginViewController *loginViewController = [[YHLoginViewController alloc] init];
+            loginViewController.phoneNumberFromWeb = url.absoluteString;
+            [[NSUserDefaults standardUserDefaults] setObject:items[1] forKey:LOGIN_MOBILEPHONE];
+            self.window.rootViewController = loginViewController;
+        }
+    }
+    if (self.window) {
+        if (url) {
+            
+          NSString *  phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
+          BOOL isValide =  [NSDate isValideTimeDifferenceWithLastLoginTime:[[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_TIME] currentLoginTime:[NSDate getCurrentTime] ValidTime:LOGIN_VALID];
+            if (isValide == NO && phone.length > 0) {
+                    YHLoginViewController *loginViewController = [[YHLoginViewController alloc] init];
+                    loginViewController.navigationController.navigationBarHidden = YES;
+                    loginViewController.hidesBottomBarWhenPushed =YES;
+                    [[Tools currentNavigationController] pushViewController:loginViewController animated:YES];
+
+            }else
+            {
+            NSString *messageIdString = [[NSUUID UUID] UUIDString];
+            NSString *fileNameStr = [url lastPathComponent];
+            NSString *fileNameTotal = [NSString stringWithFormat:@"%@_%@",messageIdString,fileNameStr];
+            if (![[NSFileManager defaultManager] fileExistsAtPath:[Tools getPath:fileNameTotal]]) {
+                NSData *data = [NSData dataWithContentsOfURL:url];
+                if (data.bytes>0&&data) {
+                    BOOL isSuccess = [data writeToFile:[Tools getPath:fileNameTotal] atomically:YES];
+                    if (isSuccess) {
+                        NSLog(@"写入成功");
+                    }else{
+                        NSLog(@"写入失败");
+                    }
+                }
+            }
+            
+                if (fileNameStr.length > 0) {
+                    
+                    YHSendFileTipsView *FileTipsView = [[YHSendFileTipsView alloc] initWithDelegete:self andFileurl:url.absoluteString andFileName:fileNameStr];
+                    
+                    [FileTipsView showAnimated];
+                    
+                }
+            }
+        }
+    }
+    return YES;
+}
+// NOTE:9.0以后使用新API接口
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<NSString*, id> *)options
+{
+    if ([url.absoluteString containsString:@"emakeNice"]) {
+        NSArray * array = [url.absoluteString componentsSeparatedByString:@"?"];
+        if (array[0]) {
+            NSArray * items = [array[1] componentsSeparatedByString:@"="];
+            YHLoginViewController *loginViewController = [[YHLoginViewController alloc] init];
+            loginViewController.phoneNumberFromWeb = url.absoluteString;
+            [[NSUserDefaults standardUserDefaults] setObject:items[1] forKey:LOGIN_MOBILEPHONE];
+            self.window.rootViewController = loginViewController;
+        }
+    }
+    if (self.window) {
+        if (url) {
+            
+            NSString *  phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
+            BOOL isValide =  [NSDate isValideTimeDifferenceWithLastLoginTime:[[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_TIME] currentLoginTime:[NSDate getCurrentTime] ValidTime:LOGIN_VALID];
+            if (isValide == NO && phone.length <= 0) {
+                YHLoginViewController *loginViewController = [[YHLoginViewController alloc] init];
+                loginViewController.navigationController.navigationBarHidden = YES;
+                loginViewController.hidesBottomBarWhenPushed =YES;
+                [[Tools currentNavigationController] pushViewController:loginViewController animated:YES];
+                
+            }else{
+                NSString *messageIdString = [[NSUUID UUID] UUIDString];
+                NSString *fileNameStr = [url lastPathComponent];
+                NSString *fileNameTotal = [NSString stringWithFormat:@"%@_%@",messageIdString,fileNameStr];
+                if (![[NSFileManager defaultManager] fileExistsAtPath:[Tools getPath:fileNameTotal]]) {
+                    NSData *data = [NSData dataWithContentsOfURL:url];
+                    if (data.bytes>0&&data) {
+                        BOOL isSuccess = [data writeToFile:[Tools getPath:fileNameTotal] atomically:YES];
+                        if (isSuccess) {
+                            NSLog(@"写入成功");
+                        }else{
+                            NSLog(@"写入失败");
+                        }
+                    }
+                }
+                if (fileNameStr.length > 0) {
+                    YHSendFileTipsView *FileTipsView = [[YHSendFileTipsView alloc] initWithDelegete:self andFileurl:url.absoluteString andFileName:fileNameStr];
+                    [FileTipsView showAnimated];
+                }
+        
+            }
+        }
+    }
+    return YES;
+}
+#pragma mark----- ShareSDK
+-(void)registerShareSDK{
+    [ShareSDK registerActivePlatforms:@[@(SSDKPlatformTypeQQ),@(SSDKPlatformTypeWechat)] onImport:^(SSDKPlatformType platformType){
+        switch (platformType) {
+            case SSDKPlatformTypeWechat:
+                [ShareSDKConnector connectWeChat:[WXApi class]];
+                break;
+            case SSDKPlatformTypeQQ:
+                [ShareSDKConnector connectQQ:[QQApiInterface class] tencentOAuthClass:[TencentOAuth class]];
+                break;
+            default:
+                break;
+        }
+    } onConfiguration:^(SSDKPlatformType platformType, NSMutableDictionary *appInfo) {
+        switch (platformType) {
+            case SSDKPlatformTypeQQ:
+                [appInfo SSDKSetupQQByAppId:SharedSDKQQAppId appKey:SharedSDKQQAppKey authType:SSDKAuthTypeBoth];
+                break;
+            case SSDKPlatformTypeWechat:
+                [appInfo SSDKSetupWeChatByAppId:SharedSDKWeiXinAppId appSecret:SharedSDKWeiXinAppKey];
+                break;
+            default:
+                break;
+        }
+    }];
+}
+
+#pragma mark-------UITabBarControllerDelegate
+//是否允许选择不同item触发后续操作，YES  允许，NO不允许
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController{
+    NSArray *array = tabBarController.viewControllers;
+    if ([array indexOfObject:viewController] == 1 ||[array indexOfObject:viewController] == 2 ||[array indexOfObject:viewController] == 3){
+         NSString * phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
+         if([array indexOfObject:viewController] == 1)
+        {
+          [MobClick event:@"todayPrice" label:@"当日售价"];
+ 
+        }
+        if (phone.length<=0) {
+            YHLoginViewController *loginViewController = [[YHLoginViewController alloc] init];
+            loginViewController.navigationController.navigationBarHidden = YES;
+            loginViewController.hidesBottomBarWhenPushed =YES;
+            loginViewController.hidesBottomBarWhenPushed = YES;
+            [[Tools currentNavigationController] pushViewController:loginViewController animated:YES];
+            return NO;
+        }
+        NSString *state =  [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERCARDSTATE];
+        if ([state isEqualToString:@"3"]){
+            //判断点击tabbar让购物车，订单类的导航的返回按钮隐藏
+            if (viewController.childViewControllers.count>0) {
+                UIViewController *vc = viewController.childViewControllers.firstObject;
+                if([vc isKindOfClass:[YHOrderManageNewViewController class]]){
+                    
+                    YHOrderManageNewViewController *order = (YHOrderManageNewViewController *)vc;
+                    order.isShowLeftButton = YES;
+                }
+                if([vc isKindOfClass:[YHShoppingCartNewViewController class]]){
+                    
+                    YHShoppingCartNewViewController *shop = (YHShoppingCartNewViewController *)vc;
+                    shop.isShowLeftButton = NO;
+                }
+            }
+            return true;
+        }else if ([state isEqualToString:@"2"]){
+            NSString *timeStr = [[NSUserDefaults standardUserDefaults] objectForKey:USERSTATECommitDate];
+            YHCertificationStateViewController *vc = [[YHCertificationStateViewController alloc] init];
+            vc.successDate = timeStr;
+            vc.hidesBottomBarWhenPushed = YES;
+            [[Tools currentNavigationController] pushViewController:vc animated:YES];
+            return false;
+        }else if ([state isEqualToString:@"4"]){
+          NSString *resason =  [[NSUserDefaults standardUserDefaults] objectForKey:USERSTATEFailReason];
+            YHCertificationStateViewController *vc = [[YHCertificationStateViewController alloc] init];
+            vc.failReason = resason;
+            vc.hidesBottomBarWhenPushed = YES;
+            [[Tools currentNavigationController] pushViewController:vc animated:YES];
+            return false;
+        } else {
+            YHCertificationStateOriginalViewController *vc = [[YHCertificationStateOriginalViewController alloc] init];
+            vc.hidesBottomBarWhenPushed = YES;
+            [[Tools currentNavigationController] pushViewController:vc animated:YES];
+            return false;
+        }
+    }else{
+        //判断点击tabbar让购物车，订单类的导航的返回按钮隐藏
+        if (viewController.childViewControllers.count>0) {
+            UIViewController *vc = viewController.childViewControllers.firstObject;
+            if([vc isKindOfClass:[YHOrderManageNewViewController class]]){
+                YHOrderManageNewViewController *order = (YHOrderManageNewViewController *)vc;
+                order.isShowLeftButton = YES;
+            }
+            if([vc isKindOfClass:[YHShoppingCartNewViewController class]]){
+                YHShoppingCartNewViewController *shop = (YHShoppingCartNewViewController *)vc;
+                shop.isShowLeftButton = NO;
+            }
+        }
+        return true;
+    }
+    return YES;
+}
+
+
+#pragma mark----- 推送
+- (void)registerAPNS:(UIApplication *)application {
+    float systemVersionNum = [[[UIDevice currentDevice] systemVersion] floatValue];
+    if (systemVersionNum >= 10.0) {
+        // iOS 10 notifications
+        _notificationCenter = [UNUserNotificationCenter currentNotificationCenter];
+        // 创建category，并注册到通知中心
+        [self createCustomNotificationCategory];
+        _notificationCenter.delegate = self;
+        // 请求推送权限
+        [_notificationCenter requestAuthorizationWithOptions:UNAuthorizationOptionAlert | UNAuthorizationOptionBadge | UNAuthorizationOptionSound completionHandler:^(BOOL granted, NSError * _Nullable error) {
+            if (granted) {
+                // granted
+                NSLog(@"User authored notification.");
+                // 向APNs注册，获取deviceToken
+                //                [application registerForRemoteNotifications];
+            } else {
+                // not granted
+                NSLog(@"User denied notification.");
+            }
+        }];
+    } else if (systemVersionNum >= 8.0) {
+        // iOS 8 Notifications
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
+        [application registerUserNotificationSettings:
+         [UIUserNotificationSettings settingsForTypes:
+          (UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge)
+                                           categories:nil]];
+        [application registerForRemoteNotifications];
+#pragma clang diagnostic pop
+    } else {
+        // iOS < 8 Notifications
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored"-Wdeprecated-declarations"
+        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
+         (UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound)];
+#pragma clang diagnostic pop
+    }
+}
+/**
+ *  主动获取设备通知是否授权(iOS 10+)
+ */
+- (void)getNotificationSettingStatus{
+    
+    [_notificationCenter getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
+        if (settings.authorizationStatus == UNAuthorizationStatusAuthorized) {
+            NSLog(@"User authed.");
+        } else {
+            NSLog(@"User denied.");
+        }
+    }];
+}
+/*
+ *  APNs注册成功回调，将返回的deviceToken上传到CloudPush服务器
+ */
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    NSLog(@"Upload deviceToken to CloudPush server.");
+    //自定义通知。将deviceToken发送给后台
+    [CloudPushSDK registerDevice:deviceToken withCallback:^(CloudPushCallbackResult *res) {
+        if (res.success) {
+            NSLog(@"Register deviceToken success, deviceToken: %@", [CloudPushSDK getApnsDeviceToken]);
+        } else {
+            NSLog(@"Register deviceToken failed, error: %@", res.error);
+        }
+    }];
+}
+/*
+ *  APNs注册失败回调
+ */
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+    
+    NSLog(@"didFailToRegisterForRemoteNotificationsWithError %@", error);
+}
+/**
+ *  创建并注册通知category(iOS 10+)
+ */
+- (void)createCustomNotificationCategory {
+    // 自定义`action1`和`action2`
+    UNNotificationAction *action1 = [UNNotificationAction actionWithIdentifier:@"action1" title:@"test1" options: UNNotificationActionOptionNone];
+    UNNotificationAction *action2 = [UNNotificationAction actionWithIdentifier:@"action2" title:@"test2" options: UNNotificationActionOptionNone];
+    // 创建id为`test_category`的category，并注册两个action到category
+    // UNNotificationCategoryOptionCustomDismissAction表明可以触发通知的dismiss回调
+    UNNotificationCategory *category = [UNNotificationCategory categoryWithIdentifier:@"test_category" actions:@[action1, action2] intentIdentifiers:@[] options:
+                                        UNNotificationCategoryOptionCustomDismissAction];
+    // 注册category到通知中心
+    [_notificationCenter setNotificationCategories:[NSSet setWithObjects:category, nil]];
+}
+/**
+ *  处理iOS 10通知(iOS 10+)
+ */
+- (void)handleiOS10Notification:(UNNotification *)notification {
+    UNNotificationRequest *request = notification.request;
+    UNNotificationContent *content = request.content;
+    NSDictionary *userInfo = content.userInfo;
+    // 通知时间
+    NSDate *noticeDate = notification.date;
+    // 标题
+    NSString *title = content.title;
+    // 副标题
+    NSString *subtitle = content.subtitle;
+    // 内容
+    NSString *body = content.body;
+    // 角标
+    int badge = [content.badge intValue];
+    // 取得通知自定义字段内容，例：获取key为"Extras"的内容
+    NSString *extras = [userInfo valueForKey:@"Extras"];
+    // 通知打开回执上报
+    [CloudPushSDK sendNotificationAck:userInfo];
+    
+
+    UNTimeIntervalNotificationTrigger *trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:0.1 repeats:NO];
+    
+//    UNNotificationRequest *request1 = [UNNotificationRequest requestWithIdentifier:[Tools getCurrentTimeInterval] content:content trigger:trigger];
+    
+    [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+        NSLog(@"添加推送 : %@", error ? [NSString stringWithFormat:@"error : %@", error] : @"success");
+    }];
+    NSLog(@"Notification, date: %@, title: %@, subtitle: %@, body: %@, badge: %d, extras: %@.", noticeDate, title, subtitle, body, badge, extras);
+}
+/**
+ *  App处于前台时收到通知(iOS 10+)
+ */
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
+    NSLog(@"Receive a notification in foregound.");
+    // 处理iOS 10通知，并上报通知打开回执
+    [self handleiOS10Notification:notification];
+    // 通知不弹出
+    completionHandler(UNNotificationPresentationOptionNone);
+    
+    // 通知弹出，且带有声音、内容和角标
+    //completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
+}
+/**
+ *  触发通知动作时回调，比如点击、删除通知和点击自定义action(iOS 10+)
+ */
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
+    NSString *userAction = response.actionIdentifier;
+    // 点击通知打开
+    if ([userAction isEqualToString:UNNotificationDefaultActionIdentifier]) {
+        NSLog(@"User opened the notification.");
+        // 处理iOS 10通知，并上报通知打开回执
+        [self handleiOS10Notification:response.notification];
+    }
+    // 通知dismiss，category创建时传入UNNotificationCategoryOptionCustomDismissAction才可以触发
+    if ([userAction isEqualToString:UNNotificationDismissActionIdentifier]) {
+        NSLog(@"User dismissed the notification.");
+    }
+    NSString *customAction1 = @"action1";
+    NSString *customAction2 = @"action2";
+    // 点击用户自定义Action1
+    if ([userAction isEqualToString:customAction1]) {
+        NSLog(@"User custom action1.");
+    }
+    
+    // 点击用户自定义Action2
+    if ([userAction isEqualToString:customAction2]) {
+        NSLog(@"User custom action2.");
+    }
+    completionHandler();
+}
+#pragma mark -----CloudPushSDK Init
+- (void)initALIPushSDK{
+    
+    // SDK初始化
+    [CloudPushSDK asyncInit:ALIPushAppKey appSecret:ALIPushAppSecret callback:^(CloudPushCallbackResult *res) {
+        if (res.success) {
+            
+            NSLog(@"Push SDK init success, deviceId: %@.", [CloudPushSDK getDeviceId]);
+            
+        } else {
+            
+            NSLog(@"Push SDK init failed, error: %@", res.error);
+        }
+    }];
+    
+}
+#pragma mark ------ Notification Open
+/*
+ *  App处于启动状态时，通知打开回调
+ */
+- (void)application:(UIApplication*)application didReceiveRemoteNotification:(NSDictionary*)userInfo {
+    NSLog(@"Receive one notification.");
+    // 取得APNS通知内容
+    NSDictionary *aps = [userInfo valueForKey:@"aps"];
+    // 内容
+    NSString *content = [aps valueForKey:@"alert"];
+    // badge数量
+    NSInteger badge = [[aps valueForKey:@"badge"] integerValue];
+    // 播放声音
+    NSString *sound = [aps valueForKey:@"sound"];
+    // 取得通知自定义字段内容，例：获取key为"Extras"的内容
+    NSString *Extras = [userInfo valueForKey:@"Extras"]; //服务端中Extras字段，key是自己定义的
+    NSLog(@"content = [%@], badge = [%ld], sound = [%@], Extras = [%@]", content, (long)badge, sound, Extras);
+    // iOS badge 清0
+    application.applicationIconBadgeNumber = 0;
+    // 通知打开回执上报
+    // [CloudPushSDK handleReceiveRemoteNotification:userInfo];(Deprecated from v1.8.1)
+    [CloudPushSDK sendNotificationAck:userInfo];
+    
+}
+
+
+#pragma mark Channel Opened
+/**
+ *    注册推送通道打开监听
+ */
+- (void)listenerOnChannelOpened {
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onChannelOpened:)
+                                                 name:@"CCPDidChannelConnectedSuccess"
+                                               object:nil];
+}
+/**
+ *    推送通道打开回调
+ *
+ *
+ */
+- (void)onChannelOpened:(NSNotification *)notification {
+    
+    NSLog(@"-----消息通道建立成功------");
+    
+}
+
+#pragma mark Receive Message
+/**
+ *    @brief    注册推送消息到来监听
+ */
+- (void)registerMessageReceive {
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onMessageReceived:)
+                                                 name:@"CCPDidReceiveMessageNotification"
+                                               object:nil];
+}
+/**
+ *    处理到来推送消息
+ *
+ *
+ */
+- (void)onMessageReceived:(NSNotification *)notification {
+    
+    NSLog(@"Receive one message!");
+    CCPSysMessage *message = [notification object];
+    NSString *title = [[NSString alloc] initWithData:message.title encoding:NSUTF8StringEncoding];
+    NSString *body = [[NSString alloc] initWithData:message.body encoding:NSUTF8StringEncoding];
+    NSLog(@"Receive message title: %@, content: %@.", title, body);
+}
+
+#pragma mark ---- method
+- (void)getAppVersion{
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    NSString *app_Version = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
+    [[YHJsonRequest shared] getAppVersionSucceededBlock:^(NSDictionary *dict){
+        if (![[dict objectForKey:@"app_version"] isEqualToString:app_Version]) {
+            if ([[dict objectForKey:@"is_update"] isEqualToString:@"2"]) {
+                if ([dict objectForKey:@"app_version"]&&[dict objectForKey:@"update_text"]) {
+                    YHAlertView *alert = [[YHAlertView alloc]initWithTitle:[dict objectForKey:@"app_version"] AndUpdateNecessaryText:[dict objectForKey:@"update_text"]];
+                    alert.rightBlock = ^(NSString *text) {
+                        if ([[dict objectForKey:@"isNeedClearFMDB"] isEqualToString:@"1"]){
+                            [Tools clearChatFMDB];
+                        }
+                        NSString*str = [NSString stringWithFormat:@"https://itunes.apple.com/cn/app/id1260429389"];
+                        [[UIApplication sharedApplication]openURL:[NSURL URLWithString:str]];
+                    };
+                    [alert showAnimated];
+                }
+            }else if ([[dict objectForKey:@"is_update"] isEqualToString:@"1"]) {
+                if ([dict objectForKey:@"app_version"]&&[dict objectForKey:@"update_text"]) {
+                    YHAlertView *alert = [[YHAlertView alloc]initWithTitle:[dict objectForKey:@"app_version"] AndUpdateUnNecessaryText:[dict objectForKey:@"update_text"]];
+                    alert.rightBlock = ^(NSString *text) {
+                        if ([[dict objectForKey:@"isNeedClearFMDB"] isEqualToString:@"1"]){
+                            [Tools clearChatFMDB];
+                        }
+                        NSString*str = [NSString stringWithFormat:@"https://itunes.apple.com/cn/app/id1260429389"];
+                        [[UIApplication sharedApplication]openURL:[NSURL URLWithString:str]];
+                    };
+                    [alert showAnimated];
+                }
+            }
+        }
+    } failedBlock:^(NSString *errorMessage) {
+       
+    }];
+}
+-(void)go:(NSTimer *)time{
+    aa++;
+    if (aa==24*60*60) {
+        [_timer invalidate];
+        [self endBack]; // 任务执行完毕，主动调用该方法结束任务
+    }
+}
+-(void)beginTask{
+    
+    _backIden = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+        [self endBack]; // 如果在系统规定时间内任务还没有完成，在时间到之前会调用到这个方法，一般是10分钟
+    }];
+}
+-(void)endBack{
+    
+    [[UIApplication sharedApplication] endBackgroundTask:_backIden];
+    _backIden = UIBackgroundTaskInvalid;
+}
+
+#pragma mark ---- YHSendFileTipsViewDelegete
+- (void)alertViewLeftBtnClick:(id)alertView{
+    
+}
+- (void)alertViewRightBtnClick:(id)alertView withFileUrl:(NSString *)fileurl withfileName:(NSString *)fileName{
+    NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:fileurl]];
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Chat" bundle:nil];
+    ChatNewViewController *vc = [storyboard instantiateViewControllerWithIdentifier:@"Chat"];
+    NSString *messageIdString = [[NSUUID UUID] UUIDString];
+
+    vc.filePath = messageIdString;
+    vc.fileName = fileName;
+    vc.fileData = data;
+    vc.isUploadFile = YES;
+    vc.hidesBottomBarWhenPushed = YES;
+    [[Tools currentNavigationController] pushViewController:vc animated:false];
+}
+@end

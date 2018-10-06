@@ -1,0 +1,166 @@
+//
+//  YHSuperGroupConfigOrderTableViewCell.m
+//  emake
+//
+//  Created by zhangshichao on 2018/9/21.
+//  Copyright © 2018年 emake. All rights reserved.
+//
+
+#import "YHSuperGroupConfigOrderTableViewCell.h"
+
+@implementation YHSuperGroupConfigOrderTableViewCell
+
+- (instancetype)init{
+    self = [super init];
+    if (self) {
+        
+        self.selectionStyle = UITableViewCellSelectionStyleNone;
+        UILabel *line = [[UILabel alloc] init];
+        line.translatesAutoresizingMaskIntoConstraints =NO;
+        line.backgroundColor = SepratorLineColor;
+        [self addSubview:line];
+        [line PSSetTop:0];
+        [line PSSetLeft:0];
+        [line PSSetSize:ScreenWidth Height:1];
+        
+        //产品image
+        UIImageView *productionImageView = [[UIImageView alloc] init];
+        productionImageView.translatesAutoresizingMaskIntoConstraints = NO;
+        productionImageView.backgroundColor = ColorWithHexString(@"ffffff");
+        productionImageView.image = [UIImage imageNamed:@"placehold"];
+        [self addSubview:productionImageView];
+        productionImageView.contentMode = UIViewContentModeScaleAspectFit;
+        productionImageView.layer.cornerRadius = 6;
+        productionImageView.clipsToBounds = YES;
+        productionImageView.autoresizesSubviews = YES;
+        productionImageView.layer.borderWidth = 1;
+        productionImageView.layer.borderColor = SepratorLineColor.CGColor;
+        productionImageView.autoresizingMask =
+        UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+        [productionImageView PSSetSize:WidthRate(74) Height:HeightRate(69)];
+        [productionImageView PSSetLeft:WidthRate(12)];
+        [productionImageView PSSetTop:HeightRate(13)];
+        self.productImage = productionImageView;
+        
+        //产品名称
+        UILabel *productNameLable = [[UILabel alloc] init];
+        productNameLable.translatesAutoresizingMaskIntoConstraints = NO;
+        productNameLable.numberOfLines = 2;
+        productNameLable.text = @"scb11-anklu";
+        productNameLable.font = [UIFont systemFontOfSize:AdaptFont(13)];
+        [self addSubview:productNameLable];
+        [productNameLable PSSetTop:HeightRate(11)];
+        [productNameLable PSSetLeft:WidthRate(96)];
+        [productNameLable PSSetRight:WidthRate(13)];
+        self.productNameLable = productNameLable;
+        
+        
+//        UILabel *capacityLabel = [[UILabel alloc] init];
+//        capacityLabel.translatesAutoresizingMaskIntoConstraints = NO;
+//        capacityLabel.text = @";";
+//        capacityLabel.font = [UIFont systemFontOfSize:AdaptFont(12)];
+//        capacityLabel.textColor =ColorWithHexString(BASE_FAINTLY_COLOR);
+//        capacityLabel.numberOfLines = 0;
+//        capacityLabel.lineBreakMode = NSLineBreakByWordWrapping;
+//
+//        [self addSubview:capacityLabel];
+//        [capacityLabel PSSetBottomAtItem:productNameLable Length:HeightRate(3)];
+//        [capacityLabel PSSetLeft:WidthRate(96)];
+//        [capacityLabel PSSetRight:WidthRate(8)];
+//        self.lbOrderDetail = capacityLabel;
+//
+        //
+        //产品价格
+        UILabel *priceLable = [[UILabel alloc] init];
+        priceLable.translatesAutoresizingMaskIntoConstraints = NO;
+        priceLable.font = [UIFont systemFontOfSize:AdaptFont(13)];
+        priceLable.text = @"¥28888";
+        priceLable.textColor =  TextColor_666666;
+        priceLable.textAlignment = NSTextAlignmentRight;
+        [self addSubview:priceLable];
+        self.productPriceLable = priceLable;
+        [priceLable PSSetRight:WidthRate(7)];
+        [priceLable PSSetBottomAtItem:productNameLable Length:HeightRate(5)];
+        
+        
+        UILabel *lable1 = [[UILabel alloc] init];
+        lable1.translatesAutoresizingMaskIntoConstraints = NO;
+        lable1.backgroundColor = SepratorLineColor;
+        [self addSubview:lable1];
+        [lable1 PSSetBottomAtItem:productionImageView Length:HeightRate(5)];
+        [lable1 PSSetLeft:0];
+        [lable1 PSSetSize:ScreenWidth Height:HeightRate(0.5)];
+//        [lable1 PSSetBottom:HeightRate(0)];
+        
+        //数量
+        UILabel *numberLable = [[UILabel alloc] init];
+        numberLable.translatesAutoresizingMaskIntoConstraints = NO;
+        numberLable.font = [UIFont systemFontOfSize:AdaptFont(12)];
+        numberLable.text = @"x2";
+        numberLable.textColor =ColorWithHexString(BASE_FAINTLY_COLOR);
+        [self addSubview:numberLable];
+        [numberLable PSSetRight:WidthRate(9)];
+        [numberLable PSSetBottomAtItem:lable1 Length:HeightRate(3)];
+        self.productNumberLable = numberLable;
+        
+        UILabel *lable2 = [[UILabel alloc] init];
+        lable2.translatesAutoresizingMaskIntoConstraints = NO;
+        lable2.backgroundColor = SepratorLineColor;
+        [self addSubview:lable2];
+        [lable2 PSSetBottomAtItem:numberLable Length:HeightRate(10)];
+        [lable2 PSSetLeft:0];
+        [lable2 PSSetSize:ScreenWidth Height:HeightRate(0.5)];
+//        [lable2 PSSetBottom:HeightRate(0)];
+        //e计
+        UILabel *weightLabel = [[UILabel alloc] init];
+        weightLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        weightLabel.text = @"￥1801000.00";
+        weightLabel.font = [UIFont systemFontOfSize:AdaptFont(16)];
+        weightLabel.textColor =ColorWithHexString(StandardBlueColor);
+        [self addSubview:weightLabel];
+        [weightLabel PSSetRight:WidthRate(6)];
+        [weightLabel PSSetBottomAtItem:lable2 Length:HeightRate(3)];
+        self.smallPrice = weightLabel;
+        
+        UILabel *weight = [[UILabel alloc] init];
+        weight.font = [UIFont systemFontOfSize:AdaptFont(12)];
+        weight.text = @"共10件商品 合计：";
+        weight.translatesAutoresizingMaskIntoConstraints = NO;
+        weight.textColor =TextColor_666666;
+        [self addSubview:weight];
+        [weight PSSetLeftAtItem:weightLabel Length:0];
+        self.TotalNumberName = weight;
+        
+        UILabel *addvalueLable = [[UILabel alloc] init];
+        addvalueLable.textColor = ColorWithHexString(BASE_LINE_COLOR);
+        addvalueLable.translatesAutoresizingMaskIntoConstraints = NO;
+        addvalueLable.text =@"（含税，不含运费）" ;
+        addvalueLable.textColor = ColorWithHexString(SymbolTopColor);
+        
+        addvalueLable.font =[UIFont systemFontOfSize:AdaptFont(13)];
+        [self addSubview:addvalueLable];
+        addvalueLable.translatesAutoresizingMaskIntoConstraints = NO;
+        [addvalueLable PSSetBottomAtItem:weight Length:HeightRate(10)];
+        [addvalueLable PSSetRight:WidthRate(9)];
+        self.lbtax = addvalueLable;
+        
+        UILabel *lable = [[UILabel alloc] init];
+        lable.translatesAutoresizingMaskIntoConstraints = NO;
+        lable.backgroundColor = SepratorLineColor;
+        [self addSubview:lable];
+        [lable PSSetBottomAtItem:addvalueLable Length:HeightRate(10)];
+        [lable PSSetLeft:0];
+        [lable PSSetSize:ScreenWidth Height:HeightRate(8)];
+        [lable PSSetBottom:HeightRate(0)];
+        
+    }
+    return self;
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+@end

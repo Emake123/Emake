@@ -1,0 +1,61 @@
+//
+//  IMUIProductContentView.swift
+//  emake
+//
+//  Created by 张士超 on 2018/5/4.
+//  Copyright © 2018年 emake. All rights reserved.
+//
+
+import UIKit
+import Foundation
+class IMUIProductContentView: UIView ,IMUIMessageContentViewProtocol{
+    var imageView = UIImageView()
+    var productName = UILabel()
+    var productPrice = UILabel()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        self.addSubview(imageView)
+        self.addSubview(productName)
+        self.addSubview(productPrice)
+        productName.numberOfLines = 2
+        productPrice.numberOfLines = 2
+        imageView.contentMode = .scaleAspectFit
+        
+    }
+    required public init?(coder aDecoder: NSCoder) {
+        
+        fatalError("init(coder:) has not been implemented")
+    }
+    public func layoutContentView(message: IMUIMessageModelProtocol) {
+        var model = YHGoodsModel.mj_object(withKeyValues: message.text())
+        imageView.frame = CGRect(x: 9, y:7, width: 65, height:59)
+        productName.font = UIFont.systemFont(ofSize: 14)
+        productPrice.font = UIFont.systemFont(ofSize: 18)
+        if message.isOutGoing {
+            productPrice.textColor = UIColor.white
+        }else{
+            productPrice.textColor = UIColor.black
+        }
+        
+        productName.frame = CGRect(x: 80, y:7, width: 180, height:25)
+        productPrice.frame = CGRect(x: 80, y:32, width: 180, height:25)
+        productName.text = model?.goodsSeriesName
+        productPrice.text = model?.goodsPriceValue
+        var imageName = model?.goodsImageUrl
+        if (imageName == nil ){
+            print("imageNameisEmpty")
+            imageName = ""
+        }else{
+            print("imageNameisNoneEmpty")
+            
+        }
+        imageView.sd_setImage(with:NSURL(string: imageName as String?? as! String ) as URL?, completed: nil)
+
+//        imageView.sd_setImage(with:NSURL.init(string:imageUrl)! as URL , placeholderImage:nil)
+    }
+    
+    
+    
+}

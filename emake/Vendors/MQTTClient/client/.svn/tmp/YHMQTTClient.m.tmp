@@ -1,0 +1,111 @@
+//
+//  YHMQTTClient.m
+//  MQTTClientManager
+//
+//  Created by 谷伟 on 2017/9/30.
+//  Copyright © 2017年 谷伟. All rights reserved.
+//
+
+#import "YHMQTTClient.h"
+#import "YHTabBarViewController.h"
+#import "YHMainViewController.h"
+#import "YHMainMessageCenterViewController.h"
+#import "FMDBManager.h"
+#import "chatNewModel.h"
+#import "chatBodyModel.h"
+#import "chatUserModel.h"
+
+@interface YHMQTTClient()
+
+
+
+@end
+@implementation YHMQTTClient
+
++ (YHMQTTClient *)sharedClient{
+    
+    static YHMQTTClient *client = nil;
+    static dispatch_once_t token;
+    dispatch_once(&token, ^{
+        client = [[YHMQTTClient alloc] init];
+    });
+    return client;
+}
+
+-(void)connectToHost:(NSString *)host Port:(NSInteger)port ClientId:(NSString *)clientId andSubcriceTopic:(NSString *)topic{
+    
+    [[MQTTClient shared] connectWithHost:host Port:port ClientId:clientId CleanSession:false];
+    [[MQTTClient shared] subscribeTopic:topic onMessage:^(MQTTMessage *message){
+    
+        NSDictionary *payload = [NSJSONSerialization JSONObjectWithData:message.payload options:0 error:nil];
+        NSLog(@"connectToHost-----%@",message);
+        NSString *messageType = [payload objectForKey:@"MessageType"];
+        //消息
+        @synchronized (self) {
+            //消息重复去重
+            NSDictionary *payload = [NSJSONSerialization JSONObjectWithData:message.payload options:0 error:nil];
+            chatNewModel *model = [chatNewModel mj_objectWithKeyValues:payload];
+            if ([[FMDBManager sharedManager] messageIsAlreadyExist:model.MessageId]) {
+                return;
+            }
+            //消息响应
+            if ([messageType isEqualToString:@"Message"]) {
+                [self.delegate onMessgae:message];
+                self.MessageCount = self.MessageCount + 1;
+                [self addBadge:self.MessageCount];
+                
+                
+                if (message.payload) {
+                    
+                    NSDictionary *payload = [NSJSONSerialization JSONObjectWithData:message.payload options:0 error:nil];
+                    chatNewModel *model = [chatNewModel mj_objectWithKeyValues:payload];
+                    chatBodyModel *body = [chatBodyModel mj_objectWithKeyValues:model.MessageBody];
+                    chatUserModel *form = [chatUserModel mj_objectWithKeyValues:model.From];
+                    if ([body.Type isEqualToString:@"Text"]) {
+                        [[JZUserNotification sharedNotification] addNotificationWithCategroy1:body.Text];
+                    }else if ([body.Type isEqualToString:@"Image"]){
+                        [[JZUserNotification sharedNotification] addNotificationWithCategroy1:@"[图片]"];
+                    }else if ([body.Type isEqualToString:@"Order"]){
+                        [[JZUserNotification sharedNotification] addNotificationWithCategroy1:@"[订单]"];
+                    }else if ([body.Type isEqualToString:@"MutilePart"]){
+                        [[JZUserNotification sharedNotification] addNotificationWithCategroy1:@"[合同]"];
+                    }else if ([body.Type isEqualToString:@"Goods"]){
+                        [[JZUserNotification sharedNotification] addNotificationWithCategroy1:@"[商品]"];
+                    }else if ([body.Type isEqualToString:@"Voice"]){
+                        [[JZUserNotification sharedNotification] addNotificationWithCategroy1:@"[语音]"];
+                    }else if ([body.Type isEqualToString:@"File"]){
+                        [[JZUserNotification sharedNotification] addNotificationWithCategroy1:@"[文件]"];
+                    }
+                }
+            }else if ([messageType isEqualToString:@"Event"]) {
+                [self.delegate onEvent:message];
+            }
+        }
+        //事件
+        
+    }];
+}
+- (void)addBadge:(NSInteger)number{
+    if ([[Tools currentViewController] isKindOfClass:[YHMainViewController class]]){
+        YHMainViewController *vc = (YHMainViewController *)[Tools currentViewController];
+        UIImageView *serverImage = (UIImageView *)[vc.serverView viewWithTag:100];
+        [serverImage showBadgeWithStyle:WBadgeStyleNumber value:number animationType:WBadgeAnimTypeNone];
+        serverImage.badgeCenterOffset = CGPointMake(WidthRate(-8), HeightRate(5));
+    }else if ([[Tools currentViewController] isKindOfClass:[YHMainMessageCenterViewController class]]){
+        
+        YHMainMessageCenterViewController *vc = (YHMainMessageCenterViewController *)[Tools currentViewController];
+        [vc.navigationItem.rightBarButtonItem showBadgeWithStyle:WBadgeStyleNumber value:number animationType:WBadgeAnimTypeNone];
+        vc.navigationItem.rightBarButtonItem.badgeCenterOffset = CGPointMake(WidthRate(-8), HeightRate(5));
+    }
+}
+- (BOOL)sendMessage:(NSDictionary *)data withTopic:(NSString *)Topic{
+    
+    NSDictionary *payload = data;
+    BOOL isSendSuccess = [[MQTTClient shared] publishTopic:Topic Payload:payload];
+    return isSendSuccess;
+}
+- (void)disConnect{
+    
+    [[MQTTClient shared] disconnect];
+}
+@end

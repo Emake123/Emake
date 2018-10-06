@@ -1,0 +1,731 @@
+ //
+//  Mine.m
+//  emake
+//
+//  Created by chenyi on 2017/7/13.
+//  Copyright © 2017年 emake. All rights reserved.
+//
+
+#import "YHMineViewController.h"
+#import "YHSettingViewController.h"
+#import "YHLoginViewController.h"
+#import "YHPersonalFileViewController.h"
+#import "YHOrderManageNewViewController.h"
+#import "YHInvoiceListViewController.h"
+#import "YHCertificationStateOriginalViewController.h"
+#import "YHCertificationStateViewController.h"
+#import "YHMainMessageCenterViewController.h"
+#import "YHCommonWebViewController.h"
+#import "YHSixTeamViewController.h"
+#import "YHMyAccountViewController.h"
+#import "YHOrderInvoiceInfoViewController.h"
+#import "YHAdressViewController.h"
+#import "YHLoginViewController.h"
+#import "YHMineFirstRowTableViewCell.h"
+#import "YHMinwCollectionViewController.h"
+#import "YHShareView.h"
+#import "YHNewAuditViewController.h"
+#import "YHNoneTeamViewController.h"
+#import "YHMineSecondTableViewCell.h"
+#import "YHMineThirdTableViewCell.h"
+#import "YHMineCommonCell.h"
+@interface YHMineViewController () <UITableViewDataSource,UITableViewDelegate,YHFirsrRowDelegate,YHSecondRowDelegate>{
+    
+    UIView *headView;
+    UIImageView *backImage;
+    NSString *userType;
+    NSDictionary *orderCountDic;
+    UITapGestureRecognizer *gestureOrder;
+    NSInteger recordeUsingText;
+    NSInteger recordeAppShare;
+
+    NSString *isCheck;
+    NSString *auditFailReason;
+    NSString *successsDate;
+    UserInfoModel *model;
+    BOOL isStore;
+}
+@end
+
+@implementation YHMineViewController
+
+- (void)viewDidLoad {
+    
+    [super viewDidLoad];
+    self.title = @"我的";
+    self.navigationItem.leftBarButtonItem = nil;
+    self.view.backgroundColor = TextColor_F5F5F5;
+    orderCountDic = [NSDictionary dictionary];
+    [self configUI];
+}
+- (void)viewWillAppear:(BOOL)animated{
+    
+    [super viewWillAppear:animated];
+    NSString *isStoreString = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
+    isStore = [isStoreString isEqualToString:@"1"];
+    userType = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERTYPE];
+    [self.navigationController setNavigationBarHidden:YES animated:animated];
+    NSString *tocken = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_Token];
+
+    if (tocken.length>0) {
+        [self getUserInfo];
+
+    }else
+    {
+        [_myTableView setTableHeaderView:[self getHeadView]];
+        [self.myTableView reloadData];
+    }
+    
+}
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [self.navigationController setNavigationBarHidden:NO animated:animated];
+}
+- (void)configUI{
+    
+    _myTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-(TOP_BAR_HEIGHT)) style:UITableViewStylePlain];
+    _myTableView.delegate = self;
+    _myTableView.dataSource = self;
+    _myTableView.showsVerticalScrollIndicator = NO;
+    _myTableView.showsVerticalScrollIndicator = NO;
+    _myTableView.estimatedRowHeight = HeightRate(50);
+    _myTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    _myTableView.tableHeaderView = [self getHeadView];
+    [self.view addSubview:_myTableView];
+    
+    [_myTableView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(0);
+        make.top.mas_equalTo(-(StatusBarHEIGHT));
+        make.right.mas_equalTo(0);
+        make.bottom.mas_equalTo(0);
+    }];
+}
+- (UIView *)getHeadView{
+    
+    headView = [[UIView alloc]initWithFrame:CGRectMake(0,0, ScreenWidth, HeightRate(238))];
+    headView.backgroundColor = [UIColor whiteColor];
+    backImage = [[UIImageView alloc]initWithFrame:headView.frame];
+    backImage.image = [UIImage imageNamed:@"wopeitu"];
+    [headView addSubview:backImage];
+
+    [backImage mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(0);
+        make.left.mas_equalTo(0);
+        make.right.mas_equalTo(0);
+        make.height.mas_equalTo(HeightRate(238));
+    }];
+    
+    UIImageView *image = [[UIImageView alloc]initWithFrame:CGRectZero];
+    image.layer.cornerRadius = WidthRate(32);
+    image.layer.borderColor = TextColor_8AA1F2.CGColor;
+    image.layer.borderWidth  =  WidthRate(5);
+    image.alpha = 0.4;
+    image.clipsToBounds = YES;
+    [headView addSubview:image];
+    [image mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(WidthRate(20));
+        if (iOS11_Former) {
+            make.top.mas_equalTo(HeightRate(31)+(StatusBarHEIGHT));
+        }else{
+           make.top.mas_equalTo(HeightRate(18)+(StatusBarHEIGHT));
+        }
+        make.width.mas_equalTo(WidthRate(64));
+        make.height.mas_equalTo(WidthRate(64));
+    }];
+    
+    UIImageView *headImage = [[UIImageView alloc]initWithFrame:CGRectZero];
+    NSString *fileName = [[NSUserDefaults standardUserDefaults]objectForKey:LOGIN_HeadImageURLString];
+    [headImage sd_setImageWithURL:[NSURL URLWithString:fileName] placeholderImage:[UIImage imageNamed:@"login_logo"]];
+    headImage.contentMode = UIViewContentModeScaleAspectFill;
+    headImage.layer.cornerRadius = WidthRate(27.5);
+    headImage.clipsToBounds = YES;
+    UITapGestureRecognizer *gesture = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(goFilePersonalVC)];
+    gesture.numberOfTapsRequired = 1;
+    [headImage addGestureRecognizer:gesture];
+    headImage.userInteractionEnabled=YES;
+    [headView addSubview:headImage];
+    [headImage mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerX.mas_equalTo(image.mas_centerX);
+        make.centerY.mas_equalTo(image.mas_centerY);
+        make.width.mas_equalTo(WidthRate(55));
+        make.height.mas_equalTo(WidthRate(55));
+    }];
+
+    UILabel *labelName = [[UILabel alloc]initWithFrame:CGRectZero];
+    labelName.font = [UIFont systemFontOfSize:18];
+    NSString *nickName = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERNICKNAME];
+
+    if (nickName.length>0) {
+        labelName.text = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERNICKNAME];
+    }else{
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE]) {
+            labelName.text = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
+        }else{
+            labelName.text = @"未登录";
+        }
+    }
+    
+    [headView addSubview:labelName];
+    [labelName mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(headImage.mas_right).offset(10);
+        if ([userType isEqualToString:@"1"]) {
+            make.centerY.mas_equalTo(headImage.mas_centerY).offset(-HeightRate(13));
+        }else{
+            make.centerY.mas_equalTo(headImage.mas_centerY).offset(0);
+        }
+        make.height.mas_equalTo(HeightRate(25));
+    }];
+    if (isStore == NO) {
+        UILabel *labelAuthorized = [[UILabel alloc]initWithFrame:CGRectZero];
+        labelAuthorized.font = [UIFont systemFontOfSize:10];
+        labelAuthorized.text = @"已认证合伙人";
+        if ([userType isEqualToString:@"1"]) {
+            labelAuthorized.hidden = false;
+        }else{
+            labelAuthorized.hidden = true;
+        }
+        [headView addSubview:labelAuthorized];
+        [labelAuthorized mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(headImage.mas_right).offset(10);
+            make.centerY.mas_equalTo(headImage.mas_centerY).offset(HeightRate(11));
+            make.height.mas_equalTo(HeightRate(23));
+        }];
+        
+        UIImageView * imageAuthorized = [[UIImageView alloc]init];
+        imageAuthorized.image = [UIImage imageNamed:@"wode_renzheng"];
+        if ([userType isEqualToString:@"1"]) {
+            imageAuthorized.hidden = false;
+        }else{
+            imageAuthorized.hidden = true;
+        }
+        [headView addSubview:imageAuthorized];
+        
+        [imageAuthorized mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(labelName.mas_right).offset(WidthRate(6));
+            make.width.mas_equalTo(WidthRate(14));
+            make.height.mas_equalTo(HeightRate(16));
+            make.centerY.mas_equalTo(labelName.mas_centerY);
+        }];
+    }else
+    {
+        
+        UIButton *storerButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        storerButton.titleLabel.font = [UIFont systemFontOfSize:AdaptFont(11)];
+        [storerButton setTitle:@"店铺掌柜" forState:UIControlStateNormal];
+        [storerButton setTitleColor:ColorWithHexString(@"333333") forState:UIControlStateNormal];
+        storerButton.layer.borderWidth = 1;
+        storerButton.layer.borderColor = ColorWithHexString(StandardBlueColor).CGColor;
+        storerButton.clipsToBounds = YES;
+        storerButton.layer.cornerRadius = HeightRate(10);
+        [storerButton setImage:[UIImage imageNamed:@"dianpuzhanggui"] forState:UIControlStateNormal];
+        [headView addSubview:storerButton];
+        [storerButton mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(labelName.mas_left).offset(WidthRate(0));
+            make.width.mas_equalTo(WidthRate(80));
+            make.height.mas_equalTo(HeightRate(20));
+            make.top.mas_equalTo(labelName.mas_bottom).offset(HeightRate(5));
+        }];
+
+        NSString *isStorer = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_UserStyle];
+        if ([isStorer isEqualToString:@"1"]) {
+            
+            storerButton.hidden = false;
+        }else
+        {
+            storerButton.hidden = YES;
+
+        }
+    }
+
+    
+    
+    UIImageView *settingImageView = [[UIImageView alloc]initWithFrame:CGRectZero];
+    settingImageView.image = [UIImage imageNamed:@"wo-shezhi"];
+    UITapGestureRecognizer *gestureAnother = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(goSettingVC)];
+    gesture.numberOfTapsRequired = 1;
+    settingImageView.contentMode = UIViewContentModeScaleToFill;
+    [settingImageView addGestureRecognizer:gestureAnother];
+    settingImageView.userInteractionEnabled=YES;
+    [headView addSubview:settingImageView];
+    [settingImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(WidthRate(-18));
+        make.height.mas_equalTo(WidthRate(35));
+        make.width.mas_equalTo(WidthRate(35));
+        make.centerY.mas_equalTo(headImage.mas_centerY);
+    }];
+    
+    UIImageView * MessageImageView = [[UIImageView alloc]initWithFrame:CGRectZero];
+    MessageImageView.image = [UIImage imageNamed:@"wo-xinxi"];
+    UITapGestureRecognizer *gestureMessage = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(goMessgaeVC)];
+    gestureMessage.numberOfTapsRequired = 1;
+    [MessageImageView addGestureRecognizer:gestureMessage];
+    MessageImageView.userInteractionEnabled=YES;
+    [headView addSubview:MessageImageView];
+    [MessageImageView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(settingImageView.mas_left).offset(WidthRate(-8));
+        make.height.mas_equalTo(WidthRate(35));
+        make.width.mas_equalTo(WidthRate(35));
+        make.centerY.mas_equalTo(headImage.mas_centerY);
+    }];
+    
+    self.messageCount = [[UILabel alloc]init];
+    self.messageCount.text = [NSString stringWithFormat:@"%@",@(0)];
+    self.messageCount.layer.borderColor = TextColor_FFAC00.CGColor;
+    self.messageCount.font = SYSTEM_FONT(AdaptFont(11));
+    self.messageCount.backgroundColor = [UIColor redColor];
+    self.messageCount.layer.cornerRadius = WidthRate(7.5);
+    self.messageCount.textAlignment = NSTextAlignmentCenter;
+    self.messageCount.textColor = [UIColor whiteColor];
+    self.messageCount.clipsToBounds = YES;
+    [headView addSubview:self.messageCount];
+    
+    [self.messageCount mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(settingImageView.mas_left).offset(WidthRate(-2));
+        make.height.mas_equalTo(WidthRate(15));
+        make.width.mas_greaterThanOrEqualTo(WidthRate(20));
+        make.centerY.mas_equalTo(MessageImageView.mas_centerY).offset(WidthRate(-12));
+    }];
+    
+    NSInteger EventCount = 0;
+    if (EventCount>0) {
+        if (EventCount>99) {
+            EventCount = 99;
+        }
+        self.messageCount.hidden = false;
+        self.messageCount.text = [NSString stringWithFormat:@"%ld",(long)EventCount];;
+    }else{
+        self.messageCount.hidden = true;
+    }
+    return  headView;
+}
+- (void)getUserInfo {
+    [[YHJsonRequest shared] getUserInfoSuccessBlock:^(UserInfoModel *userInfo) {
+        model = userInfo;
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        [userDefaults setObject:userInfo.HeadImageUrl forKey:LOGIN_HeadImageURLString];
+
+        if ((!userInfo.NickName)||(userInfo.NickName.length<=0) ){
+            [userDefaults setObject:nil forKey:LOGIN_USERNICKNAME];
+        }else{
+            [userDefaults setObject:userInfo.NickName forKey:LOGIN_USERNICKNAME];
+        }
+        [userDefaults synchronize];
+        [[NSUserDefaults standardUserDefaults] setObject:userInfo.RealName forKey:USERSCardName];
+        [[NSUserDefaults standardUserDefaults] setObject:userInfo.PSPDId forKey:USERSCardID];
+        [[NSUserDefaults standardUserDefaults] setObject:userInfo.AuditRemark forKey:USERSTATEFailReason];
+        [[NSUserDefaults standardUserDefaults] setObject:userInfo.EditWhen forKey:USERSTATECommitDate];
+        [[NSUserDefaults standardUserDefaults] setObject:userInfo.UserState forKey:LOGIN_USERCARDSTATE];
+        [[NSUserDefaults standardUserDefaults] setObject:userInfo.IsCheck forKey:USERSISCHECK];
+
+        isCheck = userInfo.IsCheck;
+        auditFailReason = userInfo.AuditRemark;
+        successsDate = userInfo.EditWhen;
+        [_myTableView setTableHeaderView:[self getHeadView]];
+        [self.myTableView reloadData];
+    } fialureBlock:^(NSString *errorMessages) {
+        [_myTableView setTableHeaderView:[self getHeadView]];
+        [self.myTableView reloadData];
+    }];
+}
+#pragma mark -- UITableViewDelagte  &  UITableViewDataSource
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    
+    if (isStore == YES) {
+        NSString *isStorer = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_UserStyle];
+        if ([isStorer isEqualToString:@"1"]) {
+            return 5;
+        }
+        return 6;
+    }
+        return 3;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (isStore == YES) {
+        YHMineCommonCell *cell = nil;
+        if (!cell) {
+            [tableView registerNib:[UINib nibWithNibName:@"YHMineCommonCell" bundle:nil] forCellReuseIdentifier:@"YHMineCommonCell"];
+            cell = [tableView dequeueReusableCellWithIdentifier:@"YHMineCommonCell"];
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        }
+            if (indexPath.row == 0) {
+                
+                cell.title.text = @"我的收藏";
+                cell.titleImage.image = [UIImage imageNamed:@"shoucang-s"];
+                cell.contentForTiltle.hidden = true;
+                
+            }else if (indexPath.row == 1){
+                cell.title.text = @"我的地址";
+                cell.titleImage.image = [UIImage imageNamed:@"wodedizhi"];
+                cell.contentForTiltle.hidden = true;
+                
+            }else if (indexPath.row == 2){
+                
+                cell.title.text = @"发票管理";
+                cell.titleImage.image = [UIImage imageNamed:@"kaipiaojilu"];
+                cell.contentForTiltle.hidden = true;
+                
+            }else if (indexPath.row == 3){
+                recordeAppShare = 4;
+                cell.title.text = @"分享APP";
+                cell.titleImage.image = [UIImage imageNamed:@"wo_fenxiang"];
+                cell.contentForTiltle.hidden = true;
+            }else if (indexPath.row == 4){
+                recordeUsingText = 5;
+                
+                cell.title.text = @"使用说明";
+                cell.titleImage.image = [UIImage imageNamed:@"shiyongshuoming"];
+                cell.contentForTiltle.hidden = true;
+            }else
+            {
+                cell.title.text = @"易智造客服";
+                cell.titleImage.image = [UIImage imageNamed:@"wo-yizhizaokefu"];
+                cell.contentForTiltle.hidden = true;
+            }
+            
+            return cell;
+    }else
+    {
+        if (indexPath.row==0) {
+            YHMineFirstRowTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"YHMineFirstRowTableViewCell"];
+            if (cell== nil) {
+                cell = [[YHMineFirstRowTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"YHMineFirstRowTableViewCell"];
+            }
+            cell.delegate = self;
+            return cell;
+        }else if(indexPath.row == 1){
+            YHMineSecondTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell1"];
+            
+            if (cell==nil) {
+                cell = [[YHMineSecondTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell1"];
+            }
+            cell.delegate = self;
+            return cell;
+        }else{
+            YHMineThirdTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell2"];
+            
+            if (cell==nil) {
+                cell = [[YHMineThirdTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell2"];
+            }
+            return cell;
+            
+        }
+    
+   
+    }
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (isStore == YES) {
+        return HeightRate(60);
+    }
+   
+    return UITableViewAutomaticDimension;
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (isStore == YES) {
+        switch (indexPath.row) {
+            case 0:{
+                [self goUserCollection];
+            }
+                break;
+            case 1:{
+                [self goUserAddressVC];
+                
+            }
+                break;
+            case 2:{
+                [self goInvoiceVC];
+            }
+                break;
+            case 3:{
+                [self goShareApp];
+                
+            }
+                break;
+            case 4:{
+                [self goUserIntroductionVC];
+            }
+                break;
+            case 5:{
+                [self goUserIntroductionVC];
+            }
+                break;
+            default:
+                break;
+        }
+        
+    }else
+    {
+        NSString * phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
+        if (indexPath.row==2) {
+            
+            if (phone.length<=0) {
+                YHLoginViewController *loginViewController = [[YHLoginViewController alloc] init];
+                loginViewController.navigationController.navigationBarHidden = YES;
+                loginViewController.hidesBottomBarWhenPushed =YES;
+                [self.navigationController pushViewController:loginViewController animated:YES];
+                return;
+            }
+            [self nexttPageTeam];
+        }
+   }
+}
+#pragma mark - 滚动代理
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    
+    CGFloat width = ScreenWidth; // 图片宽度
+    CGFloat yOffset = scrollView.contentOffset.y; // 偏移的y值，还要考虑导航栏的64哦
+    if (yOffset < 0) {//向下拉是负值，向上是正
+        CGFloat totalOffset = HeightRate(238) + HeightRate(ABS(yOffset));
+        CGFloat heigth = HeightRate(238);
+        CGFloat f = totalOffset/heigth ;//缩放比例
+        //拉伸后的图片的frame应该是同比例缩放。
+        backImage.frame =  CGRectMake(- (width * f - width) / 2, yOffset, width * f, totalOffset);
+    }
+}
+#pragma mark======Method
+-(void)nexttPageTeam{
+    [MobClick event:@"MyTeam" label:@"我的团队"];
+    if ([userType isEqualToString:@"0"]||[userType isEqualToString:@"3"]||[userType isEqualToString:@"4"]) {
+        YHNoneTeamViewController *vc = [[YHNoneTeamViewController alloc] init];
+        vc.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:vc animated:YES];
+        
+    }else{
+        YHSixTeamViewController *vc = [[YHSixTeamViewController alloc]init];
+        vc.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+}
+- (void)loginVC{
+    YHLoginViewController *loginVC = [[YHLoginViewController alloc] init];
+    [self presentViewController:loginVC animated:YES completion:^{
+            
+    }];
+}
+- (void)goSetHeadImage{
+    NSString * phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
+
+    if (phone.length<=0) {
+        YHLoginViewController *loginViewController = [[YHLoginViewController alloc] init];
+        loginViewController.navigationController.navigationBarHidden = YES;
+        loginViewController.hidesBottomBarWhenPushed =YES;
+        [self.navigationController pushViewController:loginViewController animated:YES];
+        return;
+    }
+    YHSettingViewController *vc = [[YHSettingViewController alloc] init];
+    vc.titleStr = @"个人资料";
+    vc.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+-(void)goSettingVC{
+    NSString * phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
+
+    if (phone.length<=0) {
+        YHLoginViewController *loginViewController = [[YHLoginViewController alloc] init];
+        loginViewController.navigationController.navigationBarHidden = YES;
+        loginViewController.hidesBottomBarWhenPushed =YES;
+        [self.navigationController pushViewController:loginViewController animated:YES];
+        return;
+    }
+    YHSettingViewController *vc = [[YHSettingViewController alloc] init];
+    vc.titleStr = @"设置";
+    vc.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:vc animated:YES];
+
+}
+- (void)goMessgaeVC {
+    
+    NSString * phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
+    if (phone.length<=0) {
+        YHLoginViewController *loginViewController = [[YHLoginViewController alloc] init];
+        loginViewController.navigationController.navigationBarHidden = YES;
+        loginViewController.hidesBottomBarWhenPushed =YES;
+        [self.navigationController pushViewController:loginViewController animated:YES];
+        return;
+    }
+    YHMainMessageCenterViewController *vc = [[YHMainMessageCenterViewController alloc]init];
+    vc.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+- (void)goFilePersonalVC{
+    NSString * phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
+    
+    if (phone.length<=0) {
+        YHLoginViewController *loginViewController = [[YHLoginViewController alloc] init];
+        loginViewController.navigationController.navigationBarHidden = YES;
+        loginViewController.hidesBottomBarWhenPushed =YES;
+        [self.navigationController pushViewController:loginViewController animated:YES];
+        return;
+    }
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:Is_Login]) {
+        [MobClick event:@"Personal" label:@"个人中心"];
+        YHPersonalFileViewController *vc = [[YHPersonalFileViewController alloc] init];
+        vc.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:vc animated:YES];
+        
+    }else{
+        [self loginVC];
+    }
+}
+//　实名认证
+-(void)getcertification{
+    
+    NSString *state =  [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERCARDSTATE];
+    if ([state isEqualToString:@"1"]) {
+        YHNewAuditViewController *vc =[[YHNewAuditViewController alloc] init];
+        vc.hidesBottomBarWhenPushed = YES;
+        vc.isfail = YES;
+        
+        [self.navigationController pushViewController:vc animated:YES];
+        
+    }else if ([state isEqualToString:@"2"]) {
+        YHCertificationStateViewController *vc = [[YHCertificationStateViewController alloc] init];
+        vc.failReason = auditFailReason;
+        vc.successDate = successsDate;
+        vc.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:vc animated:YES];
+        
+    }else if ([state isEqualToString:@"3"]) {
+        if (![isCheck isEqualToString:@"1"] && [userType isEqualToString:@"1"]) {
+            YHCertificationStateViewController *vc = [[YHCertificationStateViewController alloc] init];
+            
+            vc.hidesBottomBarWhenPushed = YES;
+            [self.navigationController pushViewController:vc animated:YES];
+        }else{
+            YHNewAuditViewController *vc =[[YHNewAuditViewController alloc] init];
+            vc.hidesBottomBarWhenPushed = YES;
+            vc.isfail = false;
+            
+            [self.navigationController pushViewController:vc animated:YES];
+            
+        }
+        
+    }else if ([state isEqualToString:@"4"]) {
+        YHCertificationStateViewController *vc = [[YHCertificationStateViewController alloc] init];
+        vc.failReason = auditFailReason;
+        vc.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+    
+}
+
+-(void)goInvoiceVC
+{
+    NSString * phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
+    
+    if (phone.length<=0) {
+        YHLoginViewController *loginViewController = [[YHLoginViewController alloc] init];
+        loginViewController.navigationController.navigationBarHidden = YES;
+        loginViewController.hidesBottomBarWhenPushed =YES;
+        [self.navigationController pushViewController:loginViewController animated:YES];
+        return;
+    }
+    YHOrderInvoiceInfoViewController *vc = [[YHOrderInvoiceInfoViewController alloc]init];
+    vc.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+-(void)goShareApp
+{
+    [MobClick event:@"AppShare" label:@"分享"];
+    
+    YHShareView *share = [[YHShareView alloc] initShareWithContentTitle:@"易智造" theOtherTitle:@"为帮助行业用户提高制造效率、降低制造成本，易虎网科技南京有限公司推出官方移动APP——易智造，致力于以“AI+大数据”为核心打造制造业智能生态。采用用户订货，易智造补贴工厂利润的方式，开启类似滴滴补贴的商业模式，为生产和经销环节创造更多利润。" image:nil url:ShareDownloURL withCancleTitle:@"取消"];
+    [share showAnimated];
+
+}
+-(void)goUserIntroductionVC
+{
+    YHCommonWebViewController *vc = [[YHCommonWebViewController alloc]init];
+    vc.hidesBottomBarWhenPushed = YES;
+    vc.titleName = @"使用说明";
+    vc.time = WebTypeUserInstructions;
+    vc.URLString = UserInstructionURL;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+-(void )goUserAddressVC
+{
+    NSString * phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
+    if (phone.length<=0) {
+        YHLoginViewController *loginViewController = [[YHLoginViewController alloc] init];
+        loginViewController.navigationController.navigationBarHidden = YES;
+        loginViewController.hidesBottomBarWhenPushed =YES;
+        [self.navigationController pushViewController:loginViewController animated:YES];
+        return;
+    }
+    [MobClick event:@"MyAddress" label:@"我的地址"];
+    YHAdressViewController *adress = [[YHAdressViewController alloc] init];
+    adress.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:adress animated:YES];
+}
+-(void)goUserCollection
+{
+    [MobClick event:@"MyCollections" label:@"我的收藏"];
+    YHMinwCollectionViewController *vc=[[YHMinwCollectionViewController alloc] init];
+    vc.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+#pragma mark--yhFirstRow delegate
+-(void)YHFirsrRowView:(UIView *)item index:(NSInteger)index{//index=1,2,3
+    
+    NSString * phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
+    
+    if (phone.length<=0) {
+        YHLoginViewController *loginViewController = [[YHLoginViewController alloc] init];
+        loginViewController.navigationController.navigationBarHidden = YES;
+        loginViewController.hidesBottomBarWhenPushed =YES;
+        [self.navigationController pushViewController:loginViewController animated:YES];
+        return;
+    }
+    switch (index) {
+        case 1:{
+        //我的账户
+                YHMyAccountViewController *vc = [[YHMyAccountViewController alloc]init];
+                vc.hidesBottomBarWhenPushed = YES;
+                [self.navigationController pushViewController:vc animated:YES];
+            
+        }
+            break;
+        case 2:{
+            [self goUserCollection];
+            
+        }
+            break;
+        case 3:{
+                //实名认证
+            [self getcertification];
+        }
+            break;
+        default:
+            break;
+    }
+}
+#pragma mark--YHSecondRowView delegate
+-(void)YHSecondRowView:(UIView *)item index:(NSInteger)index{
+    switch (index) {
+        case 1:{
+            
+            [self goUserAddressVC];
+        }
+            break;
+        case 2:{
+            [self goInvoiceVC];
+            
+        }
+            break;
+        case 3:{
+            [self goShareApp];
+        }
+            break;
+        case 4:{
+            [self goUserIntroductionVC];
+        }
+            break;
+        default:
+            break;
+    }
+}
+
+
+@end

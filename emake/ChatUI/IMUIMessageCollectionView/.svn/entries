@@ -1,0 +1,83 @@
+10
+
+dir
+4430
+svn://demo_zhang@svn.emake.cn/emake_app/emake/emake/ChatUI/IMUIMessageCollectionView
+svn://demo_zhang@svn.emake.cn/emake_app
+
+
+
+2018-09-05T01:57:17.174996Z
+4352
+wei_gu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+cf8112e6-e50d-40cb-89d0-ada3cd2a3d99
+
+Protocol
+dir
+
+Assets
+dir
+
+Models
+dir
+
+Controllers
+dir
+
+IMUI.h
+file
+
+
+
+
+2018-05-15T06:07:01.000000Z
+036f3dc5068891a4ad76f9b4d3c5c32e
+2018-02-23T07:19:39.628285Z
+2079
+wei_gu
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+175
+
+Extension
+dir
+
+Layout
+dir
+
+Views
+dir
+

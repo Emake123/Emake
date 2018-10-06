@@ -1,0 +1,170 @@
+//
+//  YHMainSuperTogetherCollectionViewCell.m
+//  emake
+//
+//  Created by zhangshichao on 2018/9/13.
+//  Copyright © 2018年 emake. All rights reserved.
+//
+
+#import "YHMainSuperTogetherCollectionViewCell.h"
+@interface YHMainSuperTogetherCollectionViewCell ()
+@property(nonatomic,strong) UIImageView*itemImage;
+@property(nonatomic,strong)UILabel *productName;
+@property(nonatomic,strong)UILabel *freightPrice;
+@property(nonatomic,strong)UILabel *originalPrice;
+
+
+@end
+@implementation YHMainSuperTogetherCollectionViewCell
+- (id)initWithFrame:(CGRect)frame{
+    self = [super initWithFrame:frame];
+    if (self) {
+        UIImageView*itemTopImage = [[UIImageView alloc]init];
+        itemTopImage.contentMode = UIViewContentModeScaleAspectFit;
+        itemTopImage.backgroundColor = ColorWithHexString(@"f2f2f2");
+        itemTopImage.image = [UIImage imageNamed:@"chaojituantitle"];
+        [self.contentView addSubview:itemTopImage];
+        [itemTopImage mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(0);
+            make.width.mas_equalTo(ScreenWidth);
+            make.height.mas_equalTo(HeightRate(30));
+            make.top.mas_equalTo(HeightRate(5));
+        }];
+        
+        UILabel *label = [[UILabel alloc]init];
+        label.text =@"超级团";
+        label.textColor = ColorWithHexString(@"ffffff");
+        label.font = [UIFont systemFontOfSize:AdaptFont(14)];
+        [self addSubview:label];
+        [label mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(WidthRate(10));
+            make.width.mas_equalTo(70);
+            make.height.mas_equalTo(HeightRate(30));
+            make.top.mas_equalTo(HeightRate(5));
+        }];
+        
+        UIImageView*itemImage = [[UIImageView alloc]init];
+        itemImage.contentMode = UIViewContentModeScaleAspectFit;
+//        itemImage.backgroundColor = ColorWithHexString(@"f2f2f2");
+        itemImage.image = [UIImage imageNamed:@"placehold"];
+        [self addSubview:itemImage];
+        [itemImage mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(WidthRate(10));
+            make.width.mas_equalTo(WidthRate(70));
+            make.height.mas_equalTo(HeightRate(70));
+            make.top.mas_equalTo(label.mas_bottom).offset(10);
+
+        }];
+        self.itemImage = itemImage;
+        
+        UILabel *productName = [[UILabel alloc]init];
+        productName.text =@"变压器111";
+        productName.numberOfLines = 2;
+//        productName.textColor = ColorWithHexString(@"333333");
+        productName.font = [UIFont systemFontOfSize:AdaptFont(14)];
+        [self addSubview:productName];
+        [productName mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(itemImage.mas_right).offset(WidthRate(10));
+            make.right.mas_equalTo(WidthRate(-10));
+            make.top.mas_equalTo(label.mas_bottom).offset(4);
+        }];
+        self.productName = productName;
+        
+//        UILabel *productCap = [[UILabel alloc]init];
+//        productCap.text =@"200kv";
+//        productCap.textColor = ColorWithHexString(@"999999");
+//        productCap.font = [UIFont systemFontOfSize:AdaptFont(12)];
+//        [self addSubview:productCap];
+//        [productCap mas_makeConstraints:^(MASConstraintMaker *make) {
+//            make.left.mas_equalTo(productName.mas_right).offset(WidthRate(5));
+//            make.bottom.mas_equalTo(productName.mas_bottom).offset(0);
+//        }];
+        
+        UILabel *freightPrice = [[UILabel alloc]init];
+        freightPrice.text =@"¥30000起 拼团价";
+        freightPrice.textColor = ColorWithHexString(@"F8695D");
+        freightPrice.font = [UIFont systemFontOfSize:AdaptFont(14)];
+        [self addSubview:freightPrice];
+        [freightPrice mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(itemImage.mas_right).offset(WidthRate(10));
+            make.top.mas_equalTo(productName.mas_bottom).offset(HeightRate(5));
+        }];
+        self.freightPrice = freightPrice;
+        
+        NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:@"¥30000 原价"];
+        [attrStr addAttribute:NSStrikethroughStyleAttributeName
+                        value:[NSNumber numberWithInteger:NSUnderlineStyleSingle]
+                        range:NSMakeRange(0, @"¥30000 原价".length)];
+        
+       
+        UILabel *originalPrice = [[UILabel alloc]init];
+        originalPrice.attributedText =attrStr;
+        originalPrice.textColor = ColorWithHexString(@"999999");
+        originalPrice.font = [UIFont systemFontOfSize:AdaptFont(13)];
+        [self addSubview:originalPrice];
+        [originalPrice mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(itemImage.mas_right).offset(WidthRate(10));
+            make.top.mas_equalTo(freightPrice.mas_bottom).offset(HeightRate(5));
+        }];
+        self.originalPrice = originalPrice;
+//        UILabel *totalNumbers = [[UILabel alloc]init];
+//        totalNumbers.text =@"拼团总量：30000件";
+//        totalNumbers.textColor = ColorWithHexString(@"999999");
+//        totalNumbers.font = [UIFont systemFontOfSize:AdaptFont(13)];
+//        [self addSubview:totalNumbers];
+//        [totalNumbers mas_makeConstraints:^(MASConstraintMaker *make) {
+//            make.left.mas_equalTo(itemImage.mas_right).offset(WidthRate(10));
+//            make.top.mas_equalTo(originalPrice.mas_bottom).offset(HeightRate(5));
+//        }];
+        
+        UIButton *togetherButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        togetherButton.backgroundColor  = ColorWithHexString(@"F8695D");
+        [togetherButton setTitle:@"去拼团" forState:UIControlStateNormal];
+        [togetherButton setTitleColor:ColorWithHexString(@"ffffff") forState:UIControlStateNormal];
+        togetherButton.titleLabel.font = [UIFont systemFontOfSize:AdaptFont(14)];
+        togetherButton.layer.cornerRadius = HeightRate(15);;
+        togetherButton.clipsToBounds = YES;
+        [self addSubview:togetherButton];
+        [togetherButton mas_makeConstraints:^(MASConstraintMaker *make) {
+//            make.centerY.mas_equalTo(itemImage.mas_centerY).offset(WidthRate(0));
+            make.top.mas_equalTo(productName.mas_bottom).offset(HeightRate(5));
+
+            make.right.mas_equalTo(WidthRate(-15));
+            make.width.mas_equalTo(WidthRate(80));
+            make.height.mas_equalTo(WidthRate(30));
+
+        }];
+        self.togetherBtn = togetherButton;
+    }
+    return self;
+}
+
+-(void)superGroupData:(YHSuperGroupModel *)model
+{
+    NSString *origianPrice =[NSString stringWithFormat:@"%@ 原价",[Tools getHaveNum:model.OldPrice.doubleValue]];
+    NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:origianPrice];
+    [attrStr addAttribute:NSStrikethroughStyleAttributeName
+                    value:[NSNumber numberWithInteger:NSUnderlineStyleSingle]
+                    range:NSMakeRange(0, origianPrice.length)];
+    self.originalPrice.attributedText = attrStr;
+    NSArray *imageArr = [Tools stringToJSON:model.GoodsSeriesPhotos];
+    if (imageArr.count>0) {
+        [self.itemImage sd_setImageWithURL:[NSURL URLWithString:imageArr.firstObject]];
+    }
+    self.productName.text = model.GroupName;
+    
+    if (model.GroupState.integerValue==0) {
+        self.togetherBtn.backgroundColor = ColorWithHexString(StandardBlueColor);
+        [self.togetherBtn setTitle:@"即将开始" forState:UIControlStateNormal];
+    }else if(model.GroupState.integerValue==1)
+    {
+        self.togetherBtn.backgroundColor = ColorWithHexString(@"F8695D");
+        [self.togetherBtn setTitle:@"去拼团" forState:UIControlStateNormal];
+    }else
+    {
+        self.togetherBtn.backgroundColor = ColorWithHexString(@"C9C9C9");
+        [self.togetherBtn setTitle:@"拼团结束" forState:UIControlStateNormal];
+    }
+    self.freightPrice.text = [NSString stringWithFormat:@"¥%@ 起 拼团价",[Tools getHaveNum:model.GroupPrice.doubleValue]];
+}
+@end

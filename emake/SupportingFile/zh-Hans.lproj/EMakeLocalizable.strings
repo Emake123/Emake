@@ -1,0 +1,41 @@
+/* 
+  EMakeLocalizable.strings
+  emake
+
+  Created by 袁方 on 2017/7/17.
+  Copyright © 2017年 emake. All rights reserved.
+*/
+
+/******************** Login ********************/
+"china international code" = "+86";
+"countdown tip" = "%d秒后重新获取";
+"login" = "登 录";
+"get captcha" = "获取验证码";
+"no captcha ?" = "未收到验证码？";
+"plz input mobilephone" = "请输入手机号";
+"plz input captcha" = "请输入验证码";
+"why no captcha" = "1.查看是否勿设了短信拦截。\n2.若该号码欠费停机，建议您更换手机号或者交费后重新获取。\n3.联系运营商取消黑名单。\n4.如果是信号网络延迟，可稍后尝试重新获取。";
+
+/******************** Today Price ********************/
+"enquiry price" = "我要询价";
+"today price" = "当日售价";
+
+/******************** Order Manage ********************/
+"cancel order" = "取消订单";
+"contract" = "合同";
+"customer service" = "客服";
+"freight price" = "(含运费￥%.2f)";
+"logistic detail" = "物流明细";
+"logistics id" = "运单号: ";
+"look over logistic" = "查看物流";
+"need payment" = "待付款";
+"number" = "数量: ";
+"order id" = "合同号: ";
+"pay" = "付款";
+"price number" = "共%d件商品";
+"production number" = "×%d";
+"quality guarantee three years" = "原厂质保三年";
+"reduction price" = "已优惠: ";
+"ren min bi" = "￥%.2f";
+"total price" = "合计: ";
+"transaction success" = "交易成功";

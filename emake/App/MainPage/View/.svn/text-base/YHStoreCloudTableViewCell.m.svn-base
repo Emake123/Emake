@@ -1,0 +1,107 @@
+//
+//  YHStoreCloudTableViewCell.m
+//  emake
+//
+//  Created by 张士超 on 2018/7/25.
+//  Copyright © 2018年 emake. All rights reserved.
+//
+
+#import "YHStoreCloudTableViewCell.h"
+
+@interface YHStoreCloudTableViewCell()
+
+
+
+@end
+
+@implementation YHStoreCloudTableViewCell
+
+-(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        UIImageView *goodsImageView = [[UIImageView alloc] init];
+        goodsImageView.translatesAutoresizingMaskIntoConstraints = NO;
+        goodsImageView.image = [UIImage imageNamed:@"placehold"];
+        [self addSubview:goodsImageView];
+        goodsImageView.contentMode = UIViewContentModeScaleAspectFit;
+        [goodsImageView PSSetSize:WidthRate(40) Height:HeightRate(40)];
+        [goodsImageView PSSetLeft:WidthRate(6)];
+        [goodsImageView PSSetTop:HeightRate(10)];
+        self.storeImageView = goodsImageView;
+        
+        UILabel *companyLable = [[UILabel alloc] init];
+        companyLable.translatesAutoresizingMaskIntoConstraints = NO;
+        companyLable.text =@"江苏天成食品销售中心";
+        companyLable.textColor = ColorWithHexString(@"333333");
+        companyLable.font = [UIFont systemFontOfSize:AdaptFont(14)];
+        [self addSubview:companyLable];
+        [companyLable PSSetTop:HeightRate(10)];
+        [companyLable PSSetLeft:WidthRate(52)];
+        self.companyLable = companyLable;
+       
+        UIImageView *tipsImage = [[UIImageView alloc] init];
+        tipsImage.image = [UIImage imageNamed:@"shouyeshoucang"];//shouyeshoucang
+        tipsImage.contentMode = UIViewContentModeScaleAspectFit;
+        tipsImage.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:tipsImage];
+        [tipsImage PSSetRightAtItem:companyLable Length:WidthRate(5)];
+        [tipsImage PSSetSize:WidthRate(29) Height:HeightRate(10)];
+        self.tipsImage = tipsImage;
+        
+        UILabel *orderMoneyLable = [[UILabel alloc] init];
+        orderMoneyLable.translatesAutoresizingMaskIntoConstraints = NO;
+        orderMoneyLable.text =@"订单额：¥500000000";
+        orderMoneyLable.textColor = ColorWithHexString(@"999999");
+        orderMoneyLable.font = [UIFont systemFontOfSize:AdaptFont(9)];
+        [self addSubview:orderMoneyLable];
+        [orderMoneyLable PSSetBottomAtItem:companyLable Length:HeightRate(5)];
+        [orderMoneyLable PSSetLeft:WidthRate(52)];
+        self.orderMoneyLable = orderMoneyLable;
+        
+        UILabel *orderNumberLable = [[UILabel alloc] init];
+        orderNumberLable.translatesAutoresizingMaskIntoConstraints = NO;
+        orderNumberLable.text =@"订单数：110";
+        orderNumberLable.textColor = ColorWithHexString(@"999999");
+        orderNumberLable.font = [UIFont systemFontOfSize:AdaptFont(9)];
+        [self addSubview:orderNumberLable];
+        [orderNumberLable PSSetLeft:WidthRate(52)];
+        [orderNumberLable PSSetBottomAtItem:orderMoneyLable Length:HeightRate(5)];
+        self.orderNumberLable = orderNumberLable;
+//        [orderNumberLable PSSetHeight:15];
+//        [orderNumberLable PSSetBottom:HeightRate(5)];
+        
+        UIButton *customSeviceButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        customSeviceButton.layer.cornerRadius = HeightRate(13);
+        customSeviceButton.clipsToBounds = YES;
+        customSeviceButton.layer.borderWidth = 1;
+        customSeviceButton.layer.borderColor = ColorWithHexString(StandardBlueColor).CGColor;
+        [customSeviceButton setTitle:@"联系客服" forState:UIControlStateNormal];
+        customSeviceButton.titleLabel.font = [UIFont systemFontOfSize:AdaptFont(12)];
+        [customSeviceButton setTitleColor:ColorWithHexString(StandardBlueColor) forState:UIControlStateNormal];;
+        [self addSubview:customSeviceButton];
+        customSeviceButton.translatesAutoresizingMaskIntoConstraints = NO;
+        [customSeviceButton PSSetBottom:HeightRate(5)];
+        [customSeviceButton PSSetSize:WidthRate(76) Height:HeightRate(26)];
+        [customSeviceButton PSSetRight:WidthRate(18)];
+        self.customSeviceButton = customSeviceButton;
+        
+        UILabel *line = [[UILabel alloc] init];
+        line.backgroundColor = SepratorLineColor;
+        [self addSubview:line];
+        line.translatesAutoresizingMaskIntoConstraints = NO;
+        [line PSSetLeft:WidthRate(0)];
+        [line PSSetBottomAtItem:orderNumberLable Length:HeightRate(5)];
+        [line PSSetBottom:0];
+        [line PSSetSize:ScreenWidth Height:1];
+    }
+    return self;
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+@end

@@ -1,0 +1,131 @@
+//
+//  MessageLayout.m
+//  JMessage-AuroraIMUI-OC-Demo
+//
+//  Created by oshumini on 2017/6/6.
+//  Copyright © 2017年 HXHG. All rights reserved.
+//
+
+#import "MessageLayout.h"
+#import "emake-Swift.h"
+
+@interface MessageLayout()
+@property(strong, nonatomic)IMUIMessageCellLayout *layout;
+@property(assign, nonatomic)BOOL isOutgoing;
+@end
+
+@implementation MessageLayout
+
+
+
+- (instancetype)init
+{
+  self = [super init];
+  if (self) {
+
+  }
+  return self;
+}
+
+- (instancetype)initWithIsOutGoingMessage:(BOOL)isOutgoing isNeedShowTime:(BOOL)isNeedShowTime bubbleContentSize:(CGSize)bubbleContentSize bubbleContentInsets:(UIEdgeInsets)contentInset contentType:(NSString *)contentType {
+  
+  self = [super init];
+  if (self) {
+    _layout = [[IMUIMessageCellLayout alloc] initWithIsOutGoingMessage: isOutgoing isNeedShowTime: isNeedShowTime bubbleContentSize: bubbleContentSize bubbleContentInsets: contentInset];
+    _isOutgoing = isOutgoing;
+    _bubbleContentType = contentType;
+  }
+  return self;
+}
+- (CGRect)nameLabelFrame {
+    if (self.isOutgoing) {
+        CGRect nameLabelFrameAdjust = CGRectMake(_layout.bubbleFrame.origin.x-120,_layout.nameLabelFrame.origin.y-5, 160,  20);
+        return nameLabelFrameAdjust;
+    }else{
+        CGRect nameLabelFrameAdjust = CGRectMake(_layout.bubbleFrame.origin.x,_layout.nameLabelFrame.origin.y-5, 160,  20);
+        return nameLabelFrameAdjust;
+    }
+}
+- (CGRect)statusViewFrame {
+    
+    CGRect statusViewFrameAdjust = CGRectMake(_layout.statusViewFrame.origin.x,_layout.statusViewFrame.origin.y+17, _layout.statusViewFrame.size.width,  _layout.statusViewFrame.size.height);
+    return statusViewFrameAdjust;
+}
+- (CGFloat)cellHeight {
+  return _layout.cellHeight;
+}
+
+- (CGRect)avatarFrame {
+  return _layout.avatarFrame;
+}
+
+- (CGRect)timeLabelFrame {
+  return _layout.timeLabelFrame;
+}
+
+- (CGRect)bubbleFrame {
+  return _layout.bubbleFrame;
+}
+
+- (CGSize) bubbleContentSize {
+  return _layout.bubbleContentSize;
+}
+
+- (UIEdgeInsets)bubbleContentInset {
+  return _layout.bubbleContentInset;
+}
+
+- (UIEdgeInsets)cellContentInset {
+  return _layout.cellContentInset;
+}
+
+- (id <IMUIMessageStatusViewProtocol> _Nonnull)statusView {
+  return _layout.statusView;
+}
+
+//- (CGRect)statusViewFrame {
+//  return _layout.statusViewFrame;
+//}
+
+//- (CGRect)nameLabelFrame {
+//  return _layout.nameLabelFrame;
+//}
+
+- (id <IMUIMessageContentViewProtocol> _Nonnull)bubbleContentView {
+  if ([_bubbleContentType isEqual: @"Text"]) {
+    return [IMUITextMessageContentView new];
+  }
+  
+  if ([_bubbleContentType isEqual: @"Voice"]) {
+    return [IMUIVoiceMessageContentView new];
+  }
+
+  if ([_bubbleContentType isEqual: @"Image"]) {
+    return [IMUIImageMessageContentView new];
+  }
+  
+  if ([_bubbleContentType isEqual: @"Video"]) {
+    return [IMUIVideoMessageContentView new];
+  }
+   if ([_bubbleContentType isEqual:@"Contract"]) {
+        return [IMUIContractMessageContentView new];
+   }
+    
+  if ([_bubbleContentType isEqual:@"Product"]) {
+        return [IMUIProductContentView new];
+    }
+    
+  if ([_bubbleContentType isEqual:@"Product"]) {
+        return [IMUIProductContentView new];
+    }
+    
+    if ([_bubbleContentType isEqual:@"File"]) {
+        return [IMUIFileContentView new];
+    }
+    return [IMUITextMessageContentView new];
+}
+
+- (NSString * _Nonnull)bubbleContentType {
+  return _bubbleContentType;
+}
+@end

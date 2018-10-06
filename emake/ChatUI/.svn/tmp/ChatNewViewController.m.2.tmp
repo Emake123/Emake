@@ -1,0 +1,939 @@
+//
+//  ViewController.m
+//  sampleObjectC
+//
+//  Created by oshumini on 2017/6/6.
+//  Copyright © 2017年 HXHG. All rights reserved.
+//
+#import <Photos/Photos.h>
+#import "ChatNewViewController.h"
+#import "emake-Swift.h"
+#import "MessageModel.h"
+#import "UserModel.h"
+#import "MessageEventModel.h"
+#import "FMDBManager.h"
+#import "OSSClientLike.h"
+#import "chatNewModel.h"
+#import "chatUserModel.h"
+#import "chatBodyModel.h"
+#import "YHMQTTClient.h"
+#import "YHContractCreatViewController.h"
+#import "YHMissonCreatSuccessView.h"
+#import "YHSixTeamViewController.h"
+#import "MessageEventCollectionViewCell.h"
+#import "YHShoppingCartConfirmViewController.h"
+#import "YHContractSighSuccessViewController.h"
+#import "SKFPreViewNavController.h"
+#import "YHProductDetailsViewController.h"
+#import "YHGoodsModel.h"
+static NSString *lastTimeSendMessage;
+@interface ChatNewViewController ()<IMUIInputViewDelegate, IMUIMessageMessageCollectionViewDelegate,YHMQTTClientDelegate,MessageEventCollectionViewDelegate>
+@property (weak, nonatomic) IBOutlet IMUIMessageCollectionView *messageList;
+@property (weak, nonatomic) IBOutlet IMUIInputView *imuiInputView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *distance;
+@property (nonatomic,copy)NSString *pasteText;
+@property (nonatomic,assign)float KeyFrameIndex;
+@property (assign, nonatomic) NSInteger page;
+@property (retain, nonatomic) NSMutableArray *chatListArray;
+@property (nonatomic,copy)NSString *contractType;
+@property (nonatomic,copy)NSString *MQTTTopic;
+@end
+
+@implementation ChatNewViewController
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    [YHMQTTClient sharedClient].MessageCount = 0;
+    self.isPostOrder = false;
+    self.isPostOrderDetail = false;
+    //语音停止播放
+    [[IMUIAudioPlayerHelper sharedInstance] stopAudio];
+}
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.title =@"易智造官方客服";
+    if (self.serversID.length>0) {
+        [YHMQTTClient sharedClient].delegate = self;
+        [YHMQTTClient sharedClient].MessageCount = 0;
+        NSString *messageIdString = [[NSUUID UUID] UUIDString];
+        chatNewModel *model = [self creatEventModelData:self.contractNo.length>0?self.contractNo:@"" andType:@"Text" messageIdString:messageIdString];
+        self.MQTTTopic = [NSString stringWithFormat:@"customer/%@",self.serversID];
+        [[YHMQTTClient sharedClient] sendMessage:[model mj_keyValues] withTopic: self.MQTTTopic];
+    }else{
+        [self getServerID];
+    }
+    self.page = 0;
+    self.chatListArray = [NSMutableArray arrayWithCapacity:0];
+    [self addRigthDetailButtonIsShowCart:false];
+    [self.messageList.messageCollectionView registerClass:[MessageEventCollectionViewCell class] forCellWithReuseIdentifier:[[MessageEventCollectionViewCell class] description]];
+    [self.imuiInputView.micBtn addTarget:self action:@selector(clickMicBtn) forControlEvents:UIControlEventTouchUpInside];
+    self.messageList.delegate = self;
+    self.imuiInputView.inputViewDelegate = self;
+    self.messageList.messageCollectionView.mj_header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadMoreData)];
+    [self.messageList.messageCollectionView.mj_header beginRefreshing];
+    UITapGestureRecognizer *gesture = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(doSomething)];
+    [self.messageList addGestureRecognizer:gesture];
+}
+- (void)loadMoreData{
+    self.page++;
+    [self displayHistoryListWithPage];
+}
+- (void)doSomething{
+    [self.imuiInputView hideFeatureView];
+}
+- (void)getServerID{
+    [[YHJsonRequest shared] getCustomerServiceIDSuccessBlock:^(NSDictionary *serversIDDic) {
+        
+        [YHMQTTClient sharedClient].delegate = self;
+        [YHMQTTClient sharedClient].MessageCount = 0;
+        NSString *messageIdString = [[NSUUID UUID] UUIDString];
+        chatNewModel *model = [self creatEventModelData:self.contractNo.length>0?self.contractNo:@"" andType:@"Text" messageIdString:messageIdString];
+        self.MQTTTopic = [NSString stringWithFormat:@"customer/%@",serversIDDic[@"ServiceId"]];
+        [[YHMQTTClient sharedClient] sendMessage:[model mj_keyValues] withTopic: self.MQTTTopic];
+    } fialureBlock:^(NSString *errorMessages) {
+        [self.view makeToast:errorMessages];
+    }];
+}
+- (void)displayHistoryListWithPage{
+    
+    [[FMDBManager sharedManager] getAllMessageWithPage:self.page success:^(NSArray *responseObject) {
+        [self.messageList.chatDataManager cleanCache];
+        [self.messageList.messageCollectionView reloadData];
+        [self displayHistoryList:responseObject];
+        self.chatListArray = [NSMutableArray arrayWithArray:responseObject];
+        if (self.page == 1 && self.isPostOrderDetail == true) {
+            [self didSelectProduct];
+            [self.messageList.messageCollectionView.mj_header endRefreshing];
+        }
+        if (self.page == 1 && self.isPostOrder == true) {
+            [self postEvent];
+            [self.messageList.messageCollectionView.mj_header endRefreshing];
+        }else{
+            [self.messageList.messageCollectionView.mj_header endRefreshing];
+        }
+    } failure:^(NSString *errorObject) {
+        [self.view makeToast:errorObject duration:1.0 position:CSToastPositionCenter];
+        [self.messageList.messageCollectionView.mj_header endRefreshing];
+    }];
+}
+- (void)postEvent{
+    if (self.MQTTTopic.length<=9) {
+        [self getServerID];
+        if(self.jsonStr.length>0){
+            [self.view makeToast:@"订单发送失败"];
+        }
+        return;
+    }
+    if(self.orderArray.count>0){
+    NSString *messageIdString = [[NSUUID UUID] UUIDString];
+    MessageEventModel *eventModel = [[MessageEventModel alloc]initWithMsgId:messageIdString eventText:self.jsonStr];
+    [self.messageList appendMessageWith: eventModel];
+        chatNewModel *model = [self creatMessageModelData:self.jsonStr contract:@"" contractState:@"" andType:@"Order" messageIdString:messageIdString IsIncludeTax:self.IsIncludeTax];
+        //发送消息
+        NSString *timeString = [NSDate getCurrentTime];
+        BOOL isNeedShow = [NSDate isValideTimeDifferenceWithTime:lastTimeSendMessage currentTime:timeString ValidTime:nil andValidTimeInterval:3];
+        lastTimeSendMessage = timeString;
+        if (!isNeedShow) {
+            timeString = @"";
+        }
+        BOOL isSendSuccess = [[YHMQTTClient sharedClient] sendMessage:[model mj_keyValues] withTopic:self.MQTTTopic];
+        //添加到数据库
+        if (isSendSuccess) {
+            [self addToFMDB:self.jsonStr messageId:model.MessageId sender:@"1" sendTime:timeString msgType:@"SEND_Order" staffName:@"" staffAvata:@"" contractNo:self.contractNo ContractState:@"" isIncludeTax:@""];
+        }else{
+            [self.view makeToast:@"订单发送失败"];
+        }
+        [self.messageList scrollToBottomWith:YES];
+        [self getServerID];
+    }
+}
+- (void)displayHistoryList:(NSArray *)insertLiatData{
+    for (SDChatMessage *msg in insertLiatData){
+        NSString *timeString = msg.sendTime;
+        BOOL isNeedShow = [NSDate isValideTimeDifferenceWithTime:lastTimeSendMessage currentTime:msg.sendTime ValidTime:nil andValidTimeInterval:3];
+        lastTimeSendMessage = msg.sendTime;
+        if (!isNeedShow) {
+            timeString = @"";
+        }
+        if ([msg.msgType isEqualToString:@"SEND_TEXT"] ) {
+            UserModel *user = [UserModel new];
+            user.serversAvata = msg.staffAvata;
+            user.isOutgoing = [msg.sender integerValue];
+            MessageModel *message = [[MessageModel alloc] initWithText:msg.msg messageId:msg.msgID fromUser:user timeString:timeString isOutgoing:[msg.sender integerValue] status:IMUIMessageStatusSuccess];
+            [self.messageList appendMessageWith:message];
+        }else if ([msg.msgType isEqualToString:@"SEND_IMAGE"] ){
+            NSString *imagePath = [self getPath:msg.msgID];
+            UserModel *user = [UserModel new];
+            user.serversAvata = msg.staffAvata;
+            user.isOutgoing = [msg.sender integerValue];
+            MessageModel *message = [[MessageModel alloc] initWithImagePath:imagePath messageId:msg.msgID fromUser:user timeString:timeString isOutgoing:[msg.sender integerValue] status:IMUIMessageStatusSuccess];
+            [self.messageList appendMessageWith: message];
+        }else if ([msg.msgType isEqualToString:@"SEND_MutilePart"]){
+            NSArray *part = [msg.msg componentsSeparatedByString:@"$¥"];
+            if (part.count>0) {
+                UserModel *user = [UserModel new];
+                user.serversAvata = msg.staffAvata;
+                user.isOutgoing = [msg.sender integerValue];
+                if(part.count>3){
+                    self.contractType = part[3];
+                }
+                MessageModel *message = [[MessageModel alloc] initWithText:msg.msg IsIncludeTax:msg.IsIncludeTax ContractNo:msg.contractNo ContractState:msg.ContractState ContractImagePath:part[1] ContractURL:part[2] messageId:msg.msgID fromUser:user timeString:timeString isOutgoing:[msg.sender integerValue] status:IMUIMessageStatusSuccess];
+                [self.messageList appendMessageWith: message];
+            }
+        }else  if ([msg.msgType isEqualToString:@"SEND_Order"] ) {
+            MessageEventModel *eventModel = [[MessageEventModel alloc]initWithMsgId:msg.msgID eventText:msg.msg];
+            [self.messageList appendMessageWith: eventModel];
+        }else if ([msg.msgType isEqualToString:@"SEND_Goods"]){
+            UserModel *user = [UserModel new];
+            user.serversAvata =  msg.staffAvata;
+            user.isOutgoing = [msg.sender integerValue];
+            MessageModel *message = [[MessageModel alloc] initWithProductJsonText:msg.msg messageId:msg.msgID fromUser:(id<IMUIUserProtocol>)user timeString:timeString isOutgoing:[msg.sender integerValue] status:IMUIMessageStatusSuccess];
+            [self.messageList appendMessageWith:message];
+        }else if ([msg.msgType isEqualToString:@"SEND_Voice"]){
+            UserModel *user = [UserModel new];
+            user.serversAvata =  msg.staffAvata;
+            
+            MessageModel *  message = [[MessageModel alloc] initWithVoicePath:[Tools getVoicePath:msg.msgID] duration:msg.msg.integerValue  messageId:msg.msgID fromUser:user timeString:timeString isOutgoing:[msg.sender integerValue] status:IMUIMessageStatusSuccess];
+            [_messageList appendMessageWith: message];
+        }
+    }
+    if (self.page == 1) {
+        [self.messageList scrollToBottomWith:YES];
+    }
+}
+- (void)clickMicBtn{
+    
+}
+- (NSString *)getPath:(NSString *)UUID {
+    return [NSString stringWithFormat:@"https://img-emake-cn.oss-cn-shanghai.aliyuncs.com/images/%@.png", UUID];
+}
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+// - MARK: IMUIInputViewDelegate
+- (void)messageCollectionView:(UICollectionView * _Nonnull)willBeginDragging {
+    [_imuiInputView hideFeatureView];
+}
+- (void)keyBoardWillShowWithHeight:(CGFloat)height durationTime:(double)durationTime{
+    self.distance.constant = height;
+    self.KeyFrameIndex = HeightRate(height);
+    if (ScreenWidth == 320) {
+        self.KeyFrameIndex = self.KeyFrameIndex + HeightRate(40);
+        height = height + 10;
+    }
+    [self.messageList scrollToBottomWith:YES];
+    if (self.messageList.messageCollectionView.contentSize.height<HeightRate(300)) {
+        return;
+    }
+    [self.messageList.messageCollectionView setContentOffset:CGPointMake(0, self.messageList.messageCollectionView.contentSize.height+ height + HeightRate(150) - ScreenHeight) animated:YES];
+}
+
+// - MARK: IMUIInputViewDelegate
+/// Tells the delegate that user tap send button and text input string is not empty
+- (void)sendTextMessage:(NSString * _Nonnull)messageText {
+   
+    if (self.MQTTTopic.length<=9) {
+        [self getServerID];
+        [self.view makeToast:@"消息发送失败"];
+        return;
+    }
+    NSString *messageIdString = [[NSUUID UUID] UUIDString];
+    chatNewModel *model = [self creatMessageModelData:messageText contract:@"" contractState:@"" andType:@"Text" messageIdString:messageIdString IsIncludeTax:@""];
+    //发送消息
+    NSString *timeString = [NSDate getCurrentTime];
+    BOOL isNeedShow = [NSDate isValideTimeDifferenceWithTime:lastTimeSendMessage currentTime:timeString ValidTime:nil andValidTimeInterval:3];
+    lastTimeSendMessage = timeString;
+    if (!isNeedShow) {
+        timeString = @"";
+    }
+    BOOL isSendSuccess =[[YHMQTTClient sharedClient] sendMessage:[model mj_keyValues] withTopic:self.MQTTTopic];
+    UserModel *user = [UserModel new];
+    user.isOutgoing = true;
+    MessageModel *message = nil;
+    if (isSendSuccess) {
+        message = [[MessageModel alloc]initWithText:messageText messageId:model.MessageId fromUser:user timeString:timeString isOutgoing:YES status:IMUIMessageStatusSuccess];
+        //添加到数据库
+        [self addToFMDB:messageText messageId:model.MessageId sender:@"1" sendTime:lastTimeSendMessage msgType:@"SEND_TEXT" staffName:@"" staffAvata:@"" contractNo:@"" ContractState:@"" isIncludeTax:@""];
+    }else{
+        message = [[MessageModel alloc]initWithText:messageText messageId:model.MessageId fromUser:user timeString:timeString isOutgoing:YES status:IMUIMessageStatusFailed];
+    }
+    [self.messageList appendMessageWith:message];
+    [self.messageList scrollToBottomWith:YES];
+}
+/// Tells the delegate that IMUIInputView will switch to recording voice mode
+- (void)switchToMicrophoneModeWithRecordVoiceBtn:(UIButton * _Nonnull)recordVoiceBtn {
+    
+}
+/// Tells the delegate that start record voice
+- (void)startRecordVoice {
+    
+    [self performSelector:@selector(stopRecord) withObject:nil afterDelay:60];
+}
+- (void)stopRecord{
+    
+    IMUIRecordVoiceCell *cell = (IMUIRecordVoiceCell *)[self.imuiInputView.featureView.featureCollectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+    [cell finishRecordVoice];
+}
+/// Tells the delegate when finish record voice
+- (void)finishRecordVoice:(NSString * _Nonnull)voicePath durationTime:(double)durationTime {
+    if (((int)durationTime)<1) {
+        [self.view makeToast:@"录音时间太短" duration:1.0 position:CSToastPositionCenter];
+        return;
+    }
+    NSString *messageIdString = [[NSUUID UUID] UUIDString];
+    UserModel *user = [UserModel new];
+    user.isOutgoing = true;
+    NSString *timeString = [NSDate getCurrentTime];
+    BOOL isNeedShow = [NSDate isValideTimeDifferenceWithTime:lastTimeSendMessage currentTime:timeString ValidTime:nil andValidTimeInterval:3];
+    lastTimeSendMessage = timeString;
+    if (!isNeedShow) {
+        timeString = @"";
+    }
+    [[OSSClientLike sharedClient] uploadVoiceObjectAsync:voicePath withFileName:messageIdString andType:voice succcessBlock:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+           MessageModel *  message = [[MessageModel alloc] initWithVoicePath:voicePath duration:durationTime messageId:messageIdString fromUser:user timeString:timeString isOutgoing:YES status:IMUIMessageStatusSuccess];
+            [_messageList appendMessageWith: message];
+            chatNewModel *model = [self creatMessageModelData:[NSString stringWithFormat:@"%d",(int)durationTime] contract:@"" contractState:@"" andType:@"Voice" messageIdString:messageIdString IsIncludeTax:@""];
+            
+            BOOL isSendSuccess = [[YHMQTTClient sharedClient] sendMessage:[model mj_keyValues] withTopic:self.MQTTTopic];
+            //添加到数据库
+            if (isSendSuccess) {
+                [self addToFMDB:[NSString stringWithFormat:@"%d",(int)durationTime] messageId:messageIdString sender:@"1" sendTime:lastTimeSendMessage msgType:@"SEND_Voice" staffName:@"" staffAvata:@"" contractNo:@"" ContractState:@"" isIncludeTax:@""];
+            }else{
+                
+                [self.view makeToast:@"产品发送失败"];
+            }
+           
+            [self.messageList scrollToBottomWith:YES];
+        });
+        
+    } failBLock:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            MessageModel *message = [[MessageModel alloc] initWithVoicePath:voicePath duration:durationTime messageId:messageIdString fromUser:user timeString:timeString isOutgoing:YES status:IMUIMessageStatusFailed];
+            [_messageList appendMessageWith: message];
+            [self.messageList scrollToBottomWith:YES];
+        });
+        
+    }];
+}
+- (void)cancelRecordVoice {
+    
+}
+/// Tells the delegate that IMUIInputView will switch to gallery
+- (void)switchToGalleryModeWithPhotoBtn:(UIButton * _Nonnull)photoBtn {
+    
+}
+/// Tells the delegate that user did selected Photo in gallery
+//发送图片
+- (void)didSeletedGalleryWithAssetArr:(NSArray<PHAsset *> * _Nonnull)AssetArr {
+    if (self.MQTTTopic.length<=9) {
+        [self getServerID];
+        [self.view makeToast:@"图片发送失败"];
+        return;
+    }
+    for (PHAsset *asset in AssetArr) {
+        switch (asset.mediaType) {
+            case PHAssetMediaTypeImage: {
+                PHImageRequestOptions *options = [[PHImageRequestOptions alloc]init];
+                options.synchronous  = true;
+                options.networkAccessAllowed = YES;
+                options.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
+                [[PHImageManager defaultManager] requestImageForAsset:asset targetSize: CGSizeMake(ScreenWidth, ScreenHeight) contentMode:PHImageContentModeAspectFit options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+                    
+                    NSString *messageIdString = [[NSUUID UUID] UUIDString];
+                    NSString *timeString = [NSDate getCurrentTime];
+                    BOOL isNeedShow = [NSDate isValideTimeDifferenceWithTime:lastTimeSendMessage currentTime:timeString ValidTime:nil andValidTimeInterval:3];
+                    lastTimeSendMessage = timeString;
+                    if (!isNeedShow) {
+                        timeString = @"";
+                    }
+                    NSString *filePath = [self getPath:messageIdString];
+                    UserModel *user = [UserModel new];
+                    user.isOutgoing = true;
+                    
+                    [[OSSClientLike sharedClient] uploadObjectAsync:result withFileName:messageIdString succcessBlock:^{
+                        chatNewModel *model = [self creatMessageModelData:@"" contract:@"" contractState:@"" andType:@"Image" messageIdString:messageIdString IsIncludeTax:@""];
+                        //发送消息
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                           BOOL isSendSuccess = [[YHMQTTClient sharedClient] sendMessage:[model mj_keyValues] withTopic:self.MQTTTopic];
+                            MessageModel *message = nil;
+                            if (isSendSuccess) {
+                                message = [[MessageModel alloc] initWithImagePath:filePath
+                                                                        messageId:messageIdString
+                                                                         fromUser:user
+                                                                       timeString:timeString
+                                                                       isOutgoing:true
+                                                                           status:IMUIMessageStatusSuccess];
+                                NSDictionary *dic =@{@"msg":@"",@"msgID":messageIdString,@"sender":@"1",@"sendTime":lastTimeSendMessage,@"msgType":@"SEND_IMAGE",@"staffName":@"",@"staffAvata":@""};
+                                SDChatMessage *msg =[SDChatMessage chatMessageWithDic:dic];
+                                [[FMDBManager sharedManager] addMessage:msg];
+                            }else{
+                                message = [[MessageModel alloc] initWithImagePath:filePath
+                                                                        messageId:messageIdString
+                                                                         fromUser:user
+                                                                       timeString:timeString
+                                                                       isOutgoing:true
+                                                                           status:IMUIMessageStatusFailed];
+                            }
+                            [_messageList appendMessageWith:message];
+                            [self.messageList scrollToBottomWith:YES];
+                        });
+                        
+                    }failBLock:^{
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            MessageModel *message = [[MessageModel alloc] initWithImagePath:filePath
+                                                                                  messageId:messageIdString
+                                                                                   fromUser:user
+                                                                                 timeString:timeString
+                                                                                 isOutgoing:true
+                                                                                     status:IMUIMessageStatusFailed];
+                            [_messageList appendMessageWith: message];
+                            [self.messageList scrollToBottomWith:YES];
+                        });
+                        
+                    }];
+                }];
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    
+}
+/// Tells the delegate that IMUIInputView will switch to camera mode
+- (void)switchToCameraModeWithCameraBtn:(UIButton * _Nonnull)cameraBtn {
+    
+}
+/// Tells the delegate that user did shoot picture in camera mode
+- (void)didShootPictureWithPicture:(NSData * _Nonnull)picture {
+    
+    NSString *messageIdString = [[NSUUID UUID] UUIDString];
+    NSString *filePath = [self getPath:messageIdString];
+    UserModel *user = [UserModel new];
+    user.isOutgoing = true;
+    NSString *timeString = [NSDate getCurrentTime];
+    BOOL isNeedShow = [NSDate isValideTimeDifferenceWithTime:lastTimeSendMessage currentTime:timeString ValidTime:nil andValidTimeInterval:3];
+    lastTimeSendMessage = timeString;
+    if (!isNeedShow) {
+        timeString = @"";
+    }
+    UIImage *imgae =[UIImage imageWithData:picture];
+    [[OSSClientLike sharedClient] uploadObjectAsync:imgae withFileName:messageIdString succcessBlock:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            chatNewModel *model = [self creatMessageModelData:@"" contract:@"" contractState:@"" andType:@"Image" messageIdString:messageIdString IsIncludeTax:@""];
+            //发送消息
+            BOOL isSendSuccess = [[YHMQTTClient sharedClient] sendMessage:[model mj_keyValues] withTopic:self.MQTTTopic];
+            UserModel *user = [UserModel new];
+            user.isOutgoing = true;
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                MessageModel *message = nil;
+                if (isSendSuccess) {
+                    message = [[MessageModel alloc] initWithImagePath:filePath
+                                                            messageId:messageIdString
+                                                             fromUser:user
+                                                           timeString:timeString
+                                                           isOutgoing:true
+                                                               status:IMUIMessageStatusSuccess];
+                    NSDictionary *dic =@{@"msg":@"",@"msgID":messageIdString,@"sender":@"1",@"sendTime":lastTimeSendMessage,@"msgType":@"SEND_IMAGE",@"staffName":@"",@"staffAvata":@""};
+                    SDChatMessage *msg =[SDChatMessage chatMessageWithDic:dic];
+                    [[FMDBManager sharedManager] addMessage:msg];
+                }else{
+                    message = [[MessageModel alloc] initWithImagePath:filePath
+                                                            messageId:messageIdString
+                                                             fromUser:user
+                                                           timeString:timeString
+                                                           isOutgoing:true
+                                                               status:IMUIMessageStatusFailed];
+                }
+                [_messageList appendMessageWith:message];
+                [self.messageList scrollToBottomWith:YES];
+            });
+        });
+    } failBLock:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UserModel *user = [UserModel new];
+            user.isOutgoing = true;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                MessageModel *message = [[MessageModel alloc] initWithImagePath:filePath
+                                                                      messageId:messageIdString
+                                                                       fromUser:user
+                                                                     timeString:timeString
+                                                                     isOutgoing:true
+                                                                         status:IMUIMessageStatusFailed];
+                
+                [_messageList appendMessageWith:message];
+                [self.messageList scrollToBottomWith:YES];
+            });
+        });
+    }];
+}
+/// Tells the delegate when starting record video
+- (void)startRecordVideo {
+    
+}
+/// Tells the delegate when user did shoot video in camera mode
+- (void)finishRecordVideoWithVideoPath:(NSString * _Nonnull)videoPath durationTime:(double)durationTime {
+
+}
+- (NSString *)getPath{
+    
+    NSString *path = [NSString stringWithFormat:@"%@/Documents/%f", NSHomeDirectory(), NSDate.timeIntervalSinceReferenceDate];
+    return path;
+}
+- (chatNewModel *)creatMessageModelData:(NSString *)messageText contract:(NSString *)contract contractState:(NSString *)contractState andType:(NSString *)type messageIdString:(NSString *)MessageId IsIncludeTax:(NSString *)isIncludeTax{
+    
+    NSString *userID = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERID]];
+    NSString *realname = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERREALNAME];
+    NSString *phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
+    NSString *userType = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERTYPE];
+    chatUserModel *userModel = [[chatUserModel alloc]initWith:[Tools getHeadImageURL] formId:userID displayName:realname.length>0?realname:@"" phoneNumber:phone userType:userType];
+    NSDictionary *userDic = [userModel mj_keyValues];
+    chatBodyModel *bodyModel = nil;
+    if ([type isEqualToString:@"Image"]) {
+        NSString *fileNamePath = [NSString stringWithFormat:@"https://img-emake-cn.oss-cn-shanghai.aliyuncs.com/images/%@.png",MessageId];
+        bodyModel = [[chatBodyModel alloc]initWithImage:fileNamePath Type:type];
+    }else if ([type isEqualToString:@"Text"]){
+        bodyModel = [[chatBodyModel alloc]initWithText:messageText Type:type];
+    }else if ([type isEqualToString:@"Goods"]){
+        bodyModel = [[chatBodyModel alloc]initWithText:messageText Type:type];
+
+    } else if ([type isEqualToString:@"Order"]){
+        bodyModel = [[chatBodyModel alloc]initWithText:messageText Type:type];
+        
+    }else if ([type isEqualToString:@"Voice"]){
+        NSString *fileNamePath = [NSString stringWithFormat:@"https://voi-emake-cn.oss-cn-shanghai.aliyuncs.com/mqtt/%@.m4a",MessageId];
+        bodyModel = [[chatBodyModel alloc]initWithVoicePath:fileNamePath voiceDuration:messageText Type:@"Voice"];
+    }else if ([type isEqualToString:@"MutilePart"]){
+        NSArray *part = [messageText componentsSeparatedByString:@"$¥"];
+        if (part.count > 3) {
+            bodyModel = [[chatBodyModel alloc]initWithImage:part[1] Text:part[0] ImageUrl:part[1] Url:part[2] Type:type ContractType:part[3] Contract:contract ContractState:contractState IsIncludeTax:isIncludeTax];
+        }
+        
+    }
+    NSDictionary *bodyDic = [bodyModel mj_keyValues];
+    chatNewModel *model = [[chatNewModel alloc]initWithId:self.MQTTTopic messageType:@"Message" messageId:MessageId user:userDic andMessageBody:bodyDic];
+    return model;
+}
+- (chatNewModel *)creatEventModelData:(NSString *)messageText andType:(NSString *)type messageIdString:(NSString *)MessageId{
+    NSString *userID = [NSString stringWithFormat:@"%@",[[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERID]];
+    NSString *realname = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERREALNAME];
+    NSString *phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
+    NSString *userType = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERTYPE];
+
+    chatUserModel *userModel = [[chatUserModel alloc]initWith:[Tools getHeadImageURL] formId:userID displayName:realname.length>0?realname:@"" phoneNumber:phone userType:userType];
+    NSDictionary *userDic = [userModel mj_keyValues];
+    chatBodyModel *bodyModel = [[chatBodyModel alloc]initWithEventType:type EventText:messageText];
+    NSDictionary *bodyDic = [bodyModel mj_keyValues];
+    chatNewModel *model = [[chatNewModel alloc]initWithId:self.MQTTTopic messageType:@"Event" messageId:MessageId user:userDic andMessageBody:bodyDic];
+    return model;
+}
+- (void)addToFMDB:(NSString *)messageText messageId:(NSString *)messageId sender:(NSString *)sender sendTime:(NSString *)sendTime msgType:(NSString *)sendType staffName:(NSString *)staffName staffAvata:(NSString *)staffAvata contractNo:(NSString *)contractNo ContractState:(NSString *)ContractState isIncludeTax:(NSString *)isIncludeTax{
+    messageText = messageText.length ==0?@"":messageText;
+    contractNo = contractNo.length==0?@"":contractNo;
+    ContractState = ContractState.length==0?@"":ContractState;
+    isIncludeTax = isIncludeTax.length==0?@"":isIncludeTax;
+
+//isIncludeTax
+    NSDictionary *dic =@{@"msg":messageText,@"msgID":messageId,@"sender":sender,@"sendTime":sendTime,@"msgType":sendType,@"staffName":staffName,@"staffAvata":staffAvata,@"contractNo":contractNo,@"ContractState":ContractState,@"IsIncludeTax":isIncludeTax};
+    SDChatMessage *msg =[SDChatMessage chatMessageWithDic:dic];
+    [[FMDBManager sharedManager] addMessage:msg];
+}
+#pragma mark========YHMQTTClientDelegate
+-(void)onMessgae:(MQTTMessage *)messgae{
+    
+    if (messgae.payload) {
+        NSDictionary *payload = [NSJSONSerialization JSONObjectWithData:messgae.payload options:0 error:nil];
+        chatNewModel *model = [chatNewModel mj_objectWithKeyValues:payload];
+        chatBodyModel *body = [chatBodyModel mj_objectWithKeyValues:model.MessageBody];
+        chatUserModel *form = [chatUserModel mj_objectWithKeyValues:model.From];
+        NSString *timeString = model.UpdateTime;
+        BOOL isNeedShow = [NSDate isValideTimeDifferenceWithTime:lastTimeSendMessage currentTime:timeString ValidTime:nil andValidTimeInterval:3];
+        lastTimeSendMessage = timeString;
+        if (!isNeedShow) {
+            timeString = @"";
+        }
+        if ([body.Type isEqualToString:@"Text"]){
+            UserModel *user = [UserModel new];
+            user.serversAvata = form.Avatar;
+            user.isOutgoing = false;
+            MessageModel *message = [[MessageModel alloc] initWithText:body.Text
+                                                             messageId:model.MessageId
+                                                              fromUser:user
+                                                            timeString:timeString
+                                                            isOutgoing:0
+                                                                status:IMUIMessageStatusSuccess];
+            [self.messageList appendMessageWith:message];
+            [self addToFMDB:body.Text messageId:model.MessageId sender:@"0" sendTime:lastTimeSendMessage msgType:@"SEND_TEXT" staffName:form.DisplayName staffAvata:form.Avatar contractNo:@"" ContractState:@"" isIncludeTax:@""];
+            [self.messageList scrollToBottomWith:YES];
+            
+        }else if ([body.Type isEqualToString:@"Image"]){
+            
+            NSString *imagePath = [self getPath:model.MessageId];
+            UserModel *user = [UserModel new];
+            user.serversAvata = form.Avatar;
+            user.isOutgoing = false;
+            MessageModel *message = [[MessageModel alloc] initWithImagePath:imagePath
+                                                                  messageId:model.MessageId
+                                                                   fromUser:user
+                                                                 timeString:timeString
+                                                                 isOutgoing:0
+                                                                     status:IMUIMessageStatusSuccess];
+            [self.messageList appendMessageWith: message];
+            [self addToFMDB:@"" messageId:model.MessageId sender:@"0" sendTime:lastTimeSendMessage msgType:@"SEND_IMAGE" staffName:form.DisplayName staffAvata:form.Avatar contractNo:@"" ContractState:@"" isIncludeTax:@""];
+            [self.messageList scrollToBottomWith:YES];
+        }else if ([body.Type isEqualToString:@"MutilePart"]){
+            UserModel *user = [UserModel new];
+            user.serversAvata = form.Avatar;
+            user.isOutgoing = false;
+            self.contractType = body.ContractType;
+            NSString *msg = [NSString stringWithFormat:@"%@$¥%@$¥%@$¥%@",body.Text,body.ImageUrl,body.Url,body.ContractType];
+            MessageModel *message = [[MessageModel alloc] initWithText:msg IsIncludeTax:body.IsIncludeTax ContractNo:body.Contract ContractState:body.ContractState ContractImagePath:body.ImageUrl ContractURL:body.Url messageId:model.MessageId fromUser:user timeString:timeString isOutgoing:0 status:IMUIMessageStatusSuccess ];
+                [self.messageList appendMessageWith: message];
+            [self addToFMDB:msg messageId:model.MessageId sender:@"0" sendTime:lastTimeSendMessage msgType:@"SEND_MutilePart" staffName:form.DisplayName staffAvata:form.Avatar contractNo:body.Contract ContractState:body.ContractState isIncludeTax:body.IsIncludeTax];
+                [self.messageList scrollToBottomWith:YES];
+        }else if ([body.Type isEqualToString:@"Goods"]){
+            
+            UserModel *user = [UserModel new];
+            user.serversAvata = form.Avatar;
+            user.isOutgoing = false;
+            MessageModel *message = [[MessageModel alloc] initWithProductJsonText:body.Text messageId:model.MessageId fromUser:user timeString:timeString isOutgoing:0 status:IMUIMessageStatusSuccess];
+            [self.messageList appendMessageWith: message];
+            [self addToFMDB:body.Text messageId:model.MessageId sender:@"0" sendTime:lastTimeSendMessage msgType:@"SEND_Goods" staffName:form.DisplayName staffAvata:form.Avatar contractNo:@"" ContractState:@"" isIncludeTax:@""];
+            [self.messageList scrollToBottomWith:YES];
+            
+            
+        }else if ([body.Type isEqualToString:@"Voice"]){
+            
+            UserModel *user = [UserModel new];
+            user.serversAvata = form.Avatar;
+            user.isOutgoing = false;
+            if (![[NSFileManager defaultManager] fileExistsAtPath:[Tools getVoicePath:model.MessageId]]) {
+                NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:body.Voice]];
+                if (data.bytes>0&&data) {
+                    [data writeToFile:[Tools getVoicePath:model.MessageId] atomically:YES];
+                }
+            }
+            
+            MessageModel *message = [[MessageModel alloc] initWithVoicePath:[Tools getVoicePath:model.MessageId] duration:body.VoiceDuration.integerValue messageId:model.MessageId fromUser:user timeString:timeString isOutgoing:0 status:IMUIMessageStatusSuccess];
+            [_messageList appendMessageWith: message];
+            
+            [self addToFMDB:[NSString stringWithFormat:@"%@",body.VoiceDuration] messageId:model.MessageId sender:@"0" sendTime:lastTimeSendMessage msgType:@"SEND_Voice" staffName:form.DisplayName staffAvata:form.Avatar contractNo:@"" ContractState:@"" isIncludeTax:@""];
+            [self.messageList scrollToBottomWith:YES];
+        }
+    }
+}
+- (void)onEvent:(MQTTMessage *)messgae{
+    NSDictionary *payload = [NSJSONSerialization JSONObjectWithData:messgae.payload options:0 error:nil];
+    chatNewModel *model = [chatNewModel mj_objectWithKeyValues:payload];
+    chatBodyModel *body = [chatBodyModel mj_objectWithKeyValues:model.MessageBody];
+    if ([body.Type isEqualToString:@"CARD_REVIEW"]){
+        if (body.UserState) {
+            NSString *state = [NSString stringWithFormat:@"%ld",body.UserState];
+            if ([state isEqualToString:@"3"]) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:NotificatonRefreshCartData object:nil];
+            }
+            [self getUserInfo];
+            [[NSUserDefaults standardUserDefaults] setObject:state forKey:LOGIN_USERCARDSTATE];
+            [[NSUserDefaults standardUserDefaults] setObject:body.BusinessCategory forKey:USERSELECCATEGORY];
+            [[NSUserDefaults standardUserDefaults] setObject:body.BusinessCategoryName forKey:USERSELECCATEGORYName];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+        if (body.UserType) {
+            NSString *Type = [NSString stringWithFormat:@"%ld",body.UserType];
+            [[NSUserDefaults standardUserDefaults] setObject:Type forKey:LOGIN_USERTYPE];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+        [[JZUserNotification sharedNotification] addNotificationWithCategroy2:body.EventText];
+    }else if ([body.EventType isEqualToString:@"TEAM_REQUEST"]){
+        [YHMQTTClient sharedClient].EventCount = [YHMQTTClient sharedClient].EventCount + 1;
+        YHMissonCreatSuccessView *vc  = [[YHMissonCreatSuccessView alloc]initJoinSuccess:body.RealName missionName:body.MobileNumber content:nil];
+        vc.block = ^(NSString *text) {
+            if([text isEqualToString:@"thinkAgain"]){
+            }else{
+                NSString *Type = [NSString stringWithFormat:@"%ld",body.UserType];
+                [self joinTeam:body.MobileNumber withState:Type andRefNo:body.RefNo];
+            }
+        };
+    }else if ([body.EventType isEqualToString:@"TEAM_STATE"]){
+        NSString *state = [NSString stringWithFormat:@"%ld",body.UserType];
+        [[NSUserDefaults standardUserDefaults] setObject:state forKey:LOGIN_USERTYPE];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [[JZUserNotification sharedNotification] addNotificationWithCategroy2:body.EventText];
+    }
+}
+#pragma mark ====IMUIMessageMessageCollectionViewDelegate
+- (UICollectionViewCell *)messageCollectionViewWithMessageCollectionView:(UICollectionView *)messageCollectionView forItemAt:(NSIndexPath *)forItemAt messageModel:(id<IMUIMessageProtocol>)messageModel{
+    if ([messageModel isKindOfClass: [MessageEventModel class]]) {
+        MessageEventCollectionViewCell *cell = [messageCollectionView dequeueReusableCellWithReuseIdentifier:[[MessageEventCollectionViewCell class] description] forIndexPath:forItemAt];
+        cell.delegate = self;
+        
+            MessageEventModel *eventModel = (MessageEventModel *)messageModel;
+        cell.model = eventModel;
+                NSDictionary *resultDic = [eventModel.evenText mj_JSONObject];
+        NSArray *shoppingCartArr = [NSArray array];
+        shoppingCartArr = [YHShoppingCartModel mj_objectArrayWithKeyValuesArray:resultDic[@"Data"]];
+        for (YHShoppingCartModel *order11 in shoppingCartArr) {
+            NSArray *addsevice = [YHOrderAddSevice mj_objectArrayWithKeyValuesArray:order11.add_service];
+            order11.AddServiceArr = addsevice;
+            
+        }
+        
+        NSMutableArray * LargeCartArray = [NSMutableArray arrayWithCapacity:0];
+        NSMutableArray *smallCartArray = [NSMutableArray arrayWithCapacity:0];
+        NSMutableArray *recordArray = [NSMutableArray arrayWithCapacity:0];
+        for (int i = 0; i < shoppingCartArr.count; i ++) {
+            YHShoppingCartModel *shoppingmodel = shoppingCartArr[i];
+            if (![recordArray containsObject:shoppingmodel.GoodsSeriesCode]) {
+                [recordArray addObject:shoppingmodel.GoodsSeriesCode];
+            }
+        }
+        for (int i =0; i<recordArray.count; i++) {
+            [smallCartArray removeAllObjects];
+            for (int j=0; j<shoppingCartArr.count; j++) {
+                YHShoppingCartModel *shoppingmodel1 = shoppingCartArr[j];
+                if ([shoppingmodel1.GoodsSeriesCode isEqualToString:recordArray[i]]) {
+                    [smallCartArray addObject:shoppingmodel1];
+                }
+            }
+            NSMutableArray *array = [[NSMutableArray alloc]initWithArray:smallCartArray];
+            [LargeCartArray addObject:array];
+        }
+        
+        [cell setData:@{@"订单":LargeCartArray,@"totalPrice":resultDic[@"totalPrice"],@"totalNumber":resultDic[@"totalNumber"]}];
+        return cell;
+    } else {
+        return nil;
+    }
+}
+- (NSNumber * _Nullable)messageCollectionViewWithMessageCollectionView:(UICollectionView * _Nonnull)messageCollectionView heightForItemAtIndexPath:(NSIndexPath * _Nonnull)forItemAt messageModel:(id <IMUIMessageProtocol> _Nonnull)messageModel SWIFT_WARN_UNUSED_RESULT {
+    if ([messageModel isKindOfClass: [MessageEventModel class]]) {
+        NSNumber *number = [NSNumber numberWithFloat:HeightRate(200)];
+        return number;
+      } else {
+        return nil;
+     }
+}
+//点击
+- (void)messageCollectionViewWithDidTapMessageBubbleInCell:(UICollectionViewCell * _Nonnull)didTapMessageBubbleInCell model:(id <IMUIMessageProtocol> _Nonnull)model{
+    if ([model isKindOfClass: [MessageEventModel class]]) {
+        
+    }else{
+        MessageModel *modelPaste = (MessageModel *)model;
+        NSString *imagePath = [self getPath:model.msgId];
+        if ([modelPaste.type isEqualToString:@"Image"]) {
+            
+            NSMutableArray *browseItemArray = [[NSMutableArray alloc]init];
+            [browseItemArray addObject:imagePath];
+            SKFPreViewNavController *imagePickerVc =[[SKFPreViewNavController alloc]initWithSelectedPhotoURLs:browseItemArray index:0];
+            imagePickerVc.modalPresentationStyle = UIModalPresentationOverFullScreen;
+            [self presentViewController:imagePickerVc animated:YES completion:nil];
+            
+        }else if([modelPaste.type isEqualToString:@"Contract"]){
+
+            MessageModel *msg =  (MessageModel *)model;
+            
+            if (msg.isOutGoing == 0) {//判断当前的合同是自己接收0 还是发送（0 自己发送的合同不跳转页面）
+                NSArray *part = [msg.text componentsSeparatedByString:@"$¥"];
+            YHContractCreatViewController *vc = [[YHContractCreatViewController alloc]init];
+            vc.ContractURL =  modelPaste.ContactURL;
+            if (part.count>3) {
+                vc.ContractType = part[3];
+            }
+            vc.IsIncludeTax = msg.IsIncludeTax;
+            vc.ContractState = modelPaste.ContractState;
+            vc.contractNo = modelPaste.ContactNo;
+            vc.sendDataStr = msg.text;
+            vc.contractDataBlock = ^(NSString *contractUrl){
+                if (contractUrl){
+
+                    NSString *messageIdString = [[NSUUID UUID] UUIDString];
+                    chatNewModel *model =[self creatMessageModelData:contractUrl contract:msg.ContactNo contractState:msg.ContractState andType:@"MutilePart" messageIdString:messageIdString IsIncludeTax:msg.IsIncludeTax];
+                    BOOL isSendSucces = [[YHMQTTClient sharedClient] sendMessage:[model mj_keyValues] withTopic:self.MQTTTopic];
+                    NSString *timeString = [NSDate getCurrentTime];
+                    UserModel *user = [UserModel new];
+                    user.isOutgoing = false;
+                    MessageModel *message = nil;
+                    if (isSendSucces)
+                    {
+                        message = [[MessageModel alloc] initWithText:contractUrl IsIncludeTax:msg.IsIncludeTax ContractNo:msg.ContactNo ContractState:modelPaste.ContractState ContractImagePath:part[1] ContractURL:part[2] messageId:messageIdString fromUser:user timeString:timeString isOutgoing:1 status:IMUIMessageStatusSuccess];
+                        [self addToFMDB:contractUrl messageId:messageIdString sender:@"1" sendTime:timeString msgType:@"SEND_MutilePart" staffName:@"" staffAvata:@"" contractNo:msg.ContactNo ContractState:@"" isIncludeTax:msg.IsIncludeTax];
+                    }else{
+                        message = [[MessageModel alloc] initWithText:contractUrl IsIncludeTax:msg.IsIncludeTax ContractNo:msg.ContactNo ContractState:modelPaste.ContractState ContractImagePath:part[1] ContractURL:part[2] messageId:messageIdString fromUser:user timeString:timeString isOutgoing:1 status:IMUIMessageStatusFailed];
+                    }
+
+                }
+            };
+                vc.hidesBottomBarWhenPushed = YES;
+                 [self.navigationController pushViewController:vc animated:YES];
+
+        };
+    }else if([modelPaste.type isEqualToString:@"Product"]){
+        
+        MessageModel *msg =  (MessageModel *)model;
+        NSDictionary *resultDic = [msg.text mj_JSONObject];
+        YHGoodsModel *model = [YHGoodsModel mj_objectWithKeyValues:resultDic];
+        YHProductDetailsViewController *detaiVC = [[YHProductDetailsViewController alloc] init];
+        detaiVC.productCode = model.CategoryId;
+        detaiVC.productSerialCode = model.GoodsSeriesCode;
+        detaiVC.isChat = YES;
+        
+        NSMutableArray* navArray = [[NSMutableArray alloc] initWithArray:self.navigationController.viewControllers];
+        NSMutableIndexSet *set  = [[NSMutableIndexSet alloc] init];
+        for ( int i = 0;i < navArray.count;i++) {
+            UIViewController *vc1 = navArray[i];
+            if ([vc1 isKindOfClass:[YHProductDetailsViewController class]]) {
+                [set addIndex:i];
+            }
+            
+        }
+        [navArray removeObjectsAtIndexes:set];
+        [self.navigationController setViewControllers:navArray animated:YES];
+        detaiVC.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:detaiVC animated:YES];
+    }
+  }
+}
+//长按
+- (void)messageCollectionViewWithBeganLongTapMessageBubbleInCell:(UICollectionViewCell * _Nonnull)beganLongTapMessageBubbleInCell model:(id <IMUIMessageProtocol> _Nonnull)model{
+    [self becomeFirstResponder];
+    IMUIBaseMessageCell *cellPaste = (IMUIBaseMessageCell *)beganLongTapMessageBubbleInCell;
+    MessageModel *modelPaste = (MessageModel *)model;
+    if ([modelPaste.type isEqualToString:@"Text"]) {
+        
+        self.pasteText = modelPaste.text;
+    
+        UIMenuController *menuController = [UIMenuController sharedMenuController];
+        
+        UIMenuItem *copyItem = [[UIMenuItem alloc] initWithTitle:@"复制" action:@selector(menuCopyBtnPressed:)];
+        
+        menuController.menuItems = @[copyItem];
+        
+        [menuController setTargetRect:cellPaste.bubbleView.frame inView:cellPaste.bubbleView.superview];
+        
+        [menuController setMenuVisible:YES animated:YES];
+        
+        [UIMenuController sharedMenuController].menuItems=nil;
+    }
+}
+- (void)didTapMessageBubbleWithModel:(MessageEventModel *)model{
+    
+    NSDictionary *resultDic = [model.evenText mj_JSONObject];
+    NSArray *shoppingCartArr = [NSArray array];
+    shoppingCartArr = [YHShoppingCartModel mj_objectArrayWithKeyValuesArray:resultDic[@"Data"]];
+    for (YHShoppingCartModel *order11 in shoppingCartArr) {
+        NSArray *addsevice = [YHOrderAddSevice mj_objectArrayWithKeyValuesArray:order11.add_service];
+        order11.AddServiceArr = addsevice;
+    }
+
+    NSMutableArray * LargeCartArray = [NSMutableArray arrayWithCapacity:0];
+    NSMutableArray *smallCartArray = [NSMutableArray arrayWithCapacity:0];
+    NSMutableArray *recordArray = [NSMutableArray arrayWithCapacity:0];
+    for (int i = 0; i < shoppingCartArr.count; i ++) {
+        YHShoppingCartModel *shoppingmodel = shoppingCartArr[i];
+        if (![recordArray containsObject:shoppingmodel.GoodsSeriesCode]) {
+            [recordArray addObject:shoppingmodel.GoodsSeriesCode];
+        }
+    }
+    
+    for (int i =0; i<recordArray.count; i++) {
+        [smallCartArray removeAllObjects];
+        for (int j=0; j<shoppingCartArr.count; j++) {
+            YHShoppingCartModel *shoppingmodel1 = shoppingCartArr[j];
+            if ([shoppingmodel1.GoodsSeriesCode isEqualToString:recordArray[i]]) {
+                [smallCartArray addObject:shoppingmodel1];
+            }
+        }
+        NSMutableArray *array = [[NSMutableArray alloc]initWithArray:smallCartArray];
+        [LargeCartArray addObject:array];
+    }
+    YHShoppingCartConfirmViewController *vc = [[YHShoppingCartConfirmViewController alloc]init];
+    vc.isNeedHideBottomView = YES;
+    vc.selectArray = LargeCartArray;
+    vc.totalPrice = resultDic[@"totalPrice"];
+    vc.isCanInvoice = resultDic[@"IsIncludeTax"];
+    vc.insurancePrice =resultDic[@"InsurdAmount"];
+    vc.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+-(void)menuCopyBtnPressed:(UIMenuItem *)menuItem{
+    
+    [UIPasteboard generalPasteboard].string = self.pasteText;
+}
+-(BOOL)canBecomeFirstResponder{
+    return YES;
+}
+-(BOOL)canPerformAction:(SEL)action withSender:(id)sender{
+    if (action == @selector(menuCopyBtnPressed:)) {
+        return YES;
+    }
+    return NO;
+}
+- (void)joinTeam:(NSString*)phone withState:(NSString *)state andRefNo:(NSString *)RefNo{
+    [[Tools currentViewController].view showWait:@"加载中" viewType:CurrentView];
+    NSDictionary *parameter = @{@"MobileNumber":phone};
+    [[YHJsonRequest shared] joinTeam:parameter SuccessBlock:^(NSString *successMessage) {
+        [[Tools currentViewController].view hideWait:CurrentView];
+            [[NSUserDefaults standardUserDefaults] setObject:@"2" forKey:LOGIN_USERTYPE];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        
+    } fialureBlock:^(NSString *errorMessages) {
+        [[Tools currentViewController].view hideWait:CurrentView];
+        [[Tools currentViewController].view makeToast:errorMessages duration:1.0 position:CSToastPositionCenter];
+    }];
+}
+- (void)didSelectProduct{
+  
+    if (self.MQTTTopic.length<=9) {
+        [self getServerID];
+        if(self.jsonStr.length>0){
+            [self.view makeToast:@"产品发送失败"];
+        }
+        return;
+    }
+    if(self.jsonStr.length>0 && self.isPostOrderDetail==YES){
+        NSString *messageIdString = [[NSUUID UUID] UUIDString];
+        
+        UserModel *user = [UserModel new];
+        user.isOutgoing = true;
+        NSString *timeString = [NSDate getCurrentTime];
+        BOOL isNeedShow = [NSDate isValideTimeDifferenceWithTime:lastTimeSendMessage currentTime:timeString ValidTime:nil andValidTimeInterval:3];
+        lastTimeSendMessage = timeString;
+        if (!isNeedShow) {
+            timeString = @"";
+        }
+    
+    
+          MessageModel *message = [[MessageModel alloc] initWithProductJsonText:self.jsonStr messageId:messageIdString fromUser:user timeString:timeString isOutgoing:1 status:IMUIMessageStatusSuccess];
+        [self.messageList appendMessageWith: message];
+        
+         chatNewModel *model = [self creatMessageModelData:self.jsonStr contract:@"" contractState:@"" andType:@"Goods" messageIdString:messageIdString IsIncludeTax:self.IsIncludeTax];
+        
+        BOOL isSendSuccess = [[YHMQTTClient sharedClient] sendMessage:[model mj_keyValues] withTopic:self.MQTTTopic];
+        //添加到数据库
+        if (isSendSuccess) {
+            [self addToFMDB:self.jsonStr messageId:model.MessageId sender:@"1" sendTime:timeString msgType:@"SEND_Goods" staffName:@"" staffAvata:@"" contractNo:@"" ContractState:@"" isIncludeTax:@""];
+            
+        }else{
+            [self.view makeToast:@"产品发送失败"];
+        }
+    [self.messageList scrollToBottomWith:YES];
+      
+  
+    };
+}
+- (void)getUserInfo{
+    [[YHJsonRequest shared] getUserInfoSuccessBlock:^(UserInfoModel *userInfo) {
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+     
+        [userDefaults setObject:userInfo.AuditRemark forKey:USERSTATEFailReason];
+        [userDefaults setObject:userInfo.EditWhen forKey:USERSTATECommitDate];
+        [userDefaults synchronize];
+        
+    } fialureBlock:^(NSString *errorMessages) {
+        [self.view makeToast:errorMessages];
+    }];
+}
+@end

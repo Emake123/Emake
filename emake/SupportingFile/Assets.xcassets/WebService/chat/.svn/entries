@@ -1,0 +1,125 @@
+10
+
+dir
+4430
+svn://demo_zhang@svn.emake.cn/emake_app/emake/emake/SupportingFile/Assets.xcassets/WebService/chat
+svn://demo_zhang@svn.emake.cn/emake_app
+
+
+
+2018-07-03T08:01:20.046958Z
+3864
+demo_zhang
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+cf8112e6-e50d-40cb-89d0-ada3cd2a3d99
+
+chatAddFile.imageset
+dir
+
+dialogbox1.imageset
+dir
+
+chatMyMessage_Highlighted.imageset
+dir
+
+chatAddImage.imageset
+dir
+
+chatSickMessage_Highlighted.imageset
+dir
+
+chatAddFace_Highlight.imageset
+dir
+
+chatAddCamera.imageset
+dir
+
+chatMyMessage_Normal.imageset
+dir
+
+chatMore.imageset
+dir
+
+chatSickMessage_Normal.imageset
+dir
+
+outGoing_bubble.imageset
+dir
+
+chatDown.imageset
+dir
+
+chatAddFace.imageset
+dir
+
+dialogbox.imageset
+dir
+
+Contents.json
+file
+
+
+
+
+2018-05-15T06:07:25.000000Z
+31cc68f34934a99c0b0c1bebde56309c
+2017-09-30T02:50:16.937039Z
+393
+wei_gu
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+62
+
+chatAddKeyboard.imageset
+dir
+
+defoult_header.imageset
+dir
+
+inComing_bubble.imageset
+dir
+
+chatNoCustomerService.imageset
+dir
+
+chatAddFile_Highlight.imageset
+dir
+
+chatFace_delete_highlighted.imageset
+dir
+
+chatFace_delete.imageset
+dir
+

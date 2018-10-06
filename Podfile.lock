@@ -1,0 +1,63 @@
+PODS:
+  - Bugly (2.5.0)
+  - CocoaLumberjack (3.4.0):
+    - CocoaLumberjack/Default (= 3.4.0)
+    - CocoaLumberjack/Extensions (= 3.4.0)
+  - CocoaLumberjack/Default (3.4.0)
+  - CocoaLumberjack/Extensions (3.4.0):
+    - CocoaLumberjack/Default
+  - MQTTClient (0.10.2):
+    - MQTTClient/Core (= 0.10.2)
+  - MQTTClient/Core (0.10.2):
+    - MQTTClient/Manager
+    - MQTTClient/Min
+  - MQTTClient/Manager (0.10.2):
+    - MQTTClient/Min
+  - MQTTClient/Min (0.10.2)
+  - Reachability (3.2)
+  - SDWebImage (4.2.3):
+    - SDWebImage/Core (= 4.2.3)
+  - SDWebImage/Core (4.2.3)
+  - SKFPicPreview (1.2.1):
+    - SDWebImage
+  - SVGKit (2.0.1):
+    - CocoaLumberjack (~> 3.x)
+
+DEPENDENCIES:
+  - Bugly
+  - MQTTClient
+  - Reachability (~> 3.2)
+  - SKFPicPreview
+  - SVGKit (from `https://github.com/SVGKit/SVGKit.git`, branch `2.x`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Bugly
+    - CocoaLumberjack
+    - MQTTClient
+    - Reachability
+    - SDWebImage
+    - SKFPicPreview
+
+EXTERNAL SOURCES:
+  SVGKit:
+    :branch: 2.x
+    :git: https://github.com/SVGKit/SVGKit.git
+
+CHECKOUT OPTIONS:
+  SVGKit:
+    :commit: d239c2b1b1476667e0470fc7d794649f70cff5a1
+    :git: https://github.com/SVGKit/SVGKit.git
+
+SPEC CHECKSUMS:
+  Bugly: 3ca9f255c01025582df26f9222893b383c7e4b4e
+  CocoaLumberjack: e033a5d8513357af2dd456eb66e202c325c30627
+  MQTTClient: e8d3d642f28548296511b3af4e2cef12874071ce
+  Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
+  SDWebImage: 791bb72962b3492327ddcac4b1880bd1b5458431
+  SKFPicPreview: e142e5ce79b55e10587455431c7ca6d951e64b8a
+  SVGKit: 4055d9e809b5db8633755979cfb3b02dc5a8c20d
+
+PODFILE CHECKSUM: eb44142ce80cbd1d2cc9a46f770a8718ea515836
+
+COCOAPODS: 1.5.3

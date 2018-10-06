@@ -1,0 +1,373 @@
+//
+//  YHJsonRequest.h
+//  emake
+//
+//  Created by chenyi on 2017/8/7.
+//  Copyright © 2017年 emake. All rights reserved.
+//
+
+#import "YHLoginUser.h"
+#import "YHShoppingCartModel.h"
+#import "YHRegesterModel.h"
+//#import "productModel.h"
+//#import "ProductPriceModel.h"
+#import "UserInfoModel.h"
+#import "YHOrder.h"
+#import "adressModel.h"
+#import "RankModel.h"
+#import "UserFriendModel.h"
+#import "YHInvoiceTypeModel.h"
+#import "YHInvoiceListModel.h"
+#import "YHCommpanyServersModel.h"
+#import "YHCustomQuestionModel.h"
+#import "YHStoreDetailModel.h"
+#import "YHOrderContract.h"
+#import "YHLogistInfoModel.h"
+#import "YHSuperGroupModel.h"
+// 网络请求方法枚举
+typedef enum {
+    Get = 0,
+    Post,
+    Put,
+    Delete
+} YHMyRequestMethod;
+@interface YHJsonRequest : NSObject
+
+
++(YHJsonRequest *)shared;
+//产品版本
+- (void)getAppVersionSucceededBlock:(void (^)(NSDictionary *dict))succeededBlock failedBlock:(void (^)(NSString *errorMessage))failedBlock;
+//注册
+-(void) verificationCode: (NSString *) mobileNumber isRegisterOrReset:(NSInteger)flag succeededBlock:(void (^)(NSString *successMessage))succeededBlock failedBlock:(void (^)(NSString *errorMessage))failedBlock;
+//登陆
+-(void) loginWithPassword: (NSString *) Password MobileNumber:(NSString *) mobileNumber
+           succeededBlock:(void (^)(YHLoginUser *loginUser))succeededBlock
+              failedBlock:(void (^)(NSString *errorMessage))failedBlock;
+//注册
+-(void)userRegist:(NSDictionary *)params
+   succeededBlock:(void (^)(YHRegesterModel *loginUser))succeededBlock
+      failedBlock:(void (^)(NSString *errorMessage))failedBlockk;
+
+//密码重置
+-(void)userReset:(NSString *)mobileNumber  VerificationPassword:(NSString *)VerificationPassword Password:(NSString *)Password succeededBlock:(void (^)(YHLoginUser *loginUser))succeededBlock failedBlock:(void (^)(NSString *errorMessage))failedBlock;
+//忘记密码
+-(void)userforget:(NSString *)mobileNumber  VerificationCode:(NSString *)VerificationCode Password:(NSString *)Password succeededBlock:(void (^)(YHLoginUser *loginUser))succeededBlock failedBlock:(void (^)(NSString *errorMessage))failedBlock;
+
+//获取首页背景图片
+-(void)getUserMainpageBackgroudImageDataFindSucceededBlock:(void (^)(NSDictionary *shoppingCartArray))succeededBlock failedBlock:(void (^)(NSString *errorMessage))failedBlock;
+
+//用户名片扫描
+- (void)postURL:(NSString *)URL toServers:(void(^)(UserInfoModel *successMessagesMode))successedBLock failBLock:(void (^) (NSString *errorMessage))failedBlock;
+
+//身份证上传图片
+- (void)uploadIDCardImageWithURLpostSevice: (NSString *)postParems SuccessBlock:(void(^)(NSString *successMessage ))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//获取购物车的数据列表
+-(void)userUserShoppingFindSucceededBlock:(void (^)(NSArray < YHShoppingCartModel *>*shoppingCartArray))succeededBlock failedBlock:(void (^)(NSString *errorMessage))failedBlock;
+//生成订单
+-(void)makeShoppingCartOderParams:(NSDictionary *)params SuccessBlock:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//签订合同
+-(void)userSignContract:(NSString *)contractOrderNum SuccessBlock:(void(^)(NSString *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+
+
+//添加购物车
+-(void)addShoppinCartWithParams:(NSDictionary *)Params SuccessBlock:(void(^)(NSString *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//购物车删除
+- (void)shoppingCartDeleteOderNumber:(NSArray *)order Sucess:(void(^)(NSString *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//购物车数量改变
+- (void)shoppingCartChangeOderNumber:(NSDictionary *)order Sucess:(void(^)(NSString *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//查询用户名片
+- (void)getUserInfoSuccessBlock:(void(^)(UserInfoModel *userInfo))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//上传头像、昵称
+- (void)upDateNickName:(NSString *)nickName AndHeadImage:(NSString *)url SuccessBlock:(void (^)(NSString *))successBLock fialureBlock:(void (^)(NSString *))filaedBlock;
+
+
+//订单
+-(void)userUseOrderManageParams:(NSDictionary *)params SucceededBlock:(void (^)(NSArray *orderArray))succeededBlock failedBlock:(void (^)(NSString *errorMessage))failedBlock;
+
+-(void)getUseOrderContractNoParams:(NSString *)OrderNo SucceededBlock:(void (^)(YHOrderContract *OrderContract))succeededBlock failedBlock:(void (^)(NSString *errorMessage))failedBlock;
+
+-(void)getGoodsseries:(NSString *)kindcode SuccessBlock:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//获取产品增值服务
+-(void)getProductAddServiceGoodcode:(NSString *)productId SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//获取产品参数List
+-(void)getProductAllPropertyListGoodcode:(NSString *)params seriesCode:(NSString *)seriesCode SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+-(void)getProductAllPropertyListNameGoodcode:(NSString *)params seriesCode:(NSString *)seriesCode SuccessBlock:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//产品详情
+- (void)getProductDetailsInfoWith:(NSString *)CategoryId seriesCode:(NSString *)seriesCode successBlock:(void(^)(NSDictionary *ProductDetailsDict))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBloc;
+//产品右侧列表
+- (void)getShoppingGoodCategoriesSeriesId:(NSString *)SeriesId SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//个人信息添加
+- (void)putUserInfo:(NSDictionary *)parameters SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//用户审核
+- (void)userAudit:(NSDictionary *)parameters SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//经营品类修改
+- (void)putUserBusinessCategory:(NSString *)Category SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+- (void)updatePassword:(NSDictionary *)parameters SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//更换手机号验证码
+-(void)exchangePhoneNumberVerificationCode: (NSString *) mobileNumber
+                            succeededBlock:(void (^)(NSString *successMessage))succeededBlock
+                               failedBlock:(void (^)(NSString *errorMessage))failedBlock;
+-(void)exchangePhoneNumberMobileNumber: (NSString *) mobileNumber andVerificationCode:(NSString *) code
+                        succeededBlock:(void (^)(NSString *successMessage))succeededBlock
+                           failedBlock:(void (^)(NSString *errorMessage))failedBlock;
+
+
+
+//获取用户（物流）地址接口
+-(void)getUserAdressType:(NSString *)type SuccessBlock:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//上传用户（物流）地址接口
+-(void)postUserAdressParams:(NSDictionary *)params SuccessBlock:(void(^)(NSString *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//删除用户（物流）地址
+-(void)deleteUserAdressParams:(NSDictionary *)params SuccessBlock:(void(^)(NSString *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//修改用户（物流）地址
+-(void)putUserAdressParams:(NSDictionary *)params SuccessBlock:(void(^)(NSString *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//朋友圈接口
+- (void)getUserFriendSuccessBlock:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//banner宣传链接
+- (void)getBannerAddInfo:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//订单---物流信息
+- (void)getLogisticsInfomation:(NSString *)logisticsNumber Sucess:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//订单---delete信息
+-(void)deleteOrderManageContratNo:(NSString*)ContractNo SucceededBlock:(void (^)(NSString *successMessage))succeededBlock failedBlock:(void (^)(NSString *errorMessage))failedBlock;
+
+//订单---put orderState
+-(void)putOrderManageContratNo:(NSDictionary*)params SucceededBlock:(void (^)(NSString *successMessage))succeededBlock failedBlock:(void (^)(NSString *errorMessage))failedBlock;
+
+//查看合同PDF
+- (void)getAppContractPDFWithparams:(NSDictionary *)params  SuccessBlock:(void(^)(NSString *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//发票类型
+- (void)getInvoiceTypeSucess:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//申请开票
+- (void)applyInvoice:(NSDictionary *)parameters sucess:(void(^)(NSString *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//开票记录
+- (void)applyInvoiceListsucess:(void(^)(NSArray < YHInvoiceListModel *>*shoppingCartArray))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//首页获取购物车商品名称+数量+容量
+- (void)getuserShopping:(void(^)(NSArray*shoppingCartArray))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//首页订单---last week 数量
+- (void)getuserLastweekOrder:(void(^)(NSDictionary*shoppingCartDict))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//首页----抽奖
+- (void)getUserPrizedraw:(NSString *)MobileNumber SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//首页----抽奖明细
+- (void)getUserPrizedrawInfo:(NSString *)MobileNumber SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//首页----类别明细
+- (void)getUserBusinessCategorySuccessBlock:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//企业服务
+//品牌
+- (void)getuserBrand:(void(^)(NSArray*shoppingCartArray))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//保险
+- (void)getUserInsuranceCategorySuccessBlock:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//保险说明
+- (void)getUserInsuranceHTMLStringWithID:(NSString *)InsuranceID SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//剩余可开票金额
+- (void)getRemainInvoiceAmount:(NSString *)ContractNo success:(void(^)(NSNumber *))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//团队贡献
+-(void)usersTeamMakeContributionsSucceededBlock:(void (^)(NSArray *teamArray))succeededBlock failedBlock:(void (^)(NSString *errorMessage))failedBlock;
+
+//开启任务
+- (void)makeUserTeamTaskSuccessBlock:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//领取任务
+- (void)getUserTeamTask:(NSDictionary *)params SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//战队状态
+- (void)getUserTeamStateSuccessBlock:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//贡献明细
+- (void)getUserTeamContribution:(NSDictionary *)groupIDDic SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//Leader贡献明细
+- (void)getUserTeamLeaderDetailContribution:(BOOL)isTeam SuccessBlock:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//member --贡献明细
+- (void)getUserMemberTeamContributionSuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//member buddy小伙伴 --贡献明细
+- (void)getUserMemberBuddyTeamContributionSuccessBlock:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//贡献明细 踢人
+- (void)deleteUserTeamContribution:(NSDictionary *)groupIDDic SuccessBlock:(void(^)( NSString*successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//队长邀请队员
+- (void)inviteTeamMember:(NSDictionary *)parameter SuccessBlock:(void(^)(NSString *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//队长解散队伍
+- (void)disbandTeam:(NSString *)GroupId SuccessBlock:(void(^)(NSString *successMessage ))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//账户信息
+- (void)getUserAccountInfoSuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//队员加入团队
+- (void)joinTeam:(NSDictionary *)parameter SuccessBlock:(void(^)(NSString *successMessage ))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//银行卡添加
+- (void)userAddBankCard:(NSDictionary *)info SuccessBlock:(void(^)(NSString *successMessage ))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//获取银行卡
+- (void)getUserBankCardSuccessBlock:(void(^)(NSArray *successMessage ))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//银行卡删除
+- (void)DeleteUserBankCard:(NSString *)CardId SuccessBlock:(void(^)(NSString *successMessage ))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//银行卡扫描
+- (void)scanCardWithParameters:(NSDictionary *)Parameters SuccessBlock:(void(^)(NSString *successMessage ))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//提现明细
+- (void)getDepositListSuccessBlock:(void(^)(NSArray *list))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//提现
+- (void)depositMoney:(NSDictionary *)parameters SuccessBlock:(void(^)(NSString *successMessage ))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//通知消息列表
+- (void)getMessageListSuccessBlock:(void(^)(NSArray *messageList))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//获取图片名
+- (void)postImageWithURLpostParems: (NSArray *)postParems progress:(void(^)(NSProgress *progress))progressing SuccessBlock:(void(^)(NSString *successMessage ))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//上传图片
+- (void)uploadContractImageWithURLpostSevice: (NSDictionary *)postParems SuccessBlock:(void(^)(NSArray *successMessage ))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//get合同图片
+- (void)getContractImageWithURLpostSevice: (NSString *)postParems SuccessBlock:(void(^)(NSArray *successMessage ))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//删除合同图片
+- (void)deleteContractImageWithURLpostSevice: (NSArray *)postParems SuccessBlock:(void(^)(NSString *successMessage ))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//消息列表删除
+- (void)deleteInfomationList:(NSString *)RefNo SuccessBlock:(void(^)(NSString *successMessage ))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//企业服务列表
+- (void)getBusinessService:(NSDictionary*)params SuccessBlock:(void(^)(NSArray *serversList))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//获取随机客服
+- (void)getCustomerServiceIDSuccessBlock:(void(^)(NSDictionary *serversIDDic))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBloc;
+//首页banner
+- (void)getMainPageAddSuccessBlock:(void(^)(NSArray *mianImageAddArray))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//首页分类
+- (void)getMainPageCategory:(NSDictionary *)catagoryDic SuccessBlock:(void(^)(NSArray *categoryDict))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//开票信息 列表
+- (void)getUserInvoiceManageSuccessBlock:(void(^)(NSArray *invoicelist))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//发票管理- de le te
+-(void)deleteUserInvoiceManage:(NSString *)refNo SuccessBlock:(void(^)(NSString *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//发票管理-edit put
+-(void)editUserInvoiceManage:(NSDictionary *)params SuccessBlock:(void(^)(NSString *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//发票- yes or no
+-(void)getIncludetaxInvoiceManage:(NSString *)BusinessCategory SuccessBlock:(void(^)(NSDictionary *dic))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//发票管理- post
+-(void)postUserInvoiceManage:(NSDictionary *)params SuccessBlock:(void(^)(NSString *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//是否签订合同- get
+-(void)contractIsSighedContractNo:(NSString *)ContractNo SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//是游客访问返回的品类 
+- (void)addVisitorsLoginSuccessBlock:(void(^)(NSArray *categoryDict))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//scan login
+- (void)userScanQRCodeLogin:(NSString *)loginID SuccessBlock:(void(^)(NSString *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//IsCheck
+-(void)usercheckCertification:(NSString *)IsCheck SuccessBlock:(void(^)(NSString *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//获取保单号和保单图片
+-(void)getUserInsuranceOrder:(NSString *)OrderNo SuccessBlock:(void(^)(NSDictionary *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//获取当日售价token
+-(void)getTodayPriceUrlTokenSuccessBlock:(void(^)(NSDictionary *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//意见反馈接口
+-(void)appFeedbackWithParameters:(NSDictionary *)params SuccessBlock:(void(^)(NSDictionary *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//用户搜索系列
+-(void)userSearchProductWithParameter:(NSString *)param SuccessBlock:(void(^)(NSArray *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//收藏商品系列接口
+-(void)userCollectionProductWithParameter:(NSDictionary *)param SuccessBlock:(void(^)(NSString *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//取消删除收藏商品系列接口
+-(void)userCancelCollectionProductWithParameter:(NSString *)refNo SuccessBlock:(void(^)(NSString *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//搜索关键词
+-(void)userSearchKeyWordsSuccessBlock:(void(^)(NSArray *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//获取咨询接口
+- (void)getAppAdviceSuccessBlock:(void(^)(NSDictionary *dict))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//get 收藏商品系列接口
+-(void)getUserCollectionProductSuccessBlock:(void(^)(NSArray *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//发现店铺
+- (void)getFindStoreListSuccessBlock:(void(^)(NSArray *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//店铺列表
+- (void)getStoreListSuccessBlock:(void(^)(NSArray *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//店铺详情
+- (void)getStoreDetailWith:(NSDictionary *)parramDic SuccessBlock:(void(^)(YHStoreDetailModel *model))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+-(void)getUserCollectionStoreRequestMethod:(YHMyRequestMethod )method params:(NSDictionary *)params SuccessBlock:(void(^)(NSArray *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//物流运单推送信息
+- (void)getLogistMessageInfoWithParams:(NSDictionary *)dic SuccessBlock:(void(^)(NSArray *successArray))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+- (void)getRefreshTockeWith:(NSDictionary *)dic SuccessBlock:(void(^)(NSDictionary *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+- (void)getStoreIDWithCatagoryIds:(NSDictionary *)dic SuccessBlock:(void(^)(NSDictionary *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//获取经营品类
+- (void)getCatagoryIDsSuccessBlock:(void(^)(NSArray *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//城市代理商申请
+- (void)getAppAgentApply:(NSDictionary *)dict SuccessBlock:(void(^)(NSDictionary *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//领取体验会员接口
+- (void)getAppVipExperienceSuccessBlock:(void(^)(NSDictionary *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//我的会员权益
+- (void)getAppVipUserSuccessBlock:(void(^)(NSDictionary *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+
+//验证优惠券码是否有效
+- (void)getAppCheckVipCoupon:(NSDictionary *)couponDic SuccessBlock:(void(^)(NSArray *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+///超级团列表
+- (void)getAppSuperGroup:(NSDictionary *)CategoryBIdDic SuccessBlock:(void(^)(NSArray *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//超级团详情
+- (void)getAppSuperGroupDetailWithSuperGroupIdS:(NSDictionary *)SuperGroupIdS SuccessBlock:(void(^)(NSArray *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+///超级团列表
+- (void)getAppMYSuperGroup:(NSDictionary *)CategoryBIdDic SuccessBlock:(void(^)(NSArray *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+///超级团详情
+- (void)getAppMYSuperGroupDetailWithSuperGroupIdS:(NSDictionary *)SuperGroupIdS SuccessBlock:(void(^)(YHSuperGroupModel *model))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//猜你喜欢
+- (void)getAppMYLikeSuperGroupDetailWithSuperGroupIdS:(NSDictionary *)SuperGroupIdS SuccessBlock:(void(^)(NSArray *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//收入明细
+- (void)getIncomeDetailListSuccessBlock:(void(^)(NSArray *list))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//支付宝
+- (void)getSuperGroupPay:(NSDictionary *)params SuccessBlock:(void(^)(NSString *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+- (void)postSuperGroupPay:(NSDictionary *)params SuccessBlock:(void(^)(NSString *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//代理商获取收入applyInvoice
+- (void)getAppAgentCashSuccessBlock:(void(^)(NSArray *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//代理商权益
+- (void)getAppUserAgentSuccessBlock:(void(^)(NSDictionary *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+@end
+
+
+
+
+
+
+
+

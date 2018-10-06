@@ -1,0 +1,470 @@
+//
+//  YHMainMessageCenterViewController.m
+//  emake
+//
+//  Created by 谷伟 on 2018/3/27.
+//  Copyright © 2018年 emake. All rights reserved.
+//
+
+#import "YHMainMessageCenterViewController.h"
+#import "InfomationItemCell.h"
+#import "YHSixTeamViewController.h"
+#import "InviteMessageCellTableViewCell.h"
+#import "YHInviteMessageModel.h"
+#import "ChatNewViewController.h"
+#import "FMDBManager.h"
+#import "ChatCommmonListCell.h"
+#import "MQTTCommandModel.h"
+#import "chatUserModel.h"
+@interface YHMainMessageCenterViewController ()<UITableViewDelegate,UITableViewDataSource>
+
+@property (nonatomic,retain)NSMutableArray *infoArray;
+@property (nonatomic,strong)UIView *inviteView;
+@property (nonatomic,strong)UIView *logisticView;
+@property (nonatomic,strong)UIView *notificationView;
+@property (nonatomic,strong)UIView *EmptyView;
+@property (nonatomic,assign)BOOL isSotre;
+@property (nonatomic,strong)NSMutableDictionary * messageCountDic;
+
+@end
+
+@implementation YHMainMessageCenterViewController
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    NSArray *listArray = [[FMDBManager sharedManager] getAllMessageChatList];
+    self.chatListArray = [NSMutableArray arrayWithArray:listArray];
+    [self.messageTable reloadData];
+}
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+}
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    self.title = @"消息";
+    self.view.backgroundColor = TextColor_F5F5F5;
+    NSString *isStoreStr = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
+    self.isSotre = [isStoreStr isEqualToString:@"1"];
+    [self configSubViews];
+    NSString *messageKey = [NSString stringWithFormat:@"%@%@",NsuserDefaultsChatMessagesdict,Userdefault(LOGIN_USERID)];
+    NSDictionary *messageDict = [[NSUserDefaults standardUserDefaults] objectForKey: messageKey];
+    self.messageCountDic = [NSDictionary dictionaryWithDictionary:messageDict] ;
+
+    if (self.isSotre) {
+        NSArray *listArray = [[FMDBManager sharedManager] getAllMessageChatList];
+        self.chatListArray = [NSMutableArray arrayWithArray:listArray];
+        [self configTableView];
+    }else{
+        [self getMessageList];
+    }
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshMesssageCount:) name:NotificatonChatMessagesCount object:nil];
+
+}
+-(void)refreshMesssageCount:(NSNotification *)notyfication
+{
+     [YHMQTTClient sharedClient].messageCount;
+    NSDictionary *userInfo = notyfication.userInfo;
+    NSString *messageKey = [NSString stringWithFormat:@"%@%@",NsuserDefaultsChatMessagesdict,Userdefault(LOGIN_USERID)];
+    self.messageCountDic = [NSDictionary dictionaryWithDictionary:userInfo] ;
+    [[NSUserDefaults standardUserDefaults] setObject:userInfo forKey: messageKey];
+    [self.messageTable reloadData];
+}
+- (void)configSubViews{
+    
+    self.inviteView = [self getPictureWithTextViewWithTag:0 andText:self.isSotre==YES?@"消息":@"邀请" imageString:self.isSotre==YES?@"xiaoxi_xiaoxis":@"xiaoxi-yaoqings"];
+    self.inviteView.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:self.inviteView];
+    
+    [self.inviteView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(0);
+        make.top.mas_equalTo(TOP_BAR_HEIGHT);
+        make.width.mas_equalTo(ScreenWidth/3);
+        make.height.mas_equalTo(HeightRate(88));
+    }];
+    
+    self.logisticView = [self getPictureWithTextViewWithTag:1 andText:@"交易物流" imageString:@"xiaoxi-wuliu"];
+    self.logisticView.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:self.logisticView];
+    
+    [self.logisticView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerX.mas_equalTo(self.view.mas_centerX);
+        make.top.mas_equalTo(TOP_BAR_HEIGHT);
+        make.width.mas_equalTo(ScreenWidth/3);
+        make.height.mas_equalTo(HeightRate(88));
+    }];
+    
+    self.notificationView = [self getPictureWithTextViewWithTag:2 andText:@"通知消息" imageString:@"xiaoxi-tongzhi"];
+    self.notificationView.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:self.notificationView];
+    
+    [self.notificationView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(0);
+        make.top.mas_equalTo(TOP_BAR_HEIGHT);
+        make.width.mas_equalTo(ScreenWidth/3);
+        make.height.mas_equalTo(HeightRate(88));
+    }];
+    
+}
+- (UIView *)getPictureWithTextViewWithTag:(NSInteger)tag andText:(NSString *)text imageString:(NSString *)imageString{
+    UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 0, WidthRate(88), WidthRate(88))];
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    [button addTarget:self action:@selector(goSelectVC:) forControlEvents:UIControlEventTouchUpInside];
+    button.tag = tag;
+    [view addSubview:button];
+    
+    [button mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(0);
+        make.right.mas_equalTo(0);
+        make.bottom.mas_equalTo(0);
+        make.top.mas_equalTo(0);
+    }];
+    
+    UIImageView *image = [[UIImageView alloc]initWithImage:[UIImage imageNamed:imageString]];
+    image.contentMode = UIViewContentModeScaleAspectFit;
+    image.tag = 1000;
+    [view addSubview:image];
+    
+    [image mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo(WidthRate(17));
+        make.centerX.mas_equalTo(view.mas_centerX);
+        make.width.mas_equalTo(39);
+        make.height.mas_equalTo(39);
+    }];
+    
+    UILabel *label = [[UILabel alloc]init];
+    label.text = text;
+    label.textColor = TextColor_617393;
+    label.font = SYSTEM_FONT(AdaptFont(13));
+    [view addSubview:label];
+    
+    [label mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerX.mas_equalTo(view.mas_centerX);
+        make.top.mas_equalTo(image.mas_bottom).offset(WidthRate(2));
+    }];
+    
+    return view;
+}
+- (void)configTableView{
+    self.messageTable = [[UITableView alloc]initWithFrame:CGRectZero style:UITableViewStyleGrouped];
+    self.messageTable.dataSource = self;
+    self.messageTable.delegate = self;
+    self.messageTable.separatorColor = [UIColor clearColor];
+    self.messageTable.backgroundColor = [UIColor clearColor];
+    self.messageTable.showsVerticalScrollIndicator = NO;
+    self.messageTable.showsHorizontalScrollIndicator = NO;
+    if (@available(iOS 11.0, *)){
+        self.messageTable.estimatedSectionFooterHeight = TableViewFooterNone;
+        self.messageTable.estimatedSectionHeaderHeight = TableViewHeaderNone;
+    }
+    
+    
+    self.messageTable.estimatedRowHeight = 0;
+    [self.view addSubview:self.messageTable];
+    
+    [self.messageTable mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(0);
+        make.right.mas_equalTo(0);
+        make.top.mas_equalTo((TOP_BAR_HEIGHT) + HeightRate(88));
+        make.bottom.mas_equalTo(0);
+    }];
+}
+- (void)configEmptyView{
+    self.EmptyView = [[UIView alloc]init];
+    self.EmptyView.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:self.EmptyView];
+    
+    [self.EmptyView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(0);
+        make.right.mas_equalTo(0);
+        make.top.mas_equalTo((TOP_BAR_HEIGHT) + HeightRate(98));
+        make.bottom.mas_equalTo(0);
+    }];
+    
+    
+    UIImageView *emptyImage = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"queyimianpeitu"]];
+    self.EmptyView.contentMode = UIViewContentModeScaleAspectFit;
+    [self.EmptyView addSubview:emptyImage];
+    
+    [emptyImage mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerX.mas_equalTo(self.EmptyView.mas_centerX);
+        make.top.mas_equalTo(HeightRate(70));
+        make.width.mas_equalTo(WidthRate(100));
+        make.height.mas_equalTo(WidthRate(100));
+    }];
+    
+    UILabel *labelText = [[UILabel alloc]init];
+    labelText.text = @"亲！您还没有相关消息哦。";
+    labelText.font = SYSTEM_FONT(AdaptFont(12));
+    [self.EmptyView addSubview:labelText];
+    
+    
+    [labelText mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerX.mas_equalTo(self.EmptyView.mas_centerX);
+        make.top.mas_equalTo(emptyImage.mas_bottom).offset(HeightRate(10));
+    }];
+}
+- (void)rightBtnClick:(UIButton *)sender{
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Chat" bundle:nil];
+    ChatNewViewController *vc = [storyboard instantiateViewControllerWithIdentifier:@"Chat"];
+    NSString *userID = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERID];
+    vc.hidesBottomBarWhenPushed = YES;
+    vc.listID = userID;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+- (void)goSelectVC:(UIButton *)sender{
+    sender.selected = !sender.selected;
+    switch(sender.tag) {
+        case 0:{
+            UIImageView *inviteImage = (UIImageView *)[self.inviteView viewWithTag:1000];
+            inviteImage.image = [UIImage imageNamed:@"xiaoxi_xiaoxis"];
+            
+            UIImageView *logisticImage = (UIImageView *)[self.logisticView viewWithTag:1000];
+            logisticImage.image = [UIImage imageNamed:@"xiaoxi-wuliu"];
+            
+            UIImageView *notificationImage = (UIImageView *)[self.notificationView viewWithTag:1000];
+            notificationImage.image = [UIImage imageNamed:@"xiaoxi-tongzhi"];
+            [self.EmptyView removeFromSuperview];
+            [self.messageTable removeFromSuperview];
+            NSArray *listArray = [[FMDBManager sharedManager] getAllMessageChatList];
+            self.chatListArray = [NSMutableArray arrayWithArray:listArray];
+            [self configTableView];
+        }
+            break;
+        case 1:{
+            UIImageView *inviteImage = (UIImageView *)[self.inviteView viewWithTag:1000];
+            inviteImage.image = [UIImage imageNamed:@"xiaoxi_xiaoxi"];
+            
+            UIImageView *logisticImage = (UIImageView *)[self.logisticView viewWithTag:1000];
+            logisticImage.image = [UIImage imageNamed:@"xiaoxi-wulius"];
+            
+            UIImageView *notificationImage = (UIImageView *)[self.notificationView viewWithTag:1000];
+            notificationImage.image = [UIImage imageNamed:@"xiaoxi-tongzhi"];
+            [self.infoArray removeAllObjects];
+            [self.messageTable removeFromSuperview];
+            [self.EmptyView removeFromSuperview];
+            [self configEmptyView];
+        }
+            break;
+        case 2:{
+            UIImageView *inviteImage = (UIImageView *)[self.inviteView viewWithTag:1000];
+            inviteImage.image = [UIImage imageNamed:@"xiaoxi_xiaoxi"];
+            
+            UIImageView *logisticImage = (UIImageView *)[self.logisticView viewWithTag:1000];
+            logisticImage.image = [UIImage imageNamed:@"xiaoxi-wuliu"];
+            
+            UIImageView *notificationImage = (UIImageView *)[self.notificationView viewWithTag:1000];
+            notificationImage.image = [UIImage imageNamed:@"xiaoxi-tongzhis"];
+            [self.infoArray removeAllObjects];
+            [self.messageTable removeFromSuperview];
+            [self.EmptyView removeFromSuperview];
+            [self configEmptyView];
+        }
+            break;
+        default:
+            break;
+    }
+}
+- (void)getMessageList{
+    
+    [self.view showWait:@"加载中" viewType:CurrentView];
+    self.infoArray = [NSMutableArray arrayWithCapacity:0];
+    [[YHJsonRequest shared] getMessageListSuccessBlock:^(NSArray *messageList) {
+        [self.view hideWait:CurrentView];
+        self.infoArray = [NSMutableArray arrayWithArray:messageList];
+        if (self.infoArray.count >0) {
+            if ([self.view.subviews containsObject:self.messageTable]) {
+                [self.messageTable removeFromSuperview];
+            }
+            [self configTableView];
+        }else{
+            if ([self.view.subviews containsObject:self.EmptyView]) {
+                [self.EmptyView removeFromSuperview];
+            }
+            [self configEmptyView];
+        }
+    } fialureBlock:^(NSString *errorMessages) {
+        if ([self.view.subviews containsObject:self.EmptyView]) {
+            [self.EmptyView removeFromSuperview];
+        }
+        [self configEmptyView];
+        [self.view hideWait:CurrentView];
+        [self.view makeToast:errorMessages duration:1.0 position:CSToastPositionCenter];
+    }];
+}
+- (void)joinTeam:(UIButton *)sender{
+    [self.view showWait:@"加载中" viewType:CurrentView];
+    YHInviteMessageModel *model = self.infoArray[sender.tag-1000];
+    NSDictionary *parameter = @{@"MobileNumber":model.MobileNumber};
+    [[YHJsonRequest shared] joinTeam:parameter SuccessBlock:^(NSString *successMessage) {
+        [self.view hideWait:CurrentView];
+        [[NSUserDefaults standardUserDefaults] setObject:@"2" forKey:LOGIN_USERTYPE];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self getMessageList];
+    } fialureBlock:^(NSString *errorMessages) {
+        [self.view hideWait:CurrentView];
+        [self.view makeToast:errorMessages duration:1.0 position:CSToastPositionCenter];
+    }];
+}
+#pragma mark==== UITableViewDelegate & UITableViewDataSource
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    return 2;
+}
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    if (self.isSotre) {
+        if (section == 0) {
+            return 1;
+        }else{
+            return self.chatListArray.count;
+        }
+    }else{
+        return self.infoArray.count;
+    }
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (self.isSotre) {
+        NSMutableDictionary *messageCountDic = [YHMQTTClient sharedClient].messageCountDic;
+        self.messageCountDic = messageCountDic;
+        ChatCommmonListCell *cell = nil;
+        if (cell == nil) {
+            cell = [[ChatCommmonListCell alloc]init];
+        }
+        if (indexPath.section == 0) {
+            SDChatMessage * msg = [[FMDBManager sharedManager] getMessageChatListWithOffcial];
+            msg.staffName = @"易智造客服";
+            msg.messageCount = messageCountDic[@"官方客服"];
+            [cell setDataAnother:msg];
+        }else{
+            SDChatMessage *msg = self.chatListArray[indexPath.row];
+            if (msg.userId.length>0) {
+                msg.messageCount = messageCountDic[msg.userId];
+            }
+
+            [cell setData:msg];
+        }
+        cell.selectionStyle  = UITableViewCellSelectionStyleNone;
+        return cell;
+    }else{
+        InviteMessageCellTableViewCell *cell = nil;
+        if (cell == nil) {
+            cell = [[InviteMessageCellTableViewCell alloc]init];
+        }
+        YHInviteMessageModel *model = self.infoArray[indexPath.row];
+        [cell setData:model];
+        cell.agree.tag = 1000 +indexPath.row;
+        [cell.agree addTarget:self action:@selector(joinTeam:) forControlEvents:UIControlEventTouchUpInside];
+        cell.selectionStyle  = UITableViewCellSelectionStyleNone;
+        return cell;
+    }
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    return HeightRate(67.0);
+}
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    return UITableViewCellEditingStyleDelete;
+}
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (self.isSotre) {
+        
+    }else{
+        [self.view showWait:@"请等待" viewType:CurrentView];
+        YHInviteMessageModel *model = self.infoArray[indexPath.row];
+        [[YHJsonRequest shared] deleteInfomationList:model.RefNo SuccessBlock:^(NSString *successMessage) {
+            [self.view makeToast:successMessage duration:1.0 position:CSToastPositionCenter];
+            [self.view hideWait:CurrentView];
+            [self.infoArray removeObjectAtIndex:indexPath.row];
+            [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]  withRowAnimation:UITableViewRowAnimationFade];
+            
+        } fialureBlock:^(NSString *errorMessages) {
+            [self.view makeToast:errorMessages duration:1.0 position:CSToastPositionCenter];
+            [self.view hideWait:CurrentView];
+        }];
+    }
+}
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (self.isSotre) {
+        
+        NSInteger count = [self.messageCountDic[@"messageCount"] integerValue];
+        NSMutableDictionary *messageDictionary = [NSMutableDictionary dictionary];
+        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Chat" bundle:nil];
+        ChatNewViewController *vc = [storyboard instantiateViewControllerWithIdentifier:@"Chat"];
+        if (indexPath.section == 0) {
+            NSString *userID = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERID];
+            vc.listID = userID;
+            [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"MessageDic"];
+            SDChatMessage * msg = [[FMDBManager sharedManager] getMessageChatListWithOffcial];
+            NSInteger count1 = [self.messageCountDic[@"官方客服"] integerValue];
+            count = count-count1;
+//            [messageDictionary setObject:@(0) forKey:msg.userId];
+            if (msg.userId.length>0) {
+                [[YHMQTTClient sharedClient].messageCountDic setObject:@(0) forKey:@"官方客服"];
+                
+            }
+        }else{
+            ChatCommmonListCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+            SDChatMessage *msg = self.chatListArray[indexPath.row];
+            vc.storeName = msg.staffName;
+            vc.storePhoneNumber = msg.phoneNumber;
+            vc.storeAvata = msg.staffAvata;
+            vc.listID = msg.userId;
+<<<<<<< .mine
+            NSArray *userArray = [[[msg.userInfos mj_JSONObject] reverseObjectEnumerator] allObjects];
+//            if (userArray.count >=3) {
+                NSString *title = @"";
+                for (NSDictionary *dict in userArray) {
+                    chatUserModel *userModel = [chatUserModel mj_objectWithKeyValues:dict];
+                    if ([userModel.ClientID containsString:@"user/"] || userModel.DisplayName.length<=0) {
+                        userModel.DisplayName = @"我";
+                    }
+                    title = [NSString stringWithFormat:@"%@、%@",userModel.DisplayName,title];
+                }
+                
+            vc.ChatVCTitle = title;
+=======
+            vc.titleName = cell.labelName.text;
+>>>>>>> .r4309
+            if ([msg.userId containsString:@"_"]) {
+                NSArray *array = [msg.userId componentsSeparatedByString:@"_"];
+                if (array.count == 2) {
+                    vc.storeID = array[0];
+                }
+            }
+            NSInteger count1 = [self.messageCountDic[msg.userId] integerValue];
+            count = count-count1;
+            if (msg.userId.length>0) {
+                [[YHMQTTClient sharedClient].messageCountDic setObject:@(0) forKey:msg.userId];
+
+            }
+
+//            [messageDictionary setObject:@(0) forKey:msg.userId];
+
+        }
+        
+        [messageDictionary setObject:@(count) forKey:@"messageCount"];
+//        NSString *messageKey = [NSString stringWithFormat:@"%@%@",NsuserDefaultsChatMessagesdict,Userdefault(LOGIN_USERID)];
+//        [[NSUserDefaults standardUserDefaults] setObject:messageDictionary forKey: messageKey];
+
+        [[YHMQTTClient sharedClient].messageCountDic setObject:@(count) forKey:@"messageCount"];
+//        [[NSNotificationCenter defaultCenter] postNotificationName:NotificatonChatMessagesCount object:nil userInfo:messageDictionary ];
+        vc.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+}
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+/*
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue s            ender:(id)sender {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
+
+@end

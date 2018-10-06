@@ -1,0 +1,270 @@
+//
+//  YHMySuperGroupTableViewCell.m
+//  emake
+//
+//  Created by zhangshichao on 2018/9/14.
+//  Copyright © 2018年 emake. All rights reserved.
+//
+
+#import "YHMySuperGroupTableViewCell.h"
+@interface YHMySuperGroupTableViewCell()
+@property(nonatomic,strong)UILabel *prouctExplain;
+@property(nonatomic,strong)UIImageView *itemImage;
+@property(nonatomic,strong)UILabel *freightPrice;
+@property(nonatomic,strong)UILabel *originalPrice;
+@property(nonatomic,strong)UILabel *productTip;
+@property(nonatomic,strong)UILabel *groupNmberLable;
+@property(nonatomic,strong)UILabel *productCap1;
+@property(nonatomic,strong)UILabel *groupPrice;
+@property(nonatomic,strong)UILabel *dateEnd;
+@property(nonatomic,strong)UIImageView *successImageView;
+
+
+
+
+@end
+@implementation YHMySuperGroupTableViewCell
+
+-(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        
+        self.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+        
+        UILabel *prouctExplain = [[UILabel alloc] init];
+        //        prouctExplain.backgroundColor = ColorWithHexString(@"333333");
+        prouctExplain.text = @"SCB15硅钢干式变压器 阻抗：4%；质量标准：国标；材质：全铜；温升：国标100K ";
+        prouctExplain.font = [UIFont systemFontOfSize:AdaptFont(14)];
+        prouctExplain.numberOfLines = 0;
+        [self addSubview:prouctExplain];
+        [prouctExplain mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(WidthRate(5));
+            make.right.mas_equalTo(WidthRate(-5));
+            make.top.mas_equalTo(HeightRate(10) );
+            
+        }];
+                self.prouctExplain = prouctExplain;
+        
+        UILabel *prouctExplainLine = [[UILabel alloc] init];
+        prouctExplainLine.backgroundColor = SepratorLineColor;
+        [self addSubview:prouctExplainLine];
+        [prouctExplainLine mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(WidthRate(0));
+            make.right.mas_equalTo(WidthRate(0));
+            make.top.mas_equalTo(prouctExplain.mas_bottom).offset(HeightRate(10));
+            make.height.mas_equalTo(HeightRate(1));
+        }];
+        
+        
+        
+        UIImageView*itemImage = [[UIImageView alloc]init];
+        itemImage.contentMode = UIViewContentModeScaleAspectFit;
+        itemImage.translatesAutoresizingMaskIntoConstraints = false;
+        itemImage.image = [UIImage imageNamed:@"placehold"];
+        itemImage.layer.borderColor = SepratorLineColor.CGColor;
+        itemImage.layer.borderWidth =1;
+        itemImage.layer.cornerRadius = 6;
+        itemImage.clipsToBounds = YES;
+        [self addSubview:itemImage];
+        [itemImage mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(WidthRate(10));
+            make.width.mas_equalTo(WidthRate(134));
+            make.height.mas_equalTo(HeightRate(134));
+            make.top.mas_equalTo(prouctExplainLine.mas_bottom).offset(HeightRate(10));
+            
+        }];
+        self.itemImage =itemImage;
+        
+        
+        UILabel *freightPrice = [[UILabel alloc]init];
+        freightPrice.text =@"¥30000 ";
+        freightPrice.textColor = ColorWithHexString(@"F8695D");
+        freightPrice.font = [UIFont systemFontOfSize:AdaptFont(20)];
+        [self addSubview:freightPrice];
+        [freightPrice mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(itemImage.mas_right).offset(WidthRate(10));
+            make.top.mas_equalTo(prouctExplainLine.mas_bottom).offset(HeightRate(20));
+        }];
+        self.freightPrice = freightPrice;
+        
+        
+        UIImageView *imageView = [[UIImageView alloc] init];
+        
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
+        imageView.image = [UIImage imageNamed:@"pintuanchenggongw"] ;
+        
+        [self addSubview:imageView];
+        [imageView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.width.mas_equalTo(WidthRate(90));
+            make.top.mas_equalTo(prouctExplain.mas_bottom).offset(HeightRate(0));
+            make.height.mas_equalTo(HeightRate(90));
+            make.right.mas_equalTo(WidthRate(-40));
+        }];
+        self.successImageView = imageView;
+        
+        UILabel *productCap = [[UILabel alloc]init];
+        productCap.text =@"拼团价";
+        productCap.textColor = ColorWithHexString(@"F8695D");
+        productCap.font = [UIFont systemFontOfSize:AdaptFont(12)];
+        [self addSubview:productCap];
+        [productCap mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(freightPrice.mas_right).offset(WidthRate(5));
+            make.centerY.mas_equalTo(freightPrice.mas_centerY).offset(HeightRate(5));
+        }];
+        
+        
+        NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:@"¥30000 普通价"];
+        [attrStr addAttribute:NSStrikethroughStyleAttributeName
+                        value:[NSNumber numberWithInteger:NSUnderlineStyleSingle]
+                        range:NSMakeRange(0, @"¥30000 原价".length)];
+        
+        
+        UILabel *originalPrice = [[UILabel alloc]init];
+        originalPrice.attributedText =attrStr;
+        originalPrice.textColor = ColorWithHexString(@"999999");
+        originalPrice.font = [UIFont systemFontOfSize:AdaptFont(13)];
+        [self addSubview:originalPrice];
+        [originalPrice mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(itemImage.mas_right).offset(WidthRate(10));
+            make.top.mas_equalTo(freightPrice.mas_bottom).offset(HeightRate(5));
+        }];
+        self.originalPrice = originalPrice;
+        
+        UILabel *productTip = [[UILabel alloc]init];
+        productTip.text =@"含税，不含运费";
+        productTip.textColor = ColorWithHexString(@"FF9900");
+        productTip.font = [UIFont systemFontOfSize:AdaptFont(13)];
+        [self addSubview:productTip];
+        [productTip mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(itemImage.mas_right).offset(WidthRate(5));
+            make.top.mas_equalTo(originalPrice.mas_bottom).offset(5);
+        }];
+        self.productTip = productTip;
+        
+        UIView *bgview = [[UIView alloc] init];
+        bgview.backgroundColor = ColorWithHexString(@"F2F2F2");
+        bgview.layer.cornerRadius = HeightRate(24);
+        bgview.layer.borderColor = ColorWithHexString(@"F8695D").CGColor;
+        bgview.layer.borderWidth= 1;
+        bgview.clipsToBounds= YES;
+        [self addSubview:bgview];
+        [bgview mas_makeConstraints:^(MASConstraintMaker *make) {
+//            make.width.mas_equalTo(WidthRate(353));
+            make.height.mas_equalTo(HeightRate(48));
+            make.right.mas_equalTo(WidthRate(-10));
+            make.top.mas_equalTo(productTip.mas_bottom).offset(5);
+            make.left.mas_equalTo(itemImage.mas_right).offset(WidthRate(5));
+        }];
+        
+        UILabel *groupNmberLable = [[UILabel alloc] init];
+        groupNmberLable.backgroundColor = ColorWithHexString(@"F8695D");
+        groupNmberLable.layer.cornerRadius = HeightRate(22);
+        groupNmberLable.text = @"5人团";
+        groupNmberLable.textAlignment = NSTextAlignmentCenter;
+        groupNmberLable.textColor = ColorWithHexString(@"ffffff");
+        groupNmberLable.font = [UIFont systemFontOfSize:AdaptFont(12)];
+        groupNmberLable.clipsToBounds = YES;
+        [bgview addSubview:groupNmberLable];
+        [groupNmberLable mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.width.mas_equalTo(HeightRate(44));
+            make.left.mas_equalTo(WidthRate(2));
+            make.centerY.mas_equalTo(bgview.mas_centerY).offset(HeightRate(0));
+            make.height.mas_equalTo(HeightRate(44));
+        }];
+        
+        self.groupNmberLable = groupNmberLable;
+        
+        
+        
+        
+        
+        UILabel *groupPrice = [[UILabel alloc]init];
+        groupPrice.text =@"¥30000 ";
+        groupPrice.textColor = ColorWithHexString(@"333333");
+        groupPrice.font = [UIFont systemFontOfSize:AdaptFont(18)];
+        [bgview addSubview:groupPrice];
+        [groupPrice mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(groupNmberLable.mas_right).offset(WidthRate(8));
+            make.top.mas_equalTo(HeightRate(0));
+            make.height.mas_equalTo(HeightRate(25));
+            
+        }];
+        
+        self.groupPrice = groupPrice;
+        
+        UILabel *productCap1 = [[UILabel alloc]init];
+        productCap1.text =@"还差2人拼成";
+        productCap1.textColor = ColorWithHexString(@"F8695D");
+        productCap1.font = [UIFont systemFontOfSize:AdaptFont(10)];
+        [bgview addSubview:productCap1];
+        [productCap1 mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(groupNmberLable.mas_right).offset(WidthRate(5));
+            make.top.mas_equalTo(groupPrice.mas_bottom).offset(0);
+            make.height.mas_equalTo(HeightRate(21));
+            
+        }];
+        self.productCap1 =productCap1;
+        
+        UILabel *dateEnd = [[UILabel alloc]init];
+        dateEnd.text =@"还剩12:12:45";
+        dateEnd.textColor = ColorWithHexString(@"999999");
+        dateEnd.font = [UIFont systemFontOfSize:AdaptFont(9)];
+        [bgview addSubview:dateEnd];
+        [dateEnd mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(productCap1.mas_right).offset(WidthRate(5));
+            make.centerY.mas_equalTo(productCap1.mas_centerY).offset(HeightRate(0));
+        }];
+        self.dateEnd = dateEnd;
+        
+        //        self.togetherBtn = togetherButton;
+        
+        UILabel *line = [[UILabel alloc] init];
+        line.backgroundColor = SepratorLineColor;
+        [self addSubview:line];
+        [line mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.mas_equalTo(WidthRate(0));
+            make.width.mas_equalTo(ScreenWidth);
+            make.height.mas_equalTo(HeightRate(3));
+            make.bottom.mas_equalTo(HeightRate(0));
+            make.top.mas_equalTo(itemImage.mas_bottom).offset(HeightRate(10));
+            
+        }];
+        
+        
+    }
+    return self;
+}
+-(void)requestData:(YHSuperGroupModel *)model
+{
+    self.prouctExplain.text = model.GroupName;
+    NSArray *imageArr = [Tools stringToJSON:model.GoodsSeriesPhotos];
+    if (imageArr.count>0) {
+        [self.itemImage sd_setImageWithURL:[NSURL URLWithString:imageArr.firstObject]];
+    }
+    self.freightPrice.text =[NSString stringWithFormat:@"¥%@ 起",[Tools getHaveNum:model.GroupPrice.doubleValue]] ;
+    
+    NSString *origianPrice =[NSString stringWithFormat:@"%@ 原价",[Tools getHaveNum:model.OldPrice.doubleValue]];
+    NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:origianPrice];
+    [attrStr addAttribute:NSStrikethroughStyleAttributeName
+                    value:[NSNumber numberWithInteger:NSUnderlineStyleSingle]
+                    range:NSMakeRange(0, origianPrice.length)];
+    self.originalPrice.attributedText = attrStr;
+    
+    self.productTip.text = model.GoodsAddValue;
+    self.groupPrice.text = [NSString stringWithFormat:@"¥%@ ",[Tools getHaveNum:model.GroupPrice.doubleValue]];
+    self.dateEnd.text = [NSString stringWithFormat:@"距离结束%@天 %@时%@分%@秒",model.Day,model.Hour,@"0",@"0"];
+    self.groupNmberLable.text = [NSString stringWithFormat:@"%@人团",model.infoModel.PeopleNumber];
+    self.productCap1.text = [NSString stringWithFormat:@"还差%ld人拼成",(model.infoModel.PeopleNumber.integerValue-model.infoModel.PeopleReadyNumber.integerValue)];
+    self.dateEnd.text = [NSString stringWithFormat:@"还剩%@天 %@",model.Day,model.Hour];
+    
+    self.successImageView.hidden = !model.infoModel.IsSuccess.boolValue;
+}
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+@end

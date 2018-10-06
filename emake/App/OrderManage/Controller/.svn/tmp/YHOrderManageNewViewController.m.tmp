@@ -1,0 +1,675 @@
+    //
+//  OrderManage.m
+//  emake
+//
+//  Created by chenyi on 2017/7/13.
+//  Copyright © 2017年 emake. All rights reserved.
+//
+
+#import "YHOrderManageNewViewController.h"
+#import "YHOrder.h"
+#import "YHOrderLogisticsCell.h"
+#import "ChatNewViewController.h"
+#import "YHOrderUploadPaymentVoucherViewController.h"
+#import "YHLabel.h"
+#import "YHOrderTableViewCell.h"
+#import "YHOrderFootTableViewCell.h"
+#import "accountInformationView.h"
+#import "YHOrderContract.h"
+#import "YHTitleView.h"
+#import "UIImageView+WebCache.h"
+#import "YHLookUpLogisticsViewController.h"
+#import "YHQualificationApplyViewController.h"
+#import "YHOrderContractViewController.h"
+#import "YHAlertView.h"
+#import "YHOrderInvoiceInfoViewController.h"
+#import "YHOrderDetailViewController.h"
+#import "YHOrderNewFootTableViewCell.h"
+#import "YHInsuranceSeviceViewController.h"
+#import "YHOrderInsuranceViewController.h"
+NSString *Cell = @"cell";
+NSString * LogisticsCell =@"LogisticsCell";
+NSString * FootCell = @"footCell";
+@interface YHOrderManageNewViewController ()<UITableViewDataSource, UITableViewDelegate, YHOrderFootViewDelegate,YHTitleViewViewDelegete,YHListViewDelegate>{
+    NSMutableArray *arrayState;//判断状态
+    NSMutableArray *arrayData;//数据
+    YHTitleView *titleView;
+    UIView *slectView;
+    UIView *emptyView;
+    NSInteger lastSelectIndex;
+    NSMutableArray *testArr;
+    accountInformationView *account;
+}
+@property (nonatomic, weak) UITableView *orderManageTableView;
+@property (nonatomic, strong) UILabel *tinLabel;
+@property(nonatomic,strong)NSMutableArray *dataArray;
+@property(nonatomic,strong)NSMutableArray *totalArray;
+//titleView的title
+@property(nonatomic,strong)NSArray *titleArray;
+//保险和pay的银行账户信息
+@property(nonatomic,strong)NSMutableArray *payArray;
+@property(nonatomic,strong)NSMutableArray *insuranceArray;
+@property (assign, nonatomic) NSInteger expandSectionIndex;
+@property (assign, nonatomic) BOOL isExpandSection;
+@property (assign, nonatomic) NSInteger recordSectionIndex;
+
+@end
+
+@implementation YHOrderManageNewViewController
+
+#pragma mark - LifeCycle
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self addRigthDetailButtonIsShowCart:false];
+    self.view.backgroundColor = TextColor_F5F5F5;
+    self.navigationItem.title = @"全部订单";
+    
+    _dataArray = [NSMutableArray array];
+    _totalArray = [NSMutableArray array];
+    [self configUI];
+    self.expandSectionIndex = NSNotFound;
+    if (self.isShowLeftButton == YES) {
+        self.navigationItem.leftBarButtonItem = nil;
+    }
+}
+
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    [MobClick event:@"Order" label:@"我的订单"];
+    if (_orderManageTableView) {
+        [_orderManageTableView.mj_header beginRefreshing];
+    }
+}
+//空订单图
+-(void)getEmptyOrderCart:(NSString *)title
+{
+    emptyView = [[UIView alloc]init];
+    emptyView.bounds =CGRectMake(WidthRate(0), HeightRate(0), WidthRate(200), HeightRate(120));
+    emptyView.center = self.view.center;
+    [self.view addSubview:emptyView];
+    UIImageView  *imageview = [[UIImageView alloc] initWithImage:[UIImage imageNamed: @"orderEmpty"]];
+    imageview.contentMode = UIViewContentModeScaleAspectFit;
+    imageview.frame = CGRectMake(WidthRate(55), HeightRate(0), WidthRate(70), HeightRate(70));
+    [emptyView addSubview:imageview];
+    UILabel  *lable  = [[UILabel alloc] init];
+    lable.bounds = CGRectMake(WidthRate(0), HeightRate(0), WidthRate(240), HeightRate(20));
+    lable.center = CGPointMake(imageview.centerX, imageview.centerY+imageview.height/1.5+HeightRate(10));
+    lable.textAlignment = NSTextAlignmentCenter;;
+    lable.text = @"您还没有相关订单";
+    lable .textColor = ColorWithHexString(@"909090");
+    lable.font = SYSTEM_FONT(13);
+    [emptyView addSubview:lable];
+}
+
+- (void)getOrderData{
+    
+    [self.view showWait:@"加载中" viewType:CurrentView];
+    [[YHJsonRequest shared] userUseOrderManageSucceededBlock:^(NSArray *orderArray) {
+
+        _dataArray = [NSMutableArray arrayWithArray:orderArray];
+        _totalArray = [NSMutableArray arrayWithArray:orderArray];
+        [self.orderManageTableView.mj_header endRefreshing];
+        [self.view hideWait:CurrentView];
+        [titleView selectItemWithIndex:self.OrderState];
+        
+    } failedBlock:^(NSString *errorMessage) {
+        [self.orderManageTableView.mj_header endRefreshing];
+
+            [self.view makeToast:errorMessage duration:1.5f position:CSToastPositionCenter];
+            [self.view hideWait:CurrentView];
+    }];
+}
+- (void)configUI {
+    self.titleArray = [NSArray arrayWithObjects:@"全  部",@"待付款",@"生产中",@"已入库",@"已发货", nil];
+     titleView = [[YHTitleView alloc]initWithFrame:CGRectMake(0, TOP_BAR_HEIGHT, ScreenWidth, HeightRate(35)) titleFont:14 delegate:self andTitleArray:self.titleArray];
+    [self.view addSubview:titleView];
+    UITableView *orderManageTableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];
+    orderManageTableView.dataSource = self;
+    orderManageTableView.delegate = self;
+    orderManageTableView.backgroundColor = [UIColor clearColor];
+    orderManageTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    orderManageTableView.estimatedRowHeight = HeightRate(88);
+    [self.view addSubview:orderManageTableView];
+    [orderManageTableView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.mas_equalTo((TOP_BAR_HEIGHT)+HeightRate(36));
+        make.left.mas_equalTo(0);
+        make.right.mas_equalTo(0);
+        make.bottom.mas_equalTo(0);
+        
+    }];
+    orderManageTableView.estimatedSectionFooterHeight =50;
+    orderManageTableView.estimatedRowHeight = 150;
+    orderManageTableView.estimatedSectionFooterHeight=0.0;
+    MJRefreshNormalHeader *header = [MJRefreshNormalHeader headerWithRefreshingTarget:self refreshingAction:@selector(loadNewData)];
+    // 设置自动切换透明度(在导航栏下面自动隐藏)
+    header.automaticallyChangeAlpha = YES;
+    // 隐藏时间
+    header.lastUpdatedTimeLabel.hidden = YES;
+    orderManageTableView.mj_header = header;
+    [orderManageTableView.mj_header beginRefreshing];
+    _orderManageTableView = orderManageTableView;
+}
+#pragma mark--mj-refresh
+- (void)loadNewData {
+    
+   [self getOrderData];
+}
+
+
+#pragma  mark - titleView delegate
+-(void)titleView:(id)titleView selectItemWithIndex:(NSInteger)index
+{
+    self.OrderState = index;
+    lastSelectIndex = index;
+    [self requstData:index];
+}
+#pragma  mark - requset
+- (void)requstData:(NSInteger )index{
+    
+    NSString *title = self.titleArray[index];
+    
+    NSMutableArray *selectArray =[[NSMutableArray alloc]initWithCapacity:0];
+    if (index == 0) {
+        _dataArray = _totalArray;
+        [_orderManageTableView reloadData];
+        if(_dataArray.count==0)
+        {
+            [emptyView removeFromSuperview];
+            [self getEmptyOrderCart:title];
+        }else
+        {
+            [emptyView removeFromSuperview];
+            
+            
+        }
+        return ;
+    }
+    for (YHOrderContract *contract in _totalArray) {
+        
+        if ([contract.OrderState integerValue] == index-1) {
+            [selectArray addObject:contract];
+        }
+        else{
+            _dataArray = _totalArray;
+        }
+        
+    }
+    _dataArray = selectArray;
+    [_orderManageTableView reloadData];
+    [_orderManageTableView.tableHeaderView reloadInputViews];
+    if(_dataArray.count==0)
+    {
+        [emptyView removeFromSuperview];
+        [self getEmptyOrderCart:title];
+    }else
+    {
+        [emptyView removeFromSuperview];
+    }
+}
+
+#pragma mark - UITableViewDataSource
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return self.dataArray.count;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    
+    YHOrderContract *contract = self.dataArray[section];
+    if ([contract.OrderState isEqual:@(3)] && contract.isExpandSection ==YES && contract.sectionRecord == section ) {
+        return (contract.goodsModelArr.count+contract.shipingModelArr.count+1);
+    }else{
+        return (contract.goodsModelArr.count+1);
+    }
+}
+    
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    YHOrderContract *contract = self.dataArray[indexPath.section];
+    if (indexPath.row<contract.goodsModelArr.count) {
+        YHOrder *order = contract.goodsModelArr[indexPath.row];
+        
+        YHOrderTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cell];
+        cell = [[YHOrderTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cell];
+        [cell.productImage sd_setImageWithURL:[NSURL URLWithString:order.GoodsImage]];
+        cell.productNameLable.text = [NSString stringWithFormat:@"%@",order.GoodsName];
+        cell.productPriceLable.text = [NSString stringWithFormat:@"¥%.2f",round([order.MainPrice doubleValue]*100)/100];
+        cell.productNumberLable.text =[NSString stringWithFormat:@"x%@",order.GoodsNumber];
+        cell.lbOrderDetail.text = order.GoodsExplain;
+        cell.smallPrice.text = [NSString stringWithFormat:@"¥%.2f",round([order.TotalGoodsPrice doubleValue]*100)/100];
+//#warning 运费 等待加字段
+        cell.freitFee.text = [NSString stringWithFormat:@"运费：¥%.2f",round([order.TotalShippingFee doubleValue]*100)/100];
+        
+        
+        if (order.AddServiceArr.count ==1) {
+            cell.lbAccessory.hidden = YES;
+            cell.lbAccessoryPrice.hidden = YES;
+            cell.lbBrand.hidden = YES;
+            cell.lbBrandPrice.hidden = YES;
+            [cell.lbAccessory PSUpdateConstraintsHeight:0.01];
+            cell.addSeviceView.hidden = NO;
+
+        }else if (order.AddServiceArr.count ==0)
+        {
+                cell.addSeviceView.hidden = YES;
+            [cell.lbAccessory PSUpdateConstraintsHeight:0.01];
+                [cell.lbBrand PSUpdateConstraintsHeight:0.01];
+
+        }else
+        {
+            cell.addSeviceView.hidden = NO;
+        }
+        for (YHOrderAddSevice *sevice in order.AddServiceArr) {
+            if ([sevice.arithType isEqualToString:@"1"]) {
+                if (sevice.ProductName.length ==0 ||sevice.ProductPrice.length ==0) {
+                    cell.lbAccessory.hidden = YES;
+                    cell.lbAccessoryPrice.hidden = YES;
+
+                }else
+                {
+                    [cell.lbAccessory PSUpdateConstraintsHeight:HeightRate(16)];
+
+                    cell.lbAccessory.hidden = NO;
+                    cell.lbAccessoryPrice.hidden = NO;
+                    cell.lbAccessory.text = [NSString stringWithFormat:@"%@%@",sevice.AddSeriesName,sevice.ProductName ];
+
+                cell.lbAccessoryPrice.text = [NSString stringWithFormat:@"¥%.2f",round([sevice.ProductPrice doubleValue]*100)/100];
+                }
+
+            } else if( [sevice.arithType isEqualToString:@"2"]){
+                    [cell.lbBrand PSUpdateConstraintsHeight:HeightRate(16)];
+                    cell.lbBrand.hidden = NO;
+                    cell.lbBrandPrice.hidden = NO;
+                    cell.lbBrand.text = [NSString stringWithFormat:@"%@%@",sevice.AddSeriesName,sevice.ProductName ];
+                    cell.lbBrandPrice.text =[NSString stringWithFormat:@"¥%.2f",round([sevice.ProductPrice doubleValue]*100)/100];
+
+            }
+        }
+        return cell;
+        
+    }else if (indexPath.row ==contract.goodsModelArr.count)
+    {
+//        YHOrderFootTableViewCell *cell ;
+//        cell = [[YHOrderFootTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:FootCell];
+//            cell.delegate = self;
+//        contract.sectionRecord = indexPath.section;
+//        [cell updateOrderFootViewWithOrder:contract];
+//        cell.state = [NSString stringWithFormat:@"%@",contract.OrderState];
+//        if (contract.RemainInvoiceAmount.doubleValue<=0) {
+//            [cell.paymentVoucher setTitleColor:SepratorLineColor forState:UIControlStateNormal];
+//
+//        } else {
+//            [cell.paymentVoucher setTitleColor:ColorWithHexString(@"000000") forState:UIControlStateNormal];
+//
+//        }
+ 
+        
+        YHOrderNewFootTableViewCell *cell = [[YHOrderNewFootTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"newcell"];
+        cell.logisticsDetailButton.selected = contract.isExpandSection;
+        contract.sectionRecord = indexPath.section;
+//        [cell.rightBtn addTarget:self action:@selector(rightBtnAddInsuranceClick:) forControlEvents:UIControlEventTouchUpInside];
+          [cell.helpBtn addTarget:self action:@selector(helpButtonClick) forControlEvents:UIControlEventTouchUpInside];
+        [cell.customerServiceButton addTarget:self action:@selector(customerServiceButtonClick) forControlEvents:UIControlEventTouchUpInside];
+        [cell.commBtn addTarget:self action:@selector(rcommBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+        [cell.logisticsDetailButton addTarget:self action:@selector(orderIsSlectButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+        cell.commBtn.tag = indexPath.section+100;
+        cell.rightBtn.tag = indexPath.section+100;
+
+        cell.logisticsDetailButton.tag = indexPath.section+100;
+        [cell setData:contract];
+        return cell;
+    }
+    else
+    {
+        NSInteger rowCount =indexPath.row- contract.goodsModelArr.count-1;
+        
+        YHOrderLogisticsCell *cell = [tableView dequeueReusableCellWithIdentifier:LogisticsCell];
+        YHOrderShippingInfo *ship = contract.shipingModelArr[rowCount];
+        if (!cell) {
+            cell =[[YHOrderLogisticsCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:LogisticsCell];
+        }
+        cell.logisticsIdLabel.text = [NSString stringWithFormat:@"运单号:%@",ship.ShippingNo]; ;
+        cell.dateLabel.text =[NSString stringWithFormat:@"日期:%@",ship.ShippingDate];
+        cell.numberIdLabel.text =[NSString stringWithFormat:@"已发数量:%@件",ship.ShippingNumber];
+        cell.logisticsButton.tag = 100 + 10*indexPath.section + rowCount;
+        [cell.logisticsButton addTarget:self action:@selector(logisticsButtonClick:) forControlEvents:UIControlEventTouchUpInside];
+        return cell;
+    }
+}
+
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    NSLog(@"iiiiiiiiiiii-----%ld===%ld",indexPath.row,indexPath.section);
+    
+    YHOrderContract *contract = self.dataArray[indexPath.section];
+
+    YHOrderDetailViewController *vc = [[YHOrderDetailViewController alloc] init];
+    vc.hidesBottomBarWhenPushed = YES;
+    vc.contract = contract;
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+
+#pragma mark - UITableViewDelegate
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return UITableViewAutomaticDimension;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    return HeightRate(36);
+}
+-(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return TableViewFooterNone;
+}
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    YHOrderContract *contract = self.dataArray[section];
+    return [self getheadView:tableView order:contract section:section];;
+}
+
+#pragma mark - YHOrderHeaderViewDelegate 和button的点击事件
+-(void)orderIsSlectButtonClick:(YHLogisticsDetailButton *)button
+{
+
+    NSInteger index = button.tag - 100;
+    
+    YHOrderContract *contract = self.dataArray[index];
+    contract.sectionRecord = index;
+    _recordSectionIndex = index;
+    button.selected = contract.isExpandSection;
+    NSMutableArray *indexArr = [NSMutableArray array];
+    for (int i =0; i <contract.shipingModelArr.count; i++) {
+        NSIndexPath *indexpath1 =[NSIndexPath indexPathForRow:(contract.goodsModelArr.count+1+i) inSection:index];
+        [indexArr addObject:indexpath1];
+    }
+    
+    if (contract.isExpandSection==NO) {
+        button.selected = YES;
+        contract.isExpandSection = YES;
+        [self.orderManageTableView insertRowsAtIndexPaths:indexArr withRowAnimation:UITableViewRowAnimationFade];
+    }else{
+        contract.isExpandSection = NO;
+        button.selected = NO;
+        
+        [self.orderManageTableView deleteRowsAtIndexPaths:indexArr withRowAnimation:UITableViewRowAnimationFade];
+    }
+}
+//调zhuan到保险服务页面
+-(void)helpButtonClick
+{
+    YHInsuranceSeviceViewController *insurance = [[YHInsuranceSeviceViewController alloc] init];
+    insurance.hidesBottomBarWhenPushed = YES;
+    [self.navigationController  pushViewController:insurance animated:YES];
+}
+//调zhuan到保单页面
+-(void)rightBtnAddInsuranceClick:(UIButton *)button
+{
+    
+    YHOrderContract *contract = self.dataArray[button.tag-100];
+
+    YHOrderInsuranceViewController *vc = [[YHOrderInsuranceViewController alloc] init];
+    vc.hidesBottomBarWhenPushed = YES;
+    
+    vc.contract = contract.OrderNo;
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+
+- (void)payButtonClickedWithOrder:( YHOrderContract *)orderContract {
+    
+    YHOrderUploadPaymentVoucherViewController *vc = [[YHOrderUploadPaymentVoucherViewController alloc]init];
+    vc.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+//物流
+-(void)logisticsButtonClick:(YHButton *)sender
+{
+    NSInteger section = (sender.tag - 100)/10;
+    NSInteger row = sender.tag - 100 - section*10 ;
+    YHOrderContract *contract = self.dataArray[section];
+    YHOrderShippingInfo *ship = contract.shipingModelArr[row];
+    YHLookUpLogisticsViewController *vc = [[YHLookUpLogisticsViewController alloc]init];
+    vc.logsticsNumber = ship.ShippingNo;
+    vc.hidesBottomBarWhenPushed = YES;
+
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+//订单恢复
+-(void)renewOrderButtonClickedWithOrder:(YHOrderContract *)orderContract
+{
+
+    YHAlertView *alert = [[YHAlertView alloc] initWithTitle:@"确定恢复订单" leftButtonTitle:@"取消" rightButtonTitle:@"确定"];
+    alert.model = orderContract;
+
+    alert.rightBlock = ^(NSString *str){   // 1
+        
+        [[YHJsonRequest shared] putOrderManageContratNo:@{@"OrderNo":orderContract.OrderNo,@"OrderState":@"0"} SucceededBlock:^(NSString *successMessage) {
+            
+                                          [self.view makeToast:successMessage];
+                                          [self getOrderData];
+                                          [_orderManageTableView reloadData];
+                                      } failedBlock:^(NSString *errorMessage) {
+            
+                                          [self.view makeToast:errorMessage];
+            
+                                      }];
+       
+        
+        
+    };
+    [alert showAnimated];
+}
+
+//订单删除
+- (void)deleteOrderButtonClickedWithOrder:( YHOrderContract *)orderContract {
+    //初始化警告框
+    
+    YHAlertView *alert = [[YHAlertView alloc] initWithTitle:@"确定恢复订单" leftButtonTitle:@"取消" rightButtonTitle:@"确定"];
+    alert.model = orderContract;
+    
+    alert.rightBlock = ^(NSString *str){   // 1
+        
+        for ( int i=0;i<self.dataArray.count;i++ ) {
+                        YHOrderContract *object = self.dataArray[i];
+                        if([object isEqual:orderContract])
+                        {
+                            [_orderManageTableView beginUpdates];
+            
+                            [[YHJsonRequest shared] deleteOrderManageContratNo:orderContract.OrderNo SucceededBlock:^(NSString *successMessage) {
+            
+            
+                                [_dataArray removeObject:orderContract];
+                                [_orderManageTableView deleteSections:[NSIndexSet indexSetWithIndex:i] withRowAnimation:UITableViewRowAnimationFade];
+                                [self.view makeToast:successMessage duration:2 position:CSToastPositionCenter];
+                            } failedBlock:^(NSString *errorMessage) {
+            
+                            }];
+                            [_orderManageTableView endUpdates];
+            
+            
+                        }
+            
+                    }
+        
+        
+        
+    };
+    [alert showAnimated];
+
+    
+    
+}
+//客服
+- (void)customerServiceButtonClick {
+    
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Chat" bundle:nil];
+    ChatNewViewController *vc = [storyboard instantiateViewControllerWithIdentifier:@"Chat"];
+    vc.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+//合同查看
+- (void)contractButtonClickedWithOrder:( YHOrderContract *)orderContract {
+
+    YHOrderContractViewController *contractViewController = [[YHOrderContractViewController alloc] init];
+    contractViewController.contractID = orderContract.OrderNo;
+    contractViewController.hidesBottomBarWhenPushed = YES;
+
+    [self.navigationController pushViewController:contractViewController animated:YES];
+}
+
+
+//服务打款
+-(void)payAccountOrderButtonClickedWithOrder:( YHOrderContract *)orderContract
+{
+    
+    account = [[accountInformationView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, ScreenHeight)];
+    account.listViewDelegate = self;
+    account.lableTexTAliment = NSTextAlignmentCenter;
+    account.section = orderContract.sectionRecord;
+    account.flag = 11;
+    account.NumberOfLines = 3;
+    [[UIApplication sharedApplication].keyWindow addSubview:account];
+    [account.closeButton addTarget:self action:@selector(dimissview) forControlEvents:UIControlEventTouchUpInside];
+    
+    
+}
+//保险服务打款 = 删除订单
+-(void)rcommBtnClick:(YHButton *)button{
+    
+    if([button.currentTitle isEqualToString:@"付款账号"]){
+        [MobClick event:@"PaymentAccount" label:@"付款账号"];
+        account = [[accountInformationView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, ScreenHeight)];
+        account.listViewDelegate = self;
+        account.section = button.tag-100;
+        account.flag = 10;
+        account.lableTexTAliment = NSTextAlignmentCenter;
+        account.NumberOfLines = 3;
+        [[UIApplication sharedApplication].keyWindow addSubview:account];
+        [account.closeButton addTarget:self action:@selector(dimissview) forControlEvents:UIControlEventTouchUpInside];
+    }else if([button.currentTitle isEqualToString:@"删除订单"]){
+        YHOrderContract *contract = self.dataArray[button.tag-100];
+        [self deleteOrderButtonClickedWithOrder:contract];
+    }
+}
+#pragma mark---accountInformationView 打款界面 delegate
+-(NSString *)ListView:(UIView *)listView withIndex:(NSInteger)index flag:(NSInteger)flag section:(NSInteger)section
+{
+    //因为contract的所有的
+    YHOrderContract *contract = self.dataArray[section];
+    NSString *insuranceSting ;
+    NSString *paySting ;
+    
+    switch (index) {
+        case 0:
+        {
+            paySting  = [NSString stringWithFormat:@"收款方:%@",contract.PaymentInfoModel.NameOfPartyA];
+            insuranceSting = [NSString stringWithFormat:@"收款方:%@",contract.PaymentInsuraceInfoModel.BankOfPartyA];
+            
+        }
+            break;
+        case 1:
+        {
+            paySting  = [NSString stringWithFormat:@"开户行:%@",contract.PaymentInfoModel.BankOfPartyA];
+            insuranceSting = [NSString stringWithFormat:@"开户行:%@",contract.PaymentInsuraceInfoModel.NameOfPartyA];
+            
+        }
+            break;
+        case 2:
+        {
+            paySting  = [NSString stringWithFormat:@"银行卡账号:%@",contract.PaymentInfoModel.AccountOfPartyA];
+            insuranceSting   = [NSString stringWithFormat:@"银行卡账号:%@",contract.PaymentInsuraceInfoModel.AccountOfPartyA];
+        }
+            break;
+        default:
+            break;
+    }
+    return paySting;
+}
+ -(void)dimissview
+ {
+     [UIView animateWithDuration:.5 animations:^{
+         
+         account.center = self.view.center;
+         account.bounds = CGRectZero;
+         [account removeFromSuperview];
+         
+     } completion:^(BOOL finished) {
+         
+     }];
+         
+ }
+
+-(UIView *)getheadView:(UITableView *)tableView order:(YHOrderContract *)order section:(NSInteger )section
+{
+    UIView *orderTopView;
+    if (orderTopView==nil) {
+        orderTopView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, tableView.sectionHeaderHeight)];
+        
+        orderTopView.backgroundColor = ColorWithHexString(@"F7F7F7");
+        orderTopView.clipsToBounds = NO;
+        UIView *lineBottomView = [[UIView alloc] init];
+        lineBottomView.translatesAutoresizingMaskIntoConstraints = NO;
+        lineBottomView.backgroundColor = ColorWithHexString(@"EBEBEB");
+        [orderTopView addSubview:lineBottomView];
+        [lineBottomView PSSetLeft:0];
+        [lineBottomView PSSetWidth:ScreenWidth];
+        if (section==0) {
+            [lineBottomView PSSetTop:-1];
+            [lineBottomView PSSetHeight:0.01];
+        }else
+        {
+            [lineBottomView PSSetTop:HeightRate(0)];
+            [lineBottomView PSSetHeight:HeightRate(5)];
+            
+        }
+        YHLabel *orderIdItemLabel = [[YHLabel alloc] initWithText: NSLanguageLocalizedString(@"order id") textColor:BASE_FAINTLY_COLOR];
+        orderIdItemLabel.translatesAutoresizingMaskIntoConstraints   = NO;
+        orderIdItemLabel.font =[UIFont systemFontOfSize:AdaptFont(12)];
+        [orderTopView addSubview:orderIdItemLabel];
+        
+        [orderIdItemLabel PSSetLeft:WidthRate(12)];
+        [orderIdItemLabel PSSetBottomAtItem:lineBottomView Length:HeightRate(8)];
+        
+        //订单号
+        YHLabel *orderIdLabel = [[YHLabel alloc] initWithTextColor:BASE_FAINTLY_COLOR];
+        orderIdLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        orderIdLabel.text = [NSString stringWithFormat:@"%@",order.OrderNo] ;
+        orderIdLabel.font =[UIFont systemFontOfSize:AdaptFont(12)];
+        [orderTopView addSubview:orderIdLabel];
+        [orderIdLabel PSSetRightAtItem:orderIdItemLabel Length:WidthRate(5)];
+        
+        //订单日期
+        YHLabel *orderDateLabel = [[YHLabel alloc] initWithTextColor:BASE_FAINTLY_COLOR];
+        orderDateLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        orderDateLabel.font =[UIFont systemFontOfSize:AdaptFont(12)];
+        orderDateLabel.text = order.InDate;
+        [orderTopView addSubview:orderDateLabel];
+        [orderDateLabel PSSetRightAtItem:orderIdLabel Length:WidthRate(36)];
+        
+        //订单状态
+        YHLabel *orderStatusLabel = [[YHLabel alloc] initWithTextColor:@"FA0C37"];
+        orderStatusLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        orderStatusLabel.text = order.OrderStateName;
+        
+        orderStatusLabel.font =[UIFont systemFontOfSize:AdaptFont(12)];
+        [orderTopView addSubview:orderStatusLabel];
+        orderStatusLabel.textAlignment = NSTextAlignmentRight;
+//        [orderStatusLabel PSSetRightAtItem:orderDateLabel Length:WidthRate(18)];
+        [orderStatusLabel PSSetRight:WidthRate(10)];
+        [orderStatusLabel PSSetCenterHorizontalAtItem:orderTopView];
+        [orderStatusLabel PSSetWidth:WidthRate(55)];
+        
+    }
+    
+    return orderTopView;
+    
+}
+@end
+

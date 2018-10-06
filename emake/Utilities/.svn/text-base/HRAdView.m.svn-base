@@ -1,0 +1,385 @@
+//
+//  HRAdView.m
+//  AutoAdLabelScroll
+//
+//  Created by 陈华荣 on 16/4/6.
+//  Copyright © 2016年 陈华荣. All rights reserved.
+//
+
+#import "HRAdView.h"
+#import "YHMainShoppingModel.h"
+#define ViewHeight  self.bounds.size.height
+
+@interface HRAdView ()
+/**
+ *  文字广告条前面的图标
+ */
+@property (nonatomic, strong) UIImageView *headImageView;
+/**
+ *  轮流显示的两个Label
+ */
+@property (nonatomic, strong) UIView *oneView;
+@property (nonatomic, strong) UIView *twoView;
+@property (nonatomic, strong) UILabel *commpanyLabel;
+@property (nonatomic, strong) UILabel *commpanyLabelTwo;
+@property (nonatomic, strong) UILabel *Amount;
+@property (nonatomic, strong) UILabel *AmountTwo;
+@property (nonatomic, strong) UILabel *detailLabel;
+@property (nonatomic, strong) UILabel *detailLabelTwo;
+
+
+@end
+
+@implementation HRAdView
+{
+    NSUInteger index;
+    CGFloat margin;
+    BOOL isBegin;
+}
+
+
+- (instancetype)initWithTitles:(NSArray *)lastWeekArray{
+    
+    self = [super init];
+    
+    if (self) {
+        margin = 0;
+        self.clipsToBounds = YES;
+        self.lastWeekArray = lastWeekArray;
+        self.headImg = nil;
+        self.labelFont = [UIFont systemFontOfSize:16];
+        self.color = [UIColor blackColor];
+        self.time = 2.0f;
+        self.textAlignment = NSTextAlignmentLeft;
+        self.isHaveHeadImg = NO;
+        self.isHaveTouchEvent = NO;
+        index = 0;
+        if (!_headImageView) {
+            _headImageView = [UIImageView new];
+        }
+        YHMainLastWeekOrderModel *model;
+        if (self.lastWeekArray.count>0) {
+            model = [YHMainLastWeekOrderModel mj_objectWithKeyValues:self.lastWeekArray[index]];
+
+        }
+        NSString *resultStr = @"";
+        if(model.party_name.length>4){
+            NSString *forWordStr = [model.party_name substringToIndex:2];
+            NSString *backWordStr = [model.party_name substringFromIndex:model.party_name.length-4];
+            resultStr = [NSString stringWithFormat:@"%@****%@",forWordStr,backWordStr];
+        }else
+        {
+            NSString *forWordStr =@"" ;
+            NSString *backWordStr = @"";
+            resultStr = [NSString stringWithFormat:@"%@****%@",forWordStr,backWordStr];
+        }
+        if (!self.oneView) {
+            self.oneView = [[UIView alloc]init];
+            self.oneView.backgroundColor = [UIColor whiteColor];
+            self.commpanyLabel = [[UILabel alloc]init];
+            self.commpanyLabel.font =  [UIFont systemFontOfSize:AdaptFont(14)];
+            
+            self.commpanyLabel.text = resultStr;
+            [self.oneView addSubview:self.commpanyLabel];
+            
+            [self.commpanyLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.left.mas_equalTo(WidthRate(23));
+                make.top.mas_equalTo(HeightRate(10));
+            }];
+            
+            self.Amount = [[UILabel alloc] init];
+            self.Amount.font = SYSTEM_FONT(AdaptFont(13));
+            self.Amount.textAlignment = NSTextAlignmentLeft;
+            self.Amount.textColor = RGBColor(73, 95, 132);
+            NSString *totalPrice = [Tools getNsstringFromDouble:model.total_price.doubleValue isShowUNIT:false];
+            self.Amount.text = [NSString stringWithFormat:@"¥%@",totalPrice];
+            [self.oneView addSubview:self.Amount];
+            
+            [self.Amount mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.right.mas_equalTo(WidthRate(-20));
+                make.centerY.mas_equalTo(self.commpanyLabel.mas_centerY);
+                make.height.mas_equalTo(WidthRate(26));
+            }];
+            
+            self.detailLabel = [[UILabel alloc] init];
+            self.detailLabel.font = SYSTEM_FONT(AdaptFont(13));
+            self.detailLabel.numberOfLines = 0;
+            self.detailLabel.textColor = TextColor_666666;
+            [self.oneView addSubview:self.detailLabel];
+            
+            [self.detailLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.left.mas_equalTo(WidthRate(23));
+                make.right.mas_equalTo(WidthRate(-30));
+                make.top.mas_equalTo(self.commpanyLabel.mas_bottom).offset(HeightRate(-10));
+            }];
+            
+            NSString *str = @"";
+            int i = 0;
+            for (NSDictionary *dict in model.series_list){
+                if (i>1) {
+                    break;
+                }
+                str = [NSString stringWithFormat:@"%@\n%@ %@",str,[dict objectForKey:@"series_desc"],[dict objectForKey:@"series_name"]];
+                i++;
+            }
+            self.detailLabel.text = str;
+            
+            [self addSubview:self.oneView];
+        }
+        if (self.lastWeekArray.count <= 1) {
+            return  self;
+        }
+        YHMainLastWeekOrderModel *modelTwo = [YHMainLastWeekOrderModel mj_objectWithKeyValues:self.lastWeekArray[index+1]];
+        NSString *resultStrTwo = @"";
+        if(modelTwo.party_name.length>4){
+            NSString *forWordStr = [modelTwo.party_name substringToIndex:2];
+            NSString *backWordStr = [modelTwo.party_name substringFromIndex:modelTwo.party_name.length-4];
+            resultStrTwo = [NSString stringWithFormat:@"%@****%@",forWordStr,backWordStr];
+        }else
+        {
+            NSString *forWordStr =@"" ;
+            NSString *backWordStr = @"";
+            resultStrTwo = [NSString stringWithFormat:@"%@****%@",forWordStr,backWordStr];
+        }
+        if (!self.twoView) {
+            self.twoView = [[UIView alloc]init];
+            self.twoView.backgroundColor = [UIColor whiteColor];
+            self.commpanyLabelTwo = [[UILabel alloc]init];
+            self.commpanyLabelTwo.font =  [UIFont systemFontOfSize:AdaptFont(14)];;
+            self.commpanyLabelTwo.text = resultStrTwo;
+            [self.twoView addSubview:self.commpanyLabelTwo];
+            
+            [self.commpanyLabelTwo mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.left.mas_equalTo(WidthRate(23));
+                make.top.mas_equalTo(HeightRate(10));
+            }];
+            
+            self.AmountTwo = [[UILabel alloc] init];
+            self.AmountTwo.font = SYSTEM_FONT(AdaptFont(13));
+            self.AmountTwo.textAlignment = NSTextAlignmentLeft;
+            NSString *totalPrice = [Tools getNsstringFromDouble:modelTwo.total_price.doubleValue isShowUNIT:false];
+            self.AmountTwo.text = [NSString stringWithFormat:@"¥%@",totalPrice];
+            self.AmountTwo.textColor = RGBColor(73, 95, 132);
+            [self.twoView addSubview:self.AmountTwo];
+            
+            [self.AmountTwo mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.right.mas_equalTo(WidthRate(-20));
+                make.centerY.mas_equalTo(self.commpanyLabelTwo.mas_centerY);
+                make.height.mas_equalTo(WidthRate(26));
+            }];
+            
+            self.detailLabelTwo = [[UILabel alloc] init];
+            self.detailLabelTwo.font = SYSTEM_FONT(AdaptFont(13));
+            self.detailLabelTwo.numberOfLines = 0;
+            self.detailLabelTwo.textColor = TextColor_666666;
+            [self.twoView addSubview:self.detailLabelTwo];
+            
+            [self.detailLabelTwo mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.left.mas_equalTo(WidthRate(23));
+                make.right.mas_equalTo(WidthRate(-30));
+                make.top.mas_equalTo(self.commpanyLabelTwo.mas_bottom).offset(HeightRate(-10));
+            }];
+            
+            NSString *str = @"";
+            int i = 0;
+            for (NSDictionary *dict in modelTwo.series_list){
+                if (i>1) {
+                    break;
+                }
+                str = [NSString stringWithFormat:@"%@\n%@ %@",str,[dict objectForKey:@"series_desc"],[dict objectForKey:@"series_name"]];
+                i++;
+            }
+            self.detailLabelTwo.text = str;
+            
+            [self addSubview:self.twoView];
+        }
+    }
+    return self;
+}
+- (void)timeRepeat{
+    if (self.lastWeekArray.count == 0) {
+        return;
+    }
+    if (index != self.lastWeekArray.count-1) {
+        index++;
+    }else{
+        index = 0;
+    }
+    YHMainLastWeekOrderModel *model = [YHMainLastWeekOrderModel mj_objectWithKeyValues:self.lastWeekArray[index]];
+    NSString *resultStr = @"";
+    if(model.party_name.length>4){
+        NSString *forWordStr = [model.party_name substringToIndex:2];
+        NSString *backWordStr = [model.party_name substringFromIndex:model.party_name.length-4];
+        resultStr = [NSString stringWithFormat:@"%@****%@",forWordStr,backWordStr];
+    }else
+    {
+        NSString *forWordStr =@"" ;
+        NSString *backWordStr = @"";
+        resultStr = [NSString stringWithFormat:@"%@****%@",forWordStr,backWordStr];
+    }
+    NSString *totalPrice = [Tools getNsstringFromDouble:model.total_price.doubleValue isShowUNIT:false];
+    NSString *str = @"";
+    int i = 0;
+    for (NSDictionary *dict in model.series_list){
+        if (i>1) {
+            break;
+        }
+        str = [NSString stringWithFormat:@"%@\n%@ %@",str,[dict objectForKey:@"series_desc"],[dict objectForKey:@"series_name"]];
+        i++;
+    }
+    if (index == 0) {
+        if (self.lastWeekArray.count%2 == 0) {
+            self.commpanyLabel.text = resultStr;
+            self.Amount.text = [NSString stringWithFormat:@"¥%@",totalPrice];
+            self.detailLabel.text = str;
+        }else{
+
+            self.commpanyLabelTwo.text = resultStr;
+            self.AmountTwo.text = [NSString stringWithFormat:@"¥%@",totalPrice];
+            self.detailLabelTwo.text = str;
+        }
+    }else{
+        switch (index%2) {
+            case 0:
+            {
+                self.commpanyLabel.text = resultStr;
+                self.Amount.text = [NSString stringWithFormat:@"¥%@",totalPrice];
+                self.detailLabel.text = str;
+            }
+                break;
+                
+            default:
+            {
+                if (!(index == 1 && self.lastWeekArray.count%2 == 1)){
+                    self.commpanyLabelTwo.text = resultStr;
+                    self.AmountTwo.text = [NSString stringWithFormat:@"¥%@",totalPrice];
+                    self.detailLabelTwo.text = str;
+                }
+                
+            }
+                break;
+        }
+    }
+    if (index == 0) {
+        if (self.lastWeekArray.count%2 == 0) {
+            [UIView animateWithDuration:1 animations:^{
+                self.oneView.frame = CGRectMake(margin, 0, ScreenWidth, ViewHeight);
+                self.twoView.frame = CGRectMake(margin, -ViewHeight, ScreenWidth, ViewHeight);
+            } completion:^(BOOL finished){
+                self.twoView.frame = CGRectMake(margin, ViewHeight, ScreenWidth, ViewHeight);
+            }];
+        }else{
+            
+            [UIView animateWithDuration:1 animations:^{
+                self.twoView.frame = CGRectMake(margin, 0, ScreenWidth, ViewHeight);
+                self.oneView.frame = CGRectMake(margin, -ViewHeight, ScreenWidth, ViewHeight);
+            } completion:^(BOOL finished){
+                self.oneView.frame = CGRectMake(margin, ViewHeight, ScreenWidth, ViewHeight);
+            }];
+        }
+        
+    }else{
+        if (index%2 == 0) {
+            [UIView animateWithDuration:1 animations:^{
+                self.oneView.frame = CGRectMake(margin, 0, ScreenWidth, ViewHeight);
+                self.twoView.frame = CGRectMake(margin, -ViewHeight, ScreenWidth, ViewHeight);
+            } completion:^(BOOL finished){
+                self.twoView.frame = CGRectMake(margin, ViewHeight, ScreenWidth, ViewHeight);
+            }];
+        }else{
+            
+            [UIView animateWithDuration:1 animations:^{
+                self.twoView.frame = CGRectMake(margin, 0, ScreenWidth, ViewHeight);
+                self.oneView.frame = CGRectMake(margin, -ViewHeight, ScreenWidth, ViewHeight);
+            } completion:^(BOOL finished){
+                self.oneView.frame = CGRectMake(margin, ViewHeight, ScreenWidth, ViewHeight);
+            }];
+        }
+    }
+}
+- (void)layoutSubviews{
+    [super layoutSubviews];
+    if (self.isHaveHeadImg) {
+        [self addSubview:self.headImageView];
+        self.headImageView.frame = CGRectMake(0, 0, ViewHeight,ViewHeight);
+        margin = 0;
+    }else{
+        
+        if (self.headImageView) {
+            [self.headImageView removeFromSuperview];
+            self.headImageView = nil;
+        }
+        margin = 0;
+    }
+    
+    self.oneView.frame = CGRectMake(margin, 0, ScreenWidth, ViewHeight);
+    self.twoView.frame = CGRectMake(margin, ViewHeight, ScreenWidth, ViewHeight);
+}
+
+- (NSTimer *)timer{
+    if (!_timer) {
+        _timer = [NSTimer timerWithTimeInterval:self.time target:self selector:@selector(timeRepeat) userInfo:self repeats:YES];
+    }
+    return _timer;
+}
+- (void)beginScroll{
+    if (self.timer.isValid) {
+        [self.timer invalidate];
+        self.timer = nil;
+    }
+    [[NSRunLoop mainRunLoop]addTimer:self.timer forMode:NSDefaultRunLoopMode];
+}
+- (void)paseScroll{
+    
+    [self.timer invalidate];
+    self.timer = nil;
+}
+- (void)closeScroll{
+    
+    [self.timer invalidate];
+    self.timer = nil;
+}
+- (void)setIsHaveHeadImg:(BOOL)isHaveHeadImg{
+    _isHaveHeadImg = isHaveHeadImg;
+    
+}
+- (void)setIsHaveTouchEvent:(BOOL)isHaveTouchEvent{
+    if (isHaveTouchEvent) {
+        self.userInteractionEnabled = YES;
+        UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(clickEvent:)];
+        [self addGestureRecognizer:tapGestureRecognizer];
+    }else{
+        self.userInteractionEnabled = NO;
+    }
+}
+
+- (void)setTime:(NSTimeInterval)time{
+    _time = time;
+    if (self.timer.isValid) {
+        [self.timer isValid];
+        self.timer = nil;
+    }
+}
+
+- (void)setHeadImg:(UIImage *)headImg{
+    _headImg = headImg;
+    
+    self.headImageView.image = headImg;
+}
+
+- (void)setColor:(UIColor *)color{
+    _color = color;
+    self.oneView.backgroundColor = [UIColor redColor];
+    self.twoView.backgroundColor = RGBColor(245, 250, 255);
+}
+
+- (void)clickEvent:(UITapGestureRecognizer *)tapGestureRecognizer{
+    
+    [self.lastWeekArray enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        
+    }];
+    
+}
+
+
+@end

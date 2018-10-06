@@ -1,0 +1,572 @@
+//
+//  YHStoreDetailViewController.m
+//  emake
+//
+//  Created by 谷伟 on 2018/7/19.
+//  Copyright © 2018年 emake. All rights reserved.
+//
+
+#import "YHStoreDetailViewController.h"
+#import "ProductCollectionViewCell.h"
+#import "YHProductDetailsViewController.h"
+#import "YhSearchModel.h"
+#import "ChatNewViewController.h"
+#import "YHShareView.h"
+#import "YHAlertView.h"
+@interface YHStoreDetailViewController ()<YHTitleViewViewDelegete,UITableViewDelegate,UITableViewDataSource,UICollectionViewDelegate,UICollectionViewDataSource,UIScrollViewDelegate,YHAlertViewDelegete>
+@property (nonatomic,strong)UIImageView *storeImage;
+@property (nonatomic,strong)UILabel *storeSaleTotal;
+@property (nonatomic,strong)UILabel *storeSaleCount;
+@property (nonatomic,strong)UILabel *storeCategory;
+@property (nonatomic,strong)UIButton *storeCollect;
+@property (nonatomic,strong)UITableView *leftTableView;
+@property (nonatomic,strong)UICollectionView *rightCollectionView;
+@property (nonatomic,strong)NSMutableArray *leftClassArray;
+@property (nonatomic,strong)NSMutableArray *dataArray;
+@property (nonatomic,strong)UIScrollView *scrollView;
+@property (nonatomic,strong)UIImageView *storechargeImage;
+@property (nonatomic,strong)UILabel *storechargeName;
+@property (nonatomic,strong)UILabel *storeIntroduction;
+@property (nonatomic,strong)YHTitleView *titleView;
+@property (nonatomic,assign)NSInteger leftSelectIndex;
+@property (nonatomic,strong)NSMutableArray *CategoryList;
+@property (nonatomic,strong)NSMutableArray *StoreBusinessCategory;
+@property (nonatomic,strong)NSString *StoreRefNo;
+
+@end
+
+@implementation YHStoreDetailViewController
+- (void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    [self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+}
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
+    UIImage *bgImage = [UIImage imageNamed:@"h64"];
+    bgImage = [bgImage resizableImageWithCapInsets:UIEdgeInsetsZero resizingMode:UIImageResizingModeTile];
+    [self.navigationController.navigationBar setBackgroundImage:bgImage forBarMetrics:UIBarMetricsDefault];
+    [self.navigationController.navigationBar setShadowImage:[[UIImage alloc] init]];
+
+}
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    self.view.backgroundColor = TextColor_F5F5F5;
+    self.leftSelectIndex = 0;
+    self.title = self.storeName;
+    [self addRigthDetailButtonIsShowCart:YES];
+    [self configSubViews];
+    [self getStoreDetailData];
+}
+- (void)configSubViews{
+    
+    UIView *topView = [[UIView alloc] init];
+    [self.view addSubview:topView];
+    
+    [topView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(0);
+        make.right.mas_equalTo(0);
+        make.top.mas_equalTo(0);
+        make.height.mas_equalTo(HeightRate(86));
+    }];
+    
+    UIImageView *backImage = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"h86"]];
+    [topView addSubview:backImage];
+    
+    [backImage mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(0);
+        make.right.mas_equalTo(0);
+        make.top.mas_equalTo(0);
+        make.bottom.mas_equalTo(0);
+    }];
+    
+    
+    
+    self.storeImage = [[UIImageView alloc] init];
+    self.storeImage.layer.cornerRadius = WidthRate(4);
+    self.storeImage.contentMode = UIViewContentModeScaleAspectFit;
+    [topView addSubview:self.storeImage];
+    
+    [self.storeImage mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(WidthRate(10));
+        make.width.mas_equalTo(WidthRate(66));
+        make.height.mas_equalTo(WidthRate(66));
+        make.centerY.mas_equalTo(topView.centerY);
+    }];
+    
+    self.storeSaleTotal = [[UILabel alloc] init];
+    self.storeSaleTotal.font = SYSTEM_FONT(AdaptFont(11));
+    self.storeSaleTotal.textColor = [UIColor whiteColor];
+    self.storeSaleTotal.text = @"销售额：";
+    [topView addSubview:self.storeSaleTotal];
+    
+    [self.storeSaleTotal mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(self.storeImage.mas_right).offset(WidthRate(10));
+        make.top.mas_equalTo(HeightRate(13));
+    }];
+    
+    self.storeSaleCount = [[UILabel alloc] init];
+    self.storeSaleCount.font = SYSTEM_FONT(AdaptFont(11));
+    self.storeSaleCount.textColor = [UIColor whiteColor];
+    self.storeSaleCount.text = @"订单数：";
+    [topView addSubview:self.storeSaleCount];
+    
+    [self.storeSaleCount mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(self.storeImage.mas_right).offset(WidthRate(10));
+        make.centerY.mas_equalTo(self.storeImage.mas_centerY);
+    }];
+    
+    self.storeCategory = [[UILabel alloc] init];
+    self.storeCategory.font = SYSTEM_FONT(AdaptFont(11));
+    self.storeCategory.textColor = [UIColor whiteColor];
+    self.storeCategory.text = @"主营类目：";
+    [topView addSubview:self.storeCategory];
+    
+    [self.storeCategory mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(self.storeImage.mas_right).offset(WidthRate(10));
+        make.top.mas_equalTo(self.storeSaleCount.mas_bottom).offset(HeightRate(9));
+        make.right.mas_equalTo(WidthRate(-14));
+    }];
+    
+    
+    self.storeCollect = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.storeCollect setTitle:@"收藏" forState:UIControlStateNormal];
+    [self.storeCollect setTitleColor:ColorWithHexString(@"FF0033") forState:UIControlStateNormal];
+    self.storeCollect.layer.borderWidth = WidthRate(1);
+    self.storeCollect.titleLabel.font = SYSTEM_FONT(AdaptFont(13));
+    self.storeCollect.layer.borderColor = ColorWithHexString(@"FF0033").CGColor;
+    self.storeCollect.layer.cornerRadius = HeightRate(12);
+    [self.storeCollect addTarget:self action:@selector(collectStore:) forControlEvents:UIControlEventTouchUpInside];
+    [topView addSubview:self.storeCollect];
+    
+    [self.storeCollect mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(WidthRate(-15));
+        make.width.mas_equalTo(WidthRate(60));
+        make.height.mas_equalTo(HeightRate(24));
+        make.top.mas_equalTo(HeightRate(10));
+    }];
+    
+    NSArray *titles = @[@"全部商品",@"店铺简介"];
+    self.titleView = [[YHTitleView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, HeightRate(39)) titleFont:AdaptFont(14) delegate:self andTitleArray:titles];
+    [self.view addSubview:self.titleView];
+    
+    [self.titleView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(0);
+        make.right.mas_equalTo(0);
+        make.top.mas_equalTo(topView.mas_bottom);
+        make.height.mas_equalTo(HeightRate(39));
+    }];
+    
+    
+    self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, HeightRate(126), ScreenWidth, ScreenHeight-HeightRate(126)-(TOP_BAR_HEIGHT))];
+    self.scrollView.contentSize = CGSizeMake(ScreenWidth *2, 0);
+    self.scrollView.pagingEnabled = YES;
+    self.scrollView.delegate = self;
+    self.scrollView.bounces = false;
+    self.scrollView.showsVerticalScrollIndicator = false;
+    self.scrollView.showsHorizontalScrollIndicator = false;
+    [self.view addSubview:self.scrollView];
+
+    
+    self.leftTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, WidthRate(93), ScreenHeight-HeightRate(125)-(TOP_BAR_HEIGHT)) style:UITableViewStylePlain];
+    self.leftTableView.delegate = self;
+    self.leftTableView.dataSource = self;
+    self.leftTableView.showsHorizontalScrollIndicator = NO;
+    self.leftTableView.showsVerticalScrollIndicator = NO;
+    self.leftTableView.separatorColor = [UIColor clearColor];
+    [self.scrollView addSubview:self.leftTableView];
+    
+    
+    
+    UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc]init];
+    self.rightCollectionView = [[UICollectionView alloc]initWithFrame:CGRectMake(WidthRate(93), 0, ScreenWidth-WidthRate(93), ScreenHeight-HeightRate(125)-(TOP_BAR_HEIGHT)) collectionViewLayout:layout];
+    self.rightCollectionView.backgroundColor = [UIColor whiteColor];
+    self.rightCollectionView.delegate = self;
+    self.rightCollectionView.dataSource = self;
+    [self.rightCollectionView registerClass:[ProductCollectionViewCell class] forCellWithReuseIdentifier:@"item"];
+    [self.rightCollectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"Header"];
+    [self.scrollView addSubview:self.rightCollectionView];
+   
+    
+    
+    UIView *storeInfoView = [[UIView alloc] init];
+    storeInfoView.backgroundColor = [UIColor clearColor];
+    storeInfoView.frame = CGRectMake(ScreenWidth, 0, ScreenWidth,ScreenHeight-HeightRate(125)-(TOP_BAR_HEIGHT));
+    [self.scrollView addSubview:storeInfoView];
+    
+    UIView *chargeView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, HeightRate(77))];
+    chargeView.backgroundColor = [UIColor whiteColor];
+    [storeInfoView addSubview:chargeView];
+    
+    self.storechargeImage = [[UIImageView alloc] init];
+    self.storechargeImage.layer.cornerRadius = WidthRate(33);
+    [chargeView addSubview:self.storechargeImage];
+    
+    [self.storechargeImage mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(WidthRate(17));
+        make.width.mas_equalTo(WidthRate(66));
+        make.height.mas_equalTo(WidthRate(66));
+        make.centerY.mas_equalTo(chargeView.mas_centerY);
+    }];
+    
+    self.storechargeName = [[UILabel alloc] init];
+    self.storechargeName.textColor = TextColor_333333;
+    self.storechargeName.text = @"掌柜";
+    self.storechargeName.font = SYSTEM_FONT(AdaptFont(13));
+    [chargeView addSubview:self.storechargeName];
+    
+    [self.storechargeName mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(self.storechargeImage.mas_right).offset(WidthRate(10));
+        make.centerY.mas_equalTo(chargeView.mas_centerY);
+    }];
+    
+    UIView *chargeBottomView = [[UIView alloc] initWithFrame:CGRectMake(0, HeightRate(83), ScreenWidth,ScreenHeight-HeightRate(208)-(TOP_BAR_HEIGHT))];
+    chargeBottomView.backgroundColor = [UIColor whiteColor];
+    [storeInfoView addSubview:chargeBottomView];
+    
+    self.storeIntroduction = [[UILabel alloc] init];
+    self.storeIntroduction.textColor = TextColor_333333;
+    self.storeIntroduction.numberOfLines = 0;
+    self.storeIntroduction.font = SYSTEM_FONT(AdaptFont(12));
+    [chargeBottomView addSubview:self.storeIntroduction];
+
+    
+    [self.storeIntroduction mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(WidthRate(17));
+        make.right.mas_equalTo(WidthRate(-17));
+        make.top.mas_equalTo(HeightRate(13));
+    }];
+    
+    UILabel *lineH = [[UILabel alloc] init];
+    lineH.backgroundColor = SepratorLineColor;
+    [chargeBottomView addSubview:lineH];
+    
+    [lineH mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(0);
+        make.right.mas_equalTo(0);
+        make.bottom.mas_equalTo(HeightRate(-57));
+        make.height.mas_equalTo(1);
+    }];
+    
+    
+    UILabel *lineV = [[UILabel alloc] init];
+    lineV.backgroundColor = SepratorLineColor;
+    [chargeBottomView addSubview:lineV];
+    
+    [lineV mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.bottom.mas_equalTo(HeightRate(-9));
+        make.centerX.mas_equalTo(chargeView.mas_centerX);
+        make.width.mas_equalTo(1);
+        make.height.mas_equalTo(HeightRate(39));
+    }];
+    
+    
+    UIButton *shareStore = [UIButton buttonWithType:UIButtonTypeCustom];
+    [shareStore setTitle:@"分享店铺" forState:UIControlStateNormal];
+    [shareStore setImage:[UIImage imageNamed:@"wo_fenxiang"] forState:UIControlStateNormal];
+    [shareStore setTitleColor:TextColor_333333 forState:UIControlStateNormal];
+    shareStore.titleLabel.font = SYSTEM_FONT(AdaptFont(13));
+    [shareStore addTarget:self action:@selector(showShareView) forControlEvents:UIControlEventTouchUpInside];
+    [chargeBottomView addSubview:shareStore];
+    
+    [shareStore mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(0);
+        make.width.mas_equalTo(ScreenWidth/2);
+        make.height.mas_equalTo(HeightRate(57));
+        make.bottom.mas_equalTo(0);
+    }];
+    
+    
+    UIButton *serverStore = [UIButton buttonWithType:UIButtonTypeCustom];
+    [serverStore setTitle:@"客服" forState:UIControlStateNormal];
+    [serverStore setImage:[UIImage imageNamed:@"ke_fu"] forState:UIControlStateNormal];
+    [serverStore setTitleColor:TextColor_333333 forState:UIControlStateNormal];
+    serverStore.titleLabel.font = SYSTEM_FONT(AdaptFont(13));
+    [serverStore addTarget:self action:@selector(goChatVC) forControlEvents:UIControlEventTouchUpInside];
+    [chargeBottomView addSubview:serverStore];
+    
+    [serverStore mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(0);
+        make.width.mas_equalTo(ScreenWidth/2);
+        make.height.mas_equalTo(HeightRate(57));
+        make.bottom.mas_equalTo(0);
+    }];
+}
+- (void)getStoreDetailData{
+    [self.view showWait:@"加载中" viewType:CurrentView];
+    [[YHJsonRequest shared] getStoreDetailWith:self.storeId SuccessBlock:^(YHStoreDetailModel *model) {
+        
+        self.title = model.StoreName;
+        self.leftClassArray = [NSMutableArray arrayWithArray:model.StoreCategoryList];
+        self.CategoryList = [NSMutableArray arrayWithArray:model.CategoryList];
+        NSData *data = [model.StoreBusinessCategory dataUsingEncoding:NSUTF8StringEncoding];
+        self.StoreBusinessCategory = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
+        [self.leftTableView reloadData];
+        [self getRightProductData];
+        [self.storeImage sd_setImageWithURL:[NSURL URLWithString:model.StorePhoto] placeholderImage:[UIImage imageNamed:@""]];
+        self.storeSaleTotal.text = [NSString stringWithFormat:@"销售额： %@",model.StoreSales];
+        self.storeSaleCount.text = [NSString stringWithFormat:@"订单数： %@",model.StoreOrders];
+        NSString *cateStr = @"";
+        for (NSString *cate in model.StoreCategoryList) {
+            cateStr = [NSString stringWithFormat:@"%@ %@",cateStr,cate];
+        }
+        self.StoreRefNo = model.RefNo;
+        self.storeCategory.text = [NSString stringWithFormat:@"主营类目：%@",cateStr];
+        if ([model.IsCollect isEqualToString:@"1"]) {
+            [self.storeCollect setTitle:@"已收藏" forState:UIControlStateNormal];
+            [self.storeCollect setTitleColor:ColorWithHexString(@"FF0033")  forState:UIControlStateNormal];
+            self.storeCollect.backgroundColor = ColorWithHexString(@"ffffff") ;
+            
+            self.storeCollect.selected = YES;
+        }else{
+            [self.storeCollect setTitle:@"收藏" forState:UIControlStateNormal];
+            [self.storeCollect setTitleColor:ColorWithHexString(@"ffffff")  forState:UIControlStateNormal];
+            self.storeCollect.backgroundColor = ColorWithHexString(@"FF0033") ;
+
+            self.storeCollect.selected = false;
+
+        }
+        [self.storechargeImage sd_setImageWithURL:[NSURL URLWithString:model.StorePhoto] placeholderImage:[UIImage imageNamed:@""]];
+        self.storeIntroduction.text = model.StoreSummary;
+        NSString *nickName = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERNICKNAME];
+        if (nickName.length>0) {
+            self.storechargeName.text = model.RealName;
+
+        }else
+        {
+            NSString *name;
+            if (model.RealName.length>0) {
+             NSString *  namesub = [model.RealName substringToIndex:1];
+                name = [NSString stringWithFormat:@"%@**",namesub];
+            }else
+            {
+              NSString *  namesub=  [model.MobileNumber substringFromIndex:8];
+                name = [NSString stringWithFormat:@"掌柜%@",namesub];
+            }
+            
+            self.storechargeName.text = name;
+        }
+        [self.view hideWait:CurrentView];
+    } fialureBlock:^(NSString *errorMessages) {
+        [self.view hideWait:CurrentView];
+        [self.view makeToast:errorMessages duration:1 position:CSToastPositionCenter];
+    }];
+}
+- (void)getRightProductData{
+    NSString *categoryID = self.StoreBusinessCategory[self.leftSelectIndex];
+    for (NSDictionary *dict in self.CategoryList) {
+        if ([[dict objectForKey:@"CategoryId"] isEqualToString:categoryID]) {
+            NSArray *productArray = [dict objectForKey:@"CategorySeries"];
+            self.dataArray = [NSMutableArray arrayWithCapacity:0];
+            for (NSDictionary *dict in productArray) {
+                YHStoreGoodSeriesModel *model = [YHStoreGoodSeriesModel mj_objectWithKeyValues:dict];
+                [self.dataArray addObject:model];
+            }
+            break;
+        }
+    }
+    
+    [self.rightCollectionView reloadData];
+}
+- (void)collectStore:(UIButton *)button{
+    //判断是否是游客登录
+    [self isVisitorLoginByPhoneNumberExits];
+    
+    if (button.selected ==YES) {
+        YHAlertView *alert = [[YHAlertView alloc] initWithDelegate:self TopButtonTitle:@"再想想" BottomButtonTitle:@"取消收藏"];
+        [alert showAnimated];
+       
+    }else
+    {
+        [self.view showWait:@"等稍等" viewType:CurrentView];
+        [[YHJsonRequest shared] getUserCollectionStoreRequestMethod:Post params:@{@"StoreId":self.storeId} SuccessBlock:^(NSArray *Success) {
+            [self.view makeToast:@"收藏成功" duration:1.5 position:CSToastPositionCenter];
+
+            [self.storeCollect setTitle:@"已收藏" forState:UIControlStateNormal];
+            [self.storeCollect setTitleColor:ColorWithHexString(@"FF0033")  forState:UIControlStateNormal];
+            self.storeCollect.backgroundColor = ColorWithHexString(@"ffffff") ;
+            
+            self.storeCollect.selected = YES;
+            [self.view hideWait:CurrentView];
+            
+        }fialureBlock:^(NSString *errorMessages) {
+            [self.view hideWait:CurrentView];
+            
+            [self.view makeToast:errorMessages duration:1.5 position:CSToastPositionCenter];
+            
+        }];
+    }
+
+}
+- (void)goChatVC{
+    //判断是否是游客登录
+    [self isVisitorLoginByPhoneNumberExits];
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Chat" bundle:nil];
+    ChatNewViewController *vc = [storyboard instantiateViewControllerWithIdentifier:@"Chat"];
+    vc.hidesBottomBarWhenPushed = YES;
+    NSString *userID = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERID];
+    vc.listID = [NSString stringWithFormat:@"%@_%@",self.storeId,userID];
+    vc.storeID = self.storeId;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+- (void)showShareView{
+    YHShareView *share = [[YHShareView alloc] initShareWithContentTitle:@"易智造" theOtherTitle:@"为帮助行业用户提高制造效率、降低制造成本，易虎网科技南京有限公司推出官方移动APP——易智造，致力于以“AI+大数据”为核心打造制造业智能生态。采用用户订货，易智造补贴工厂利润的方式，开启类似滴滴补贴的商业模式，为生产和经销环节创造更多利润。" image:nil url:ShareDownloURL withCancleTitle:@"取消"];
+    [share showAnimated];
+}
+#pragma mark ---UITableViewDelegate & UITableViewDataSource
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return self.leftClassArray.count;
+}
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    return 1;
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    UITableViewCell *cell = nil;
+    if (!cell) {
+        cell = [[UITableViewCell alloc]init];
+    }
+    if (indexPath.row == self.leftSelectIndex) {
+        cell.backgroundColor = [UIColor whiteColor];
+    }else{
+        cell.backgroundColor = TextColor_F5F5F5;
+    }
+    UILabel *labelText = [[UILabel alloc]initWithFrame:CGRectMake(WidthRate(7), 0, WidthRate(93), HeightRate(37))];
+    labelText.font = SYSTEM_FONT(AdaptFont(12));
+    labelText.text = self.leftClassArray[indexPath.row];
+    [cell addSubview:labelText];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    return cell;
+}
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    self.leftSelectIndex = indexPath.row;
+    [self getRightProductData];
+    [self.leftTableView reloadData];
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return HeightRate(38);
+}
+#pragma mark--- UICollectionViewDelegate & UICollectionViewDataSource
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
+    
+    return self.dataArray.count;
+}
+-(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
+    ProductCollectionViewCell *item = [collectionView dequeueReusableCellWithReuseIdentifier:@"item" forIndexPath:indexPath];
+    for(UIView * subView in item.subviews){
+        if(subView){
+            [subView removeFromSuperview];
+        }
+    }
+    if (!item) {
+        item = [[ProductCollectionViewCell alloc]init];
+    }
+    YHStoreGoodSeriesModel *model = self.dataArray[indexPath.item];
+    UIImageView *ItemImage = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, WidthRate(110), WidthRate(110))];
+    ItemImage.contentMode = UIViewContentModeScaleAspectFit;
+    [ItemImage sd_setImageWithURL:[NSURL URLWithString:model.GoodsSeriesIcon]];
+    ItemImage.layer.borderColor = SepratorLineColor.CGColor;
+    ItemImage.layer.borderWidth = WidthRate(1);
+    [item addSubview:ItemImage];
+    
+    UILabel *labelName = [[UILabel alloc]initWithFrame:CGRectMake(0, HeightRateCommon(115), WidthRate(120), HeightRateCommon(15))];
+    labelName.text = model.GoodsSeriesName;
+    labelName.font =  SYSTEM_FONT(AdaptFont(11));
+    labelName.textColor = TextColor_333333;
+    labelName.numberOfLines = 2;
+    labelName.textAlignment = NSTextAlignmentLeft;
+    [item addSubview:labelName];
+    
+    UILabel *labelPriceRange = [[UILabel alloc]initWithFrame:CGRectMake(0, HeightRateCommon(130), WidthRate(120), HeightRateCommon(15))];
+    labelPriceRange.text = model.PriceRange;
+    labelPriceRange.font =  SYSTEM_FONT(AdaptFont(11));
+    labelPriceRange.textColor = ColorWithHexString(APP_THEME_MAIN_COLOR);
+    labelPriceRange.numberOfLines = 1;
+    labelPriceRange.textAlignment = NSTextAlignmentLeft;
+    [item addSubview:labelPriceRange];
+    
+    UILabel *labelSaleCount = [[UILabel alloc]initWithFrame:CGRectMake(0, HeightRateCommon(145), WidthRate(120), HeightRateCommon(15))];
+    labelSaleCount.text = [NSString stringWithFormat:@"销量：%@",model.GoodsSale];//@"销量：";
+    labelSaleCount.font =  SYSTEM_FONT(AdaptFont(12));
+    labelSaleCount.numberOfLines = 1;
+    labelSaleCount.textColor = TextColor_666666;
+    labelSaleCount.textAlignment = NSTextAlignmentLeft;
+    [item addSubview:labelSaleCount];
+    
+    return item;
+}
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
+    
+    return CGSizeMake(WidthRate(120), HeightRateCommon(167));
+}
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section{
+    
+    return WidthRate(15);
+}
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section{
+    return HeightRateCommon(25);
+}
+- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section{
+    
+    return UIEdgeInsetsMake(HeightRateCommon(25), WidthRate(10), HeightRate(0), HeightRateCommon(10));
+}
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    YHStoreGoodSeriesModel *model = self.dataArray[indexPath.row];
+    YHProductDetailsViewController *vc = [[YHProductDetailsViewController alloc] init];
+    vc.GoodsSeriesCode = model.GoodsSeriesCode;
+    vc.StoreID = self.storeId;
+    [Tools jumpIntoOnlyVC:self.navigationController destnationViewController:vc];
+//    [self.navigationController pushViewController:vc animated:YES];
+}
+#pragma mark - UIScrollViewDelegate
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    
+    NSInteger index = scrollView.contentOffset.x/ScreenWidth;
+    [self.titleView ChageItemWithIndex:index];
+}
+#pragma mark - YHTitleViewViewDelegete
+- (void)titleView:(id)titleView selectItemWithIndex:(NSInteger)index{
+    if (index == 0) {
+        [self.scrollView setContentOffset:CGPointMake(0, 0) animated:YES];
+    }else{
+        [self.scrollView setContentOffset:CGPointMake(ScreenWidth, 0) animated:YES];
+    }
+}
+
+#pragma mark--YhalertView
+-(void)alertViewLeftBtnClick:(id)alertView
+{
+    NSLog(@"self.StoreRefNo= %@",self.StoreRefNo);
+    NSDictionary *dic = @{@"RefNo":self.StoreRefNo.length>0?self.StoreRefNo:@""};
+    [[YHJsonRequest shared] getUserCollectionStoreRequestMethod:Delete params:dic SuccessBlock:^(NSArray *Success) {
+        
+        [self.storeCollect setTitle:@"收藏" forState:UIControlStateNormal];
+        [self.storeCollect setTitleColor:ColorWithHexString(@"ffffff")  forState:UIControlStateNormal];
+        self.storeCollect.backgroundColor = ColorWithHexString(@"FF0033") ;
+        
+        self.storeCollect.selected = false;
+        [self.view makeToast:@"取消收藏" duration:1.5 position:CSToastPositionCenter title:nil image:nil style:nil completion:^(BOOL didTap) {
+   
+        }];
+        
+        
+    } fialureBlock:^(NSString *errorMessages) {
+        [self.view makeToast:errorMessages duration:1.5 position:CSToastPositionCenter];
+        
+    }];
+}
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

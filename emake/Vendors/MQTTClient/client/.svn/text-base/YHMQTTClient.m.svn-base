@@ -1,0 +1,287 @@
+//
+//  YHMQTTClient.m
+//  MQTTClientManager
+//
+//  Created by 谷伟 on 2017/9/30.
+//  Copyright © 2017年 谷伟. All rights reserved.
+//
+
+#import "YHMQTTClient.h"
+#import "chatNewModel.h"
+#import "chatBodyModel.h"
+#import "chatUserModel.h"
+#import "FMDBManager.h"
+#import "MQTTCommandModel.h"
+#import "YHMainViewController.h"
+#import "YHMainMessageCenterViewController.h"
+#import "YHTabBarViewController.h"
+#import "MQTTStatus.h"
+#import "MQTTCommandModel.h"
+#import "ChatNewViewController.h"
+#import "YHMineViewController.h"
+@interface YHMQTTClient()<MQTTSessionDelegate>
+@property (nonatomic,strong)NSTimer *timer;
+@property(nonatomic, assign)    BOOL   isAutoConnect;//是否自动重连标识
+@property(nonatomic, assign)    NSUInteger connectCount;//自动重连次数
+@property(nonatomic, assign)    NSUInteger nowCount;//当前已经重连的次数
+@property(nonatomic, assign)    MQTTSessionEvent mqttStatus;//连接服务器状态
+@property(nonatomic, strong)   NSMutableDictionary *messageDic;//连接服务器状态
+
+@end
+@implementation YHMQTTClient
+
++ (YHMQTTClient *)sharedClient{
+    
+    static YHMQTTClient *client = nil;
+    static dispatch_once_t token;
+    dispatch_once(&token, ^{
+        client = [[YHMQTTClient alloc] init];
+        client.transport = [[MQTTCFSocketTransport alloc] init];
+        client.transport.host = MQTT_IP;
+        client.transport.port = MQTT_PORT;
+        client.session = [[MQTTSession alloc] init];
+        client.session.transport = client.transport;
+        client.session.delegate = client;
+        client.session.keepAliveInterval = 60;
+        client.session.protocolLevel = MQTTProtocolVersion311;
+        client.session.cleanSessionFlag = false;
+        client.connectCount = 500;
+        client.isAutoConnect = YES;
+    });
+    return client;
+}
+
+-(void)connectToHost:(NSString *)host Port:(NSInteger)port withUserID:(NSString *)userId{
+    
+    self.session.delegate = self;
+    self.session.clientId = [NSString stringWithFormat:@"user/%@",userId];
+    self.CMDTopic = [NSString stringWithFormat:@"user/%@",userId];
+    self.messageTopic = [NSString stringWithFormat:@"chatroom/%@",userId];
+    self.nowCount++;
+    [self.session connectToHost:MQTT_IP port:MQTT_PORT usingSSL:false connectHandler:^(NSError *error){
+        if (!error) {
+            [self subcriceMessageTopic:self.messageTopic subcriceAnotherMessageTopic:self.messageAnotherTopic subcriceCMDTopic:self.CMDTopic];
+        }else{
+            NSLog(@"connectToHost failed %@", error.localizedDescription);
+        }
+    }];
+}
+- (void)subcriceMessageTopic:(NSString *)messageTopic subcriceAnotherMessageTopic:(NSString *)messageAnotherTopic subcriceCMDTopic:(NSString *)cmdTopic{
+    
+    [self.session subscribeToTopic:messageTopic atLevel:MQTTQosLevelExactlyOnce subscribeHandler:^(NSError *error, NSArray<NSNumber *> *gQoss){
+        if (error) {
+            NSLog(@"Subscription messageTopic:%@ failed %@", messageTopic,error.localizedDescription);
+        } else {
+            NSLog(@"Subscription messageTopic:%@ sucessfull! Granted Qos: %@", messageTopic,gQoss);
+            NSString *userID = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERID];
+            [self sendRequestChatroomCustomerListCMDWith:userID andStoreId:nil];
+        }
+    }];
+    
+    [self.session subscribeToTopic:cmdTopic atLevel:MQTTQosLevelExactlyOnce subscribeHandler:^(NSError *error, NSArray<NSNumber *> *gQoss){
+        if (error) {
+            NSLog(@"Subscription cmdTopic:%@ failed %@", cmdTopic,error.localizedDescription);
+        } else {
+            NSLog(@"Subscription cmdTopic:%@ sucessfull! Granted Qos: %@",cmdTopic, gQoss);
+        }
+    }];
+}
+- (void)sendMessage:(NSDictionary *)data withTopic:(NSString *)Topic complete:(void(^)(NSError *error))completeBlock{
+    
+    NSData *JSONdata = [NSJSONSerialization dataWithJSONObject:data options:NSJSONWritingPrettyPrinted error:nil];
+    [self.session publishData:JSONdata onTopic:Topic retain:false qos:MQTTQosLevelExactlyOnce publishHandler:^(NSError *error) {
+        completeBlock(error);
+    }];
+
+}
+- (void)sendCommmand:(NSDictionary *)command withSelfTopic:(NSString *)selfTopic complete:(void(^)(NSError *error))completeBlock{
+    NSData *JSONdata = [NSJSONSerialization dataWithJSONObject:command options:NSJSONWritingPrettyPrinted error:nil];
+    [self.session publishData:JSONdata onTopic:selfTopic retain:false qos:MQTTQosLevelExactlyOnce publishHandler:^(NSError *error) {
+        completeBlock(error);
+    }];
+}
+- (void)sendRequestChatroomCustomerListCMDWith:(NSString *)userId andStoreId:(NSString *)storeId{
+    
+    MQTTCommandModel *model = [[MQTTCommandModel alloc] creatRequestChatroomCustomerList:userId andStoreId:storeId];
+    [[YHMQTTClient sharedClient] sendCommmand:[model mj_keyValues] withSelfTopic:self.CMDTopic complete:^(NSError *error) {
+        if (!error) {
+        }
+    }];
+    
+}
+- (void)disConnect{
+    [self.session disconnect];
+}
+- (BOOL)isMQTTConnect{
+    if (self.mqttStatus == MQTTSessionEventConnected) {
+        return YES;
+    }
+    return false;
+}
+#pragma mark --- MQTTSessionDelegate
+- (void)newMessage:(MQTTSession *)session data:(NSData *)data onTopic:(NSString *)topic qos:(MQTTQosLevel)qos retained:(BOOL)retained mid:(unsigned int)mid{
+    
+    NSDictionary *payload = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:nil];
+    NSLog(@"消息---mqtt--%@",payload);
+    if (self.messageDic==nil) {
+        self.messageDic = [NSMutableDictionary dictionary];
+        self.messageCount = 0;
+    }else{
+        self.messageCount   = [[self.messageDic objectForKey:@"messageCount"] integerValue];
+    }
+    NSLog(@"消息-topic--%@",topic);
+    BOOL isChatVC = [[Tools currentViewController] isKindOfClass:[ChatNewViewController class]];
+    //指令消息
+    NSString *listID = @"";
+    NSArray *topicArray = [topic componentsSeparatedByString:@"/"];
+    if (topicArray.count == 2) {//与客服聊天
+       
+        listID = topicArray[1];
+        NSLog(@"消息---listID--%@",listID);
+        if ([payload objectForKey:@"MessageType"] != nil) {
+
+        NSNumber  *count = [self.messageDic  objectForKey:@"官方客服"];
+        NSInteger newCount = count.integerValue;
+            if (isChatVC == false) {
+                self.messageCount += 1;
+                newCount += 1;
+
+            }
+        [self.messageDic setObject:@(newCount) forKey:@"官方客服"];
+
+        }
+
+    }else if (topicArray.count == 3) {//与店铺聊天
+
+        listID = [NSString stringWithFormat:@"%@_%@",topicArray[1],topicArray[2]];
+        //屏蔽自家店铺给自己发消息
+        if ([topicArray[1] isEqualToString:topicArray[2]]) {
+            return;
+        }
+        if ([payload objectForKey:@"MessageType"] != nil) {
+
+            NSNumber  *count = [self.messageDic objectForKey:listID];
+            NSInteger newCount = count.integerValue;
+            if (isChatVC == false) {
+                self.messageCount += 1;
+                newCount += 1;
+            }
+            [self.messageDic setObject:@(newCount) forKey:listID];
+            NSLog(@"消息--qqqqqun-listID--%@",listID);
+        }
+    }
+
+    
+    if (isChatVC == false) {
+       
+        [self.messageDic setObject:@(self.messageCount) forKey:@"messageCount"];
+        self.messageCountDic = self.messageDic;
+    }
+   
+    [self addBadge:5];
+
+    if ([payload objectForKey:@"MessageType"] == nil) {
+        [self.delegate onCommand:data andTopic:topic];
+    }else{
+        NSString *messageType = [payload objectForKey:@"MessageType"];
+        @synchronized (self) {
+            //消息响应
+            if ([messageType isEqualToString:@"Message"]) {
+                chatNewModel *model = [chatNewModel mj_objectWithKeyValues:payload];
+                chatBodyModel *body = [chatBodyModel mj_objectWithKeyValues:model.MessageBody];
+                chatUserModel *form = [chatUserModel mj_objectWithKeyValues:model.From];
+                [self.delegate onMessgae:data andTopic:topic];
+                NSString *userId = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERID];
+                if ([form.UserId isEqualToString:userId]) {
+                    return;
+                }
+                if ([body.Type isEqualToString:@"Text"]) {
+                    [[JZUserNotification sharedNotification] addNotificationWithCategroy1:body.Text];
+                }else if ([body.Type isEqualToString:@"Image"]){
+                    [[JZUserNotification sharedNotification] addNotificationWithCategroy1:@"[图片]"];
+                }else if ([body.Type isEqualToString:@"Order"]){
+                    [[JZUserNotification sharedNotification] addNotificationWithCategroy1:@"[订单]"];
+                }else if ([body.Type isEqualToString:@"MutilePart"]){
+                    [[JZUserNotification sharedNotification] addNotificationWithCategroy1:@"[合同]"];
+                }else if ([body.Type isEqualToString:@"Goods"]){
+                    [[JZUserNotification sharedNotification] addNotificationWithCategroy1:@"[商品]"];
+                }else if ([body.Type isEqualToString:@"Voice"]){
+                    [[JZUserNotification sharedNotification] addNotificationWithCategroy1:@"[语音]"];
+                }else if ([body.Type isEqualToString:@"File"]){
+                    [[JZUserNotification sharedNotification] addNotificationWithCategroy1:@"[文件]"];
+                }
+                
+             
+            }else if ([messageType isEqualToString:@"Event"]) {
+                [self.delegate onEvent:data andTopic:topic];
+            }
+        }
+    }
+    
+}
+- (void)protocolError:(MQTTSession *)session error:(NSError *)error{
+    NSLog(@"消息出现错误");
+}
+- (void)handleEvent:(MQTTSession *)session event:(MQTTSessionEvent)eventCode error:(NSError *)error{
+    
+    NSDictionary *events = @{
+                             @(MQTTSessionEventConnected): @"connected",
+                             @(MQTTSessionEventConnectionRefused): @"账号或密码错误，服务器拒绝连接",
+                             @(MQTTSessionEventConnectionClosed): @"connection closed",
+                             @(MQTTSessionEventConnectionError): @"connection error",
+                             @(MQTTSessionEventProtocolError): @"protocoll error",
+                             @(MQTTSessionEventConnectionClosedByBroker): @"connection closed by broker"
+                             };
+    NSLog(@"-----------------MQTT连接状态%@-----------------",[events objectForKey:@(eventCode)]);
+    self.mqttStatus = eventCode;
+    switch (eventCode) {
+        case MQTTSessionEventConnected:
+        {
+            
+        }
+            break;
+        case MQTTSessionEventConnectionClosed:
+        {
+            //Closed目前情况看不管什么错误都会通知，再和实际的错误通知一起就等于通知了2次
+        }
+            break;
+        case MQTTSessionEventConnectionRefused:{
+            //服务器拒绝的账号密码错误直接提示
+        }
+        default:
+        {
+            //是否自动重连
+            if (self.isAutoConnect) {
+                //当前重连次数是否超过最大限制
+                if (self.nowCount<self.connectCount) {
+                    //延迟重登，避免mqtt缓冲区处理不及时崩溃
+                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                        NSString *userID = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERID];
+                        [self connectToHost:MQTT_IP Port:MQTT_PORT withUserID:userID];
+                    });
+                }else{
+                }
+            }else{
+            }
+        }
+            break;
+    }
+}
+- (void)addBadge:(NSInteger)number{
+
+    if ([[Tools currentViewController] isKindOfClass:[YHMainViewController class]]){
+        YHMainViewController *vc = (YHMainViewController *)[Tools currentViewController];
+        [vc RefreshMesssageCount];
+
+    }else if ([[Tools currentViewController] isKindOfClass:[YHMainMessageCenterViewController class]]){
+        
+        YHMainMessageCenterViewController *vc = (YHMainMessageCenterViewController *)[Tools currentViewController];
+        [vc messageRefresh];
+    }else if ([[Tools currentViewController] isKindOfClass:[YHMineViewController class]])
+    {
+        YHMineViewController *vc = (YHMineViewController *)[Tools currentViewController];
+        [vc refreshMesssageCount];
+    }
+}
+
+@end

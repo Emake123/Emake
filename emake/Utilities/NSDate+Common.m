@@ -1,0 +1,148 @@
+//
+//  NSDate+Common.m
+//  emake
+//
+//  Created by 袁方 on 2017/7/21.
+//  Copyright © 2017年 emake. All rights reserved.
+//
+
+#import "NSDate+Common.h"
+
+@implementation NSDate (Common)
+
+
+/**
+ *  获取时间差值  截止时间-当前时间
+ *  nowDateStr : 当前时间
+ *  deadlineStr : 截止时间
+ *  @return 时间戳差值
+ */
++(NSInteger)getDateDifferenceWithNowDateStr:(NSString*)nowDateStr deadlineStr:(NSString*)deadlineStr {
+    
+    NSInteger timeDifference = 0;
+    
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yy-MM-dd HH:mm:ss"];
+    NSDate *nowDate = [formatter dateFromString:nowDateStr];
+    NSDate *deadline = [formatter dateFromString:deadlineStr];
+    NSTimeInterval oldTime = [nowDate timeIntervalSince1970];
+    NSTimeInterval newTime = [deadline timeIntervalSince1970];
+    timeDifference = newTime - oldTime;
+    
+    return timeDifference;
+}
++ (NSDate *)dateFromString:(NSString *)dateStr {
+    NSString *day = [NSString stringWithFormat:@"^\\d\\d\\d\\d-\\d\\d-\\d\\d$"];
+    NSString *hour = [NSString stringWithFormat:@"^\\d\\d\\d\\d-\\d\\d-\\d\\d \\d\\d$"];
+    NSString *minute = [NSString stringWithFormat:@"^\\d\\d\\d\\d-\\d\\d-\\d\\d \\d\\d:\\d\\d$"];
+    NSString *second = [NSString stringWithFormat:@"^\\d\\d\\d\\d-\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d$"];
+    NSString *millisecond = [NSString stringWithFormat:@"^\\d\\d\\d\\d-\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d.\\d\\d\\d$"];
+    NSString *supermillisecond = [NSString stringWithFormat:@"^\\d\\d\\d\\d-\\d\\d-\\d\\d \\d\\d:\\d\\d:\\d\\d.\\d\\d\\d\\d\\d\\d$"];
+    
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    if ([[NSPredicate predicateWithFormat:@"SELF MATCHES %@", day] evaluateWithObject:dateStr]) {
+        formatter.dateFormat = @"yyyy-MM-dd";
+    } else if ([[NSPredicate predicateWithFormat:@"SELF MATCHES %@", hour] evaluateWithObject:dateStr]) {
+        formatter.dateFormat = @"yyyy-MM-dd HH";
+    } else if ([[NSPredicate predicateWithFormat:@"SELF MATCHES %@", minute] evaluateWithObject:dateStr]) {
+        formatter.dateFormat = @"yyyy-MM-dd HH:mm";
+    } else if ([[NSPredicate predicateWithFormat:@"SELF MATCHES %@", second] evaluateWithObject:dateStr]) {
+        formatter.dateFormat = @"yyyy-MM-dd HH:mm:ss";
+    } else if ([[NSPredicate predicateWithFormat:@"SELF MATCHES %@", millisecond] evaluateWithObject:dateStr]) {
+        formatter.dateFormat = @"yyyy-MM-dd HH:mm:ss.SSS";
+    } else if ([[NSPredicate predicateWithFormat:@"SELF MATCHES %@", supermillisecond] evaluateWithObject:dateStr]) {
+        formatter.dateFormat = @"yyyy-MM-dd HH:mm:ss.SSSSSS";
+    } else {
+        return nil;
+    }
+    
+    return [formatter dateFromString:dateStr];
+}
+
+//获得当前时间(YYYY-MM-dd HH:mm:ss)
++(NSString *)getCurrentTime
+{
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    
+    // ----------设置你想要的格式,hh与HH的区别:分别表示12小时制,24小时制
+    
+    [formatter setDateFormat:@"YYYY-MM-dd HH:mm:ss"];
+    
+    //现在时间,你可以输出来看下是什么格式
+    
+    NSDate *datenow = [NSDate date];
+    
+    //----------将nsdate按formatter格式转成nsstring
+    
+    NSString *currentTimeString = [formatter stringFromDate:datenow];
+    
+    return currentTimeString;
+    
+}
+//获取当前时间戳
++(NSString *)getCurrentTimeStr{
+    NSDate* date = [NSDate dateWithTimeIntervalSinceNow:0];//获取当前时间0秒后的时间
+    NSTimeInterval time=[date timeIntervalSince1970];// *1000 是精确到毫秒，不乘就是精确到秒
+    NSString *timeString = [NSString stringWithFormat:@"%.0f", time];
+    return timeString;
+}
+
+
++(NSString *)getCurrentTimeYearMonthDay{
+    
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    
+    // ----------设置你想要的格式,hh与HH的区别:分别表示12小时制,24小时制
+    [formatter setDateFormat:@"YYYY年MM月dd日"];
+    
+    //现在时间,你可以输出来看下是什么格式
+    
+    NSDate *datenow = [NSDate date];
+    
+    //----------将nsdate按formatter格式转成nsstring
+    
+    NSString *currentTimeString = [formatter stringFromDate:datenow];
+        
+    return currentTimeString;
+}
+//时间字符串比较
++(BOOL)isValideTimeDifferenceWithTime:(NSString *)lastTime currentTime:(NSString *)currentTime ValidTime:(NSString *)validTime andValidTimeInterval:(NSInteger)interval{
+    NSDateFormatter *date = [[NSDateFormatter alloc]init];
+    [date setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    NSDate *startD =[date dateFromString:lastTime];
+    NSDate *endD = [date dateFromString:currentTime];
+    NSTimeInterval last = [startD timeIntervalSince1970]*1;
+    NSTimeInterval current = [endD timeIntervalSince1970]*1;
+    NSTimeInterval value = current - last;
+    if (value > interval*60) {
+        return YES;
+    }
+    else return NO;
+}
+//时间戳比较
++(BOOL)isValideTimeIntervalDifferenceWithTime:(NSString *)lastTime currentTime:(NSString *)currentTime{
+    NSTimeInterval value = [currentTime integerValue] - [lastTime integerValue];
+    if (value > 3*60) {
+        return YES;
+    }
+    else return NO;
+}
+
+
++(BOOL)isValideTimeDifferenceWithLastLoginTime:(NSString *)lastLoginTime currentLoginTime:(NSString *)currentLoginTime ValidTime:(NSString *)validTime{
+    NSDateFormatter *date = [[NSDateFormatter alloc]init];
+    [date setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    NSDate *startD =[date dateFromString:lastLoginTime];
+    NSDate *endD = [date dateFromString:currentLoginTime];
+    NSTimeInterval last = [startD timeIntervalSince1970]*1;
+    NSTimeInterval current = [endD timeIntervalSince1970]*1;
+    NSTimeInterval value = current - last;
+    int day = (int)value / (24 * 3600);
+    if (day < 30 ) {
+        return YES;
+    }
+    else return NO;
+}
+
+
+@end

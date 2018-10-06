@@ -1,0 +1,190 @@
+//
+//  YHMineCityDelegateSuccessViewController.m
+//  emake
+//
+//  Created by zhangshichao on 2018/9/18.
+//  Copyright © 2018年 emake. All rights reserved.
+//
+
+#import "YHMineCityDelegateSuccessViewController.h"
+#import "YHMineMemberIInterestIncomeViewController.h"
+
+@interface YHMineCityDelegateSuccessViewController ()
+
+@end
+
+@implementation YHMineCityDelegateSuccessViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+    self.title = @"城市代理商";
+    [self configUI];
+}
+-(void)configUI
+{
+    UIImageView *topImage = [[UIImageView alloc] init];
+    topImage.image = [UIImage imageNamed:@"huiyuanB"] ;
+//    topImage.contentMode = UIViewContentModeScaleAspectFit;
+    [self.view addSubview:topImage];
+    [topImage mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(0);
+        make.width.mas_equalTo(ScreenWidth);
+        make.top.mas_equalTo(TOP_BAR_HEIGHT);
+        make.height.mas_equalTo(HeightRateCommon(277));
+
+    }];
+    
+    UIView *bgView = [[UIView alloc] init];
+    [self.view addSubview:bgView];
+    [bgView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(WidthRate(15));
+        make.right.mas_equalTo(WidthRate(-15));
+        make.top.mas_equalTo(topImage.mas_bottom).offset(HeightRate(30));
+        make.height.mas_equalTo(HeightRateCommon(60));
+        
+    }];
+    
+    UILabel *nameLabel = [[UILabel alloc] init];
+    nameLabel.text = @"zhang**";
+    nameLabel.font = [UIFont systemFontOfSize:AdaptFont(13)];
+    [bgView addSubview:nameLabel];
+    [nameLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(0);
+        make.width.mas_equalTo(WidthRate(107));
+        make.top.mas_equalTo(topImage.mas_bottom).offset(HeightRate(30));
+        make.height.mas_equalTo(HeightRateCommon(60));
+        
+    }];
+    
+    UILabel *detailLabel = [[UILabel alloc] init];
+    detailLabel.text = @"1213123123*";
+    detailLabel.font = [UIFont systemFontOfSize:AdaptFont(13)];
+    [bgView addSubview:detailLabel];
+    [detailLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(0);
+        make.width.mas_equalTo(WidthRate(107));
+        make.top.mas_equalTo(topImage.mas_bottom).offset(HeightRate(30));
+        make.height.mas_equalTo(HeightRateCommon(60));
+        
+    }];
+    UIView *line = [[UIView alloc] init];
+    line.backgroundColor = SepratorLineColor;
+    [self.view addSubview:line];
+    [line mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(WidthRate(15));
+        make.right.mas_equalTo(WidthRate(-15));
+        make.top.mas_equalTo(bgView.mas_bottom).offset(HeightRate(0));
+        make.height.mas_equalTo(HeightRateCommon(1));
+        
+    }];
+    UILabel *moneyLabel = [[UILabel alloc] init];
+    moneyLabel.text = @"已获得现金 5000元  ";
+    moneyLabel.font = [UIFont systemFontOfSize:AdaptFont(13)];
+    moneyLabel.textColor =ColorWithHexString(@"F8695D");
+    [self.view addSubview:moneyLabel];
+    [moneyLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(WidthRate(15));
+        make.top.mas_equalTo(line.mas_bottom).offset(HeightRate(10));
+        make.height.mas_equalTo(HeightRate(30));
+        
+    }];
+    
+    UIButton *LookDetailButton = [[UIButton alloc] init];
+    [LookDetailButton setTitle:@"查看收入明细" forState:UIControlStateNormal];
+    [LookDetailButton addTarget:self action:@selector(lookIncomeDetail) forControlEvents:UIControlEventTouchUpInside];
+    LookDetailButton.titleLabel.font = [UIFont systemFontOfSize:AdaptFont(13)];
+    [LookDetailButton setTitleColor:ColorWithHexString(@"F8695D") forState:UIControlStateNormal];
+    LookDetailButton.clipsToBounds = YES;
+    LookDetailButton.layer.cornerRadius = 6;
+    LookDetailButton.layer.borderWidth =1;
+    LookDetailButton.layer.borderColor = ColorWithHexString(@"F8695D").CGColor;
+    [self.view addSubview:LookDetailButton];
+    [LookDetailButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(WidthRate(-15));
+        make.width.mas_equalTo(WidthRate(107));
+        make.top.mas_equalTo(line.mas_bottom).offset(HeightRate(10));
+        make.height.mas_equalTo(HeightRate(30));
+        
+    }];
+    
+    UIView *line2 = [[UIView alloc] init];
+    line2.backgroundColor = SepratorLineColor;
+    [self.view addSubview:line2];
+    [line2 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(WidthRate(15));
+        make.right.mas_equalTo(WidthRate(-15));
+        make.top.mas_equalTo(LookDetailButton.mas_bottom).offset(HeightRate(10));
+        make.height.mas_equalTo(HeightRateCommon(8));
+        
+    }];
+    
+    NSString *str1= @"我的优惠码：13912345678";
+    NSString *str2= @"（输入优惠码直减200元）";
+    NSString *str3= @"仅限：输配电／休闲食品行业";
+    NSString *resultstr = [NSString stringWithFormat:@"%@%@\n%@",str1,str2,str3];
+NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:resultstr];
+    [attrStr addAttribute:NSForegroundColorAttributeName
+                    value:ColorWithHexString(@"999999")
+                    range:NSMakeRange(str1.length, resultstr.length-str1.length)];
+//    [attrStr addAttribute:NSFontAttributeName
+//                    value:[UIFont systemFontOfSize:30.0f]
+//                    range:NSMakeRange(0, 3)];
+    
+    UILabel *myFreightCodeLabel = [[UILabel alloc] init];
+    myFreightCodeLabel.font = [UIFont systemFontOfSize:AdaptFont(13)];
+    myFreightCodeLabel.textColor =ColorWithHexString(@"F8695D");
+    myFreightCodeLabel.numberOfLines = 0;
+    myFreightCodeLabel.attributedText =attrStr;
+    [self.view addSubview:myFreightCodeLabel];
+    [myFreightCodeLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(WidthRate(15));
+        make.right.mas_equalTo(WidthRate(-15));
+
+        make.top.mas_equalTo(line2.mas_bottom).offset(HeightRate(10));
+        make.height.mas_equalTo(HeightRate(60));
+        
+    }];
+   
+    
+    UIButton *memberDevelopButton = [[UIButton alloc] init];
+    [memberDevelopButton setTitle:@"立即发展" forState:UIControlStateNormal];
+    memberDevelopButton.titleLabel.font = [UIFont systemFontOfSize:AdaptFont(13)];
+    [memberDevelopButton setTitleColor:ColorWithHexString(@"ffffff") forState:UIControlStateNormal];
+    memberDevelopButton.backgroundColor = ColorWithHexString(@"F8695D");
+    memberDevelopButton.clipsToBounds = YES;
+    memberDevelopButton.layer.cornerRadius = 6;
+    memberDevelopButton.layer.borderWidth =1;
+    memberDevelopButton.layer.borderColor = ColorWithHexString(@"F8695D").CGColor;
+    [self.view addSubview:memberDevelopButton];
+    [memberDevelopButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.right.mas_equalTo(WidthRate(-15));
+        make.left.mas_equalTo(WidthRate(15));
+        make.bottom.mas_equalTo(HeightRate(-20));
+        make.height.mas_equalTo(HeightRate(40));
+        
+    }];
+}
+
+-(void)lookIncomeDetail
+{
+    YHMineMemberIInterestIncomeViewController *vc = [[YHMineMemberIInterestIncomeViewController alloc] init];
+    [self.navigationController pushViewController:vc animated:YES];
+}
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

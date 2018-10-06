@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="YHPersonalFileCommonCell" rowHeight="47" id="KGk-i7-Jjw" customClass="YHPersonalFileCommonCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="47"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="46.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="glX-Sy-Ryj">
+                        <rect key="frame" x="20" y="23.5" width="0.0" height="0.0"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="direction_right.png" translatesAutoresizingMaskIntoConstraints="NO" id="KFc-Bc-jvl">
+                        <rect key="frame" x="299" y="16.5" width="14" height="14"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="14" id="5Ss-eL-lbr"/>
+                            <constraint firstAttribute="height" constant="14" id="fAW-rr-3HQ"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xAH-QF-eee">
+                        <rect key="frame" x="284" y="23.5" width="0.0" height="0.0"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="a8d-V6-3cC">
+                        <rect key="frame" x="0.0" y="46" width="320" height="0.5"/>
+                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="0.69999999999999996" id="aw5-Zj-nh6"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="w4P-U1-x8K">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="0.5"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="0.5" id="Orx-nS-KWT"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="a8d-V6-3cC" secondAttribute="trailing" id="13F-ji-KRt"/>
+                    <constraint firstItem="glX-Sy-Ryj" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="14o-9O-uTP"/>
+                    <constraint firstAttribute="bottom" secondItem="a8d-V6-3cC" secondAttribute="bottom" id="4hO-RV-ldf"/>
+                    <constraint firstItem="a8d-V6-3cC" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="9yE-8i-bLN"/>
+                    <constraint firstItem="KFc-Bc-jvl" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="CD7-B1-swO"/>
+                    <constraint firstAttribute="trailing" secondItem="a8d-V6-3cC" secondAttribute="trailing" id="Hn2-hr-JXI"/>
+                    <constraint firstAttribute="trailing" secondItem="KFc-Bc-jvl" secondAttribute="trailing" constant="7" id="K0o-ge-qbj"/>
+                    <constraint firstItem="a8d-V6-3cC" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="Kz0-Lf-GDd"/>
+                    <constraint firstItem="KFc-Bc-jvl" firstAttribute="leading" secondItem="xAH-QF-eee" secondAttribute="trailing" constant="15" id="OOi-Lj-KIk"/>
+                    <constraint firstItem="w4P-U1-x8K" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="Oaw-1y-yWR"/>
+                    <constraint firstItem="w4P-U1-x8K" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="U9f-3p-DBU"/>
+                    <constraint firstAttribute="trailing" secondItem="w4P-U1-x8K" secondAttribute="trailing" id="WZk-RV-fhd"/>
+                    <constraint firstItem="glX-Sy-Ryj" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="YhD-Ss-XT5"/>
+                    <constraint firstItem="xAH-QF-eee" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="hqf-hn-c6A"/>
+                    <constraint firstAttribute="bottom" secondItem="a8d-V6-3cC" secondAttribute="bottom" id="iqY-cx-lHt"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="contentForTitle" destination="xAH-QF-eee" id="6fk-Z7-Bz3"/>
+                <outlet property="lineLabel" destination="a8d-V6-3cC" id="SmK-vt-CXH"/>
+                <outlet property="lineTop" destination="w4P-U1-x8K" id="aR3-fs-AQ8"/>
+                <outlet property="rightImage" destination="KFc-Bc-jvl" id="YUd-mp-sZV"/>
+                <outlet property="title" destination="glX-Sy-Ryj" id="SLs-hq-CFR"/>
+            </connections>
+            <point key="canvasLocation" x="25" y="135"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="direction_right.png" width="14" height="14"/>
+    </resources>
+</document>
