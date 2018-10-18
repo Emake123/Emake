@@ -49,15 +49,15 @@
     TPKeyboardAvoidingTableView *mytable = [[TPKeyboardAvoidingTableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];
     mytable.delegate = self;
     mytable.dataSource = self;
-    mytable.rowHeight = HeightRate(60);
-//    mytable.scrollEnabled = false;
+//    mytable.rowHeight = HeightRate(60);
+    mytable.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:mytable];
     mytable.translatesAutoresizingMaskIntoConstraints = false;
     [mytable PSSetTop:TOP_BAR_HEIGHT];
     [mytable PSSetLeft:0];
-    [mytable PSSetSize:ScreenWidth Height:HeightRate(392)];
+    [mytable PSSetSize:ScreenWidth Height:ScreenHeight-(TOP_BAR_HEIGHT)-HeightRate(80)];
     self.mytable = mytable;
-    
+    mytable.scrollEnabled = false;
     NSString *commitTipsStr = @"遇到问题，请联系客服";
     NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:commitTipsStr];
     [attrStr addAttribute:NSForegroundColorAttributeName
@@ -75,7 +75,8 @@
 //    lable.hidden =[state isEqualToString:@"3"]?([userType isEqualToString:@"1"]?YES:NO):NO;
     [lable addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(customerSevicerClick)]];
     [lable PSSetLeft:WidthRate(33)];
-    [lable PSSetBottomAtItem:mytable Length:HeightRate(20)];
+//    [lable PSSetBottomAtItem:mytable Length:HeightRate(20)];
+    [lable PSSetBottom:HeightRate(75)];
    
     
     self.commitBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -95,6 +96,15 @@
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
     return HeightRate(90);
+}
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.row==0) {
+        return [self conculateHeight];
+    }else
+    {
+        return HeightRate(60);
+    }
 }
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
@@ -142,16 +152,16 @@
         YHCityDelegateApplyTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
         if (cell==nil) {
             
-            cell = [[YHCityDelegateApplyTableViewCell alloc] init];
+            cell = [[YHCityDelegateApplyTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
         }
-        cell.leftButton.tag= 50;
-        cell.rightButton.tag= 51;
-        [cell.leftButton addTarget:self action:@selector(selectCatagoryID:) forControlEvents:UIControlEventTouchUpInside];
-        [cell.rightButton addTarget:self action:@selector(selectCatagoryID:) forControlEvents:UIControlEventTouchUpInside];
-                
+//        cell.leftButton.tag= 50;
+//        cell.rightButton.tag= 51;
+//        [cell.leftButton addTarget:self action:@selector(selectCatagoryID:) forControlEvents:UIControlEventTouchUpInside];
+//        [cell.rightButton addTarget:self action:@selector(selectCatagoryID:) forControlEvents:UIControlEventTouchUpInside];
+        
 
-        cell.rightButton.hidden = false;
-        cell.leftButton.hidden = false;
+        [self getcatagoryView:cell ArrayUI:self.catagoryIds];
+        cell.catagoryView.hidden = false;
         cell.nameLable.hidden = YES;
         cell.nameTextField.hidden = YES;
         cell.lineLable.hidden = YES;
@@ -167,8 +177,9 @@
             
             cell = [[YHCityDelegateApplyTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell1"];
         }
-        cell.rightButton.hidden = YES;
-        cell.leftButton.hidden = YES;
+        cell.catagoryView.hidden = YES;
+
+    
         cell.nameLable.hidden = false;
         cell.nameTextField.hidden = false;
         cell.nameTextField.delegate = self;
@@ -187,8 +198,9 @@
             cell.lineLable.hidden = false;
             cell.getCodeButton.hidden = false;
             cell.DownImageView.hidden = YES;
+//            cell.getCodeButton.tag = 60;
             [cell.getCodeButton addTarget:self action:@selector(getCodeBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-            cell.getCodeButton.tag = 10;
+            cell.getCodeButton.tag = 60;
             if (self.delegateCity.length>0) {
                 cell.nameTextField.text = self.codeStr;
             }
@@ -254,7 +266,9 @@
         HDPickerView *pickerView = [HDPickerView selectCity:^(NSString * _Nullable province, NSString * _Nullable city, NSString * _Nullable area, NSArray * _Nullable streets) {
             weakSelf.delegateCity =[province isEqualToString:city]?province:[NSString stringWithFormat:@"%@%@",province,city];
             [weakSelf.textFielfDic setObject: weakSelf.delegateCity forKey:key];
-            [tableView reloadData];
+//            [tableView reloadData];
+            [tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:2 inSection:0]] withRowAnimation:UITableViewRowAnimationFade];
+
         } flag:YES];
         [pickerView show];
     }
@@ -264,7 +278,7 @@
 -(void)selectCatagoryID:(UIButton *)button
 {
     button.selected = !button.selected;
-    NSInteger index = button.tag-50;
+    NSInteger index = button.tag-10;
     NSString *cataGoryId = @"";
     for (NSDictionary *dict in self.catagoryIds) {
         NSString *name = dict[@"CategoryBName"];
@@ -378,6 +392,8 @@
 //    [self.textFielfDic setObject:textField.text forKey:key];
 }
 
+
+
 //联系客服
 -(void)customerSevicerClick
 {
@@ -386,6 +402,81 @@
     NSURL *telURL          = [NSURL URLWithString:[NSString stringWithFormat:@"tel:%@",telStr]];
     [callWebView loadRequest:[NSURLRequest requestWithURL:telURL]];
     [self.view addSubview:callWebView];
+}
+
+-(void)getcatagoryView:(UIView *)bgview  ArrayUI:(NSArray *)arr
+{
+    CGFloat TotalWidth = 0;
+    UIButton *item;
+    CGFloat recordxx =0;
+    for (NSInteger i = 0; i < arr.count; i++) {
+        NSDictionary *dic =self.catagoryIds[i];
+        NSString *name = dic[@"CategoryBName"];
+        NSString *str =[name containsString:@"云工厂"]?[name substringWithRange:NSMakeRange(0, name.length-3)]:name ;
+        CGRect rect = [str boundingRectWithSize:CGSizeMake(WidthRate(300), 40) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:AdaptFont(11)]} context:nil];
+        
+        CGFloat w = rect.size.width+30;
+        CGFloat h = 30;
+        
+        TotalWidth += w+10;
+        
+        
+        int yy = (int)(WidthRate(TotalWidth)/(ScreenWidth-30));
+        CGFloat Y = yy*40 +10;
+        
+        UIButton *lable = [[UIButton alloc] init];
+//        lable.textColor = ColorWithHexString(@"333333");
+        [lable setTitleColor:ColorWithHexString(@"333333") forState:UIControlStateNormal];
+        lable.titleLabel.font = [UIFont systemFontOfSize:AdaptFont(11)];
+        lable.layer.borderWidth = 1;
+        lable.layer.borderColor = ColorWithHexString(@"E4E4E4").CGColor;
+//        lable.textAlignment = NSTextAlignmentCenter;
+//        lable.text = str;
+        [lable setTitle:str forState:UIControlStateNormal];
+        lable.tag = i+10;
+        [bgview addSubview:lable];
+        lable.translatesAutoresizingMaskIntoConstraints = NO;
+        [lable PSSetSize:WidthRate(w) Height:HeightRate(30)];
+        
+        if (item == nil | recordxx != yy) {
+            [lable PSSetLeft:WidthRate(15)];
+            [lable PSSetTop:HeightRate(Y)];
+        }else
+        {
+            [lable PSSetRightAtItem:item Length:WidthRate(10)];
+            [lable PSSetTop:HeightRate(Y)];
+        }
+//        lable.userInteractionEnabled = YES;
+//        [lable addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(selectlableClick:)]];
+        [lable addTarget:self action:@selector(selectCatagoryID:) forControlEvents:UIControlEventTouchUpInside];
+        item = lable;
+        recordxx = yy;
+    }
+    
+}
+
+-(CGFloat)conculateHeight
+{
+    CGFloat TotalWidth =0;
+    CGFloat Totalheight = 0;
+    
+    for (NSInteger i = 0; i < self.catagoryIds.count; i++) {
+        NSDictionary *dic =self.catagoryIds[i];
+        NSString *name = dic[@"CategoryBName"];
+        NSString *str =[name containsString:@"云工厂"]?[name substringWithRange:NSMakeRange(0, name.length-3)]:name ;
+        CGRect rect = [str boundingRectWithSize:CGSizeMake(WidthRate(300), 40) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:AdaptFont(11)]} context:nil];
+        
+        CGFloat w = rect.size.width+30;
+        CGFloat h = 40;
+        
+        TotalWidth += w+10;
+        int yy = (int)(WidthRate(TotalWidth)/(ScreenWidth-30));
+        Totalheight = (yy+1)*h +10;
+        NSLog(@"Totalwidth=%f,yy=%d,Totalheight=%f",TotalWidth,yy,Totalheight);
+        
+        
+    }
+    return HeightRate(Totalheight);
 }
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

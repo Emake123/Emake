@@ -121,4 +121,10 @@
 
 //获取客服列表信息
 - (NSString *)getServerListWithStoreID:(NSString *)storeID;
+
+//获取消息个数信息
+- (NSInteger)getUserMessageCount:(NSString *)listId;
+
+//更新消息个数
+- (void)updateUserMessageCount:(NSInteger)count withListID:(NSString *)listId;
 @end

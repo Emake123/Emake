@@ -100,8 +100,7 @@ typedef enum {
 -(void)getProductAllPropertyListNameGoodcode:(NSString *)params seriesCode:(NSString *)seriesCode SuccessBlock:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
 //产品详情
 - (void)getProductDetailsInfoWith:(NSString *)CategoryId seriesCode:(NSString *)seriesCode successBlock:(void(^)(NSDictionary *ProductDetailsDict))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBloc;
-//产品右侧列表
-- (void)getShoppingGoodCategoriesSeriesId:(NSString *)SeriesId SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
 
 //个人信息添加
 - (void)putUserInfo:(NSDictionary *)parameters SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
@@ -169,7 +168,7 @@ typedef enum {
 
 //企业服务
 //品牌
-- (void)getuserBrand:(void(^)(NSArray*shoppingCartArray))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+- (void)getuserBrandParams:(NSDictionary *)dic success:(void(^)(NSArray*shoppingCartArray))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
 //保险
 - (void)getUserInsuranceCategorySuccessBlock:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
 //保险说明
@@ -354,6 +353,9 @@ typedef enum {
 
 //支付宝
 - (void)getSuperGroupPay:(NSDictionary *)params SuccessBlock:(void(^)(NSString *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+//微信支付
+- (void)getSuperGroupWechatPay:(NSDictionary *)params SuccessBlock:(void(^)(NSDictionary *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
 
 - (void)postSuperGroupPay:(NSDictionary *)params SuccessBlock:(void(^)(NSString *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
 
@@ -362,6 +364,9 @@ typedef enum {
 
 //代理商权益
 - (void)getAppUserAgentSuccessBlock:(void(^)(NSDictionary *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
+
+//代理商权益
+- (void)getAppSuperGroupSubmitWithparams:(NSDictionary *)params  SuccessBlock:(void(^)(NSString *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock;
 @end
 
 

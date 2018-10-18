@@ -16,5 +16,7 @@ typedef void(^paySuccessBlock)(BOOL isSuccess);
 @property(nonatomic,strong)NSString *payOrderMoney;
 @property(nonatomic,strong)NSDictionary *payParams;
 @property(nonatomic,strong)NSString *OrderNo;
+@property(nonatomic,assign)NSInteger recordIndex;
+
 
 @end

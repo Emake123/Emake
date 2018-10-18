@@ -192,8 +192,14 @@ static NSString *lastTimeSend;
     NSDictionary *userInfo = [YHMQTTClient sharedClient].messageCountDic ;
     
     NSInteger messageCount =[ userInfo[@"messageCount"] integerValue];
-    self.MessageCount = messageCount;
-    //    NSInteger EventCount = [YHMQTTClient sharedClient].messageCount;
+    
+//    NSInteger messageCount =  self.MessageCount ;
+        NSInteger EventCount = [YHMQTTClient sharedClient].messageCount;
+ 
+    
+    
+
+    
     if (self.isShowChat==YES) {
 //        NSInteger messageCount = 0;
         if (messageCount>0) {
@@ -511,6 +517,14 @@ static NSString *lastTimeSend;
             modelFile.FilePath = body.Url;
             [self addToFMDB:[modelFile mj_JSONString] messageId:model.MessageID sender:sender sendTime:model.Timestamp msgType:@"SEND_File" staffName:form.DisplayName staffAvata:form.Avatar withListID:listID clientID:form.ClientID storeInfo:form.Group];
         }
+        
+        NSInteger messageCount1111 = [[FMDBManager sharedManager] getUserMessageCount:listID];
+        
+        messageCount1111 +=1;
+        
+        [[FMDBManager sharedManager] updateUserMessageCount:5 withListID:listID ];
+        NSInteger messageCount11112 = [[FMDBManager sharedManager] getUserMessageCount:listID];
+
         [self refreshMesssageCount];
 
     }
@@ -595,6 +609,7 @@ static NSString *lastTimeSend;
     if (![[FMDBManager sharedManager] messageIsAlreadyExist:messageId withListID:listID]) {
         [[FMDBManager sharedManager] addMessage:msg withListID:listID];
     }
+    NSInteger messageCount = [[FMDBManager sharedManager] getUserMessageCount:listID];
     
     //添加聊天列表
     if ([[FMDBManager sharedManager] isChatListAllreadyExistWith:listID]) {
@@ -602,14 +617,15 @@ static NSString *lastTimeSend;
         if (jsonStr.length > 0) {
             msg.Group = jsonStr;
             [[FMDBManager sharedManager] deleteUserListWithListID:listID];
-            [[FMDBManager sharedManager] addUserList:msg withListId:listID andMessageCount:0];
+            [[FMDBManager sharedManager] addUserList:msg withListId:listID andMessageCount:messageCount];
         }else{
             [[FMDBManager sharedManager] deleteUserListWithListID:listID];
-            [[FMDBManager sharedManager] addUserList:msg withListId:listID andMessageCount:0];
+            [[FMDBManager sharedManager] addUserList:msg withListId:listID andMessageCount:messageCount];
         }
     }else{
         [[FMDBManager sharedManager] deleteUserListWithListID:listID];
-        [[FMDBManager sharedManager] addUserList:msg withListId:listID andMessageCount:0];
+        
+        [[FMDBManager sharedManager] addUserList:msg withListId:listID andMessageCount:messageCount];
     }
     if ([[Tools currentViewController] isKindOfClass:[YHMainMessageCenterViewController class]]) {
         YHMainMessageCenterViewController *vc =(YHMainMessageCenterViewController *) [Tools currentViewController];
@@ -660,9 +676,9 @@ static NSString *lastTimeSend;
 
             [[NSUserDefaults standardUserDefaults] setObject:refreshTokenStr.length>0?refreshTokenStr:@"" forKey:LOGIN_Refresh_Token];//
             [[NSUserDefaults standardUserDefaults] setObject:accessTokenStr.length>0?accessTokenStr:@"" forKey:LOGIN_Access_Token];
-            NSLog(@"LOGIN_Access_Token==%@;;;refreshTokenStr==%@",accessTokenStr,refreshTokenStr);
+//            NSLog(@"LOGIN_Access_Token==%@;;;refreshTokenStr==%@",accessTokenStr,refreshTokenStr);
         } fialureBlock:^(NSString *errorMessages) {
-            [self.view makeToast:errorMessages duration:1.5 position:CSToastPositionCenter];
+//            [self.view makeToast:errorMessages duration:1.5 position:CSToastPositionCenter];
             
         }];
     }else

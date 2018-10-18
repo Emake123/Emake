@@ -130,12 +130,17 @@
     
     NSDictionary *payload = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:nil];
     NSLog(@"收到=消息---mqtt--%@",payload);
+    if (payload.count>4) {
+        
+    }
     if (self.messageDic==nil) {
         self.messageDic = [NSMutableDictionary dictionary];
         self.messageCount = 0;
     }else{
         self.messageCount   = [[self.messageDic objectForKey:@"messageCount"] integerValue];
     }
+    
+    
     NSLog(@"收到=消息-topic--%@",topic);
     BOOL isChatVC = [[Tools currentViewController] isKindOfClass:[ChatNewViewController class]];
     //指令消息
@@ -155,6 +160,7 @@
 
             }
         [self.messageDic setObject:@(newCount) forKey:@"官方客服"];
+        
 
         }
 
@@ -178,14 +184,17 @@
         }
     }
 
-    
+
     if (isChatVC == false) {
-       
+
+//        NSInteger myMessageCount =  [[FMDBManager sharedManager] getUserMessageCount:listID];
+//        NSLog(@"yhmqtt=listid=%@=myMessageCount=%ld",listID,myMessageCount);
+//        myMessageCount =myMessageCount+1;
+//        [[FMDBManager sharedManager] updateUserMessageCount:myMessageCount withListID:listID];
         [self.messageDic setObject:@(self.messageCount) forKey:@"messageCount"];
         self.messageCountDic = self.messageDic;
     }
    
-    [self addBadge:5];
 
     if ([payload objectForKey:@"MessageType"] == nil) {
         [self.delegate onCommand:data andTopic:topic];
@@ -198,6 +207,9 @@
                 chatBodyModel *body = [chatBodyModel mj_objectWithKeyValues:model.MessageBody];
                 chatUserModel *form = [chatUserModel mj_objectWithKeyValues:model.From];
                 [self.delegate onMessgae:data andTopic:topic];
+                
+             
+                
                 NSString *userId = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERID];
                 if ([form.UserId isEqualToString:userId]) {
                     return;
@@ -218,6 +230,10 @@
                     }else if ([body.Type isEqualToString:@"File"]){
                         [[JZUserNotification sharedNotification] addNotificationWithCategroy1:@"[文件]"];
                     }
+                    
+                    
+                
+                    
                 }
                 
                 
@@ -227,6 +243,8 @@
             }
         }
     }
+    [self addBadge:5];
+
     
 }
 - (void)protocolError:(MQTTSession *)session error:(NSError *)error{
@@ -292,6 +310,8 @@
         YHMineViewController *vc = (YHMineViewController *)[Tools currentViewController];
         [vc refreshMesssageCount];
     }
+    
+    
 }
 
 @end

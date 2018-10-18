@@ -8,7 +8,7 @@
 
 #import "YHCommonWebViewController.h"
 #import <WebKit/WebKit.h>
-@interface YHCommonWebViewController ()
+@interface YHCommonWebViewController ()<WKUIDelegate>
 @property (nonatomic, strong) UIProgressView *progressView;
 @property (nonatomic, retain) WKWebView *webView;
 @property (nonatomic, retain) UIWebView *htmlWebView;
@@ -21,7 +21,7 @@
         WKWebView *wk =  [[WKWebView alloc] init];
         wk.scrollView.showsHorizontalScrollIndicator = false;
         wk.scrollView.alwaysBounceVertical = YES;
-     
+        wk.UIDelegate =self;
              NSURLRequest *urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:self.URLString] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
             [wk loadRequest:urlRequest ];
 
@@ -75,7 +75,7 @@
         
         [self.webView addObserver:self forKeyPath:@"estimatedProgress" options:NSKeyValueObservingOptionNew context:nil];
         [self.view addSubview:_webView];
-        
+        self.webView.userInteractionEnabled = YES;
         [self.webView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.top.mas_equalTo(TOP_BAR_HEIGHT);
             make.left.mas_equalTo(0);
@@ -108,6 +108,17 @@
         }
     }
 }
+#pragma mark wkwebview----uidelegate
+-(WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
+{
+    NSLog(@"createWebViewWithConfiguration");
+    if (!navigationAction.targetFrame.isMainFrame) {
+        [webView loadRequest:navigationAction.request];
+    }
+    return nil;
+}
+
+
 - (void)dealloc{
     if (self.isLoadHTMLStr == false) {
         [self.progressView removeFromSuperview ];

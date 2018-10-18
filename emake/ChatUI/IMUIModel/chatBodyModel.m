@@ -40,7 +40,7 @@
     return self;
 }
 
-- (instancetype)initWithVoicePath:(NSString *)voicePath voiceDuration:(NSString *)duration Type:(NSString *)Type{
+- (instancetype)initWithVoicePath:(NSString *)voicePath voiceDuration:(int)duration Type:(NSString *)Type{
     self.Type = Type;
     self.Voice = voicePath;
     self.VoiceDuration = duration;

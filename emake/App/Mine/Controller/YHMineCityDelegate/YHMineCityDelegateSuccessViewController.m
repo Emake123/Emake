@@ -27,7 +27,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-    self.title = @"城市代理商";
+    self.title = @"会员招募";
     [self configUI];
     [self getAppAgengtCashData];
     [self getAppUserAgentCoupon];
@@ -113,12 +113,36 @@
         make.height.mas_equalTo(HeightRate(30));
         
     }];
+    
+    
+    NSString *inviteMoney = @"2100元";
+    UILabel *BGTitleLabel = [[UILabel alloc] init];
+//    BGTitleLabel.text =[NSString stringWithFormat:@"每邀请一个用户成功成为会员得\n最高%@\n现金可提现"] ;
+    BGTitleLabel.numberOfLines = 0;
+    BGTitleLabel.textAlignment = NSTextAlignmentCenter;
+    BGTitleLabel.font = [UIFont boldSystemFontOfSize:AdaptFont(20)];
+    BGTitleLabel.textColor =ColorWithHexString(@"ffffff");
+    [self.view addSubview:BGTitleLabel];
+    [BGTitleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(WidthRate(40));
+        make.right.mas_equalTo(WidthRate(-40));
+ make.top.mas_equalTo(LookDetailRulerButton.mas_bottom).offset(HeightRate(10));
+//        make.height.mas_equalTo(HeightRate(30));
+        
+    }];
+    
+    
+    NSString *bgtitleStr = [NSString stringWithFormat:@"每邀请一个用户成功成为会员得\n最高%@\n现金可提现",inviteMoney];
+    NSMutableAttributedString *att = [[NSMutableAttributedString alloc] initWithString:bgtitleStr];
+    [att addAttribute:NSFontAttributeName value:[UIFont boldSystemFontOfSize:AdaptFont(28)] range:NSMakeRange(17, inviteMoney.length) ];
+    BGTitleLabel.attributedText = att;
+    
     UIView *line = [[UIView alloc] init];
     line.backgroundColor = SepratorLineColor;
     [self.view addSubview:line];
     [line mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.mas_equalTo(WidthRate(15));
-        make.right.mas_equalTo(WidthRate(-15));
+        make.left.mas_equalTo(WidthRate(0));
+        make.right.mas_equalTo(WidthRate(-9));
         make.top.mas_equalTo(bgView.mas_bottom).offset(HeightRate(0));
         make.height.mas_equalTo(HeightRateCommon(1));
         
@@ -159,8 +183,8 @@
     line2.backgroundColor = SepratorLineColor;
     [self.view addSubview:line2];
     [line2 mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.mas_equalTo(WidthRate(15));
-        make.right.mas_equalTo(WidthRate(-15));
+        make.left.mas_equalTo(WidthRate(0));
+        make.right.mas_equalTo(WidthRate(-0));
         make.top.mas_equalTo(LookDetailButton.mas_bottom).offset(HeightRate(10));
         make.height.mas_equalTo(HeightRateCommon(8));
         
@@ -227,14 +251,18 @@
 -(NSMutableAttributedString *)getCouponLableAttrbute:(NSString *)code CouponPrice:(NSString *)CouponPrice CategoryBName:(NSString *)CategoryBName
 
 {
+    NSString *str=@"我的优惠码：";
     NSString *str1= code;//;@"我的优惠码：13912345678";
-    NSString *str2= [NSString stringWithFormat:@"（输入优惠码直减%@元）",[Tools getHaveNum:CouponPrice.doubleValue]];//@"（输入优惠码直减200元）";
+    NSString *str2= [NSString stringWithFormat:@"输入优惠码各品类各减%@元",[Tools getHaveNum:CouponPrice.doubleValue]];//@"（输入优惠码直减200元）";
     NSString *str3= [NSString stringWithFormat:@"仅限：%@",CategoryBName] ;//@"仅限：输配电／休闲食品行业";
-    NSString *resultstr = [NSString stringWithFormat:@"%@%@\n%@",str1,str2,str3];
+    NSString *resultstr = [NSString stringWithFormat:@"%@%@\n%@\n%@",str,str1,str2,str3];
     NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:resultstr];
     [attrStr addAttribute:NSForegroundColorAttributeName
                     value:ColorWithHexString(@"999999")
-                    range:NSMakeRange(str1.length, resultstr.length-str1.length)];
+                    range:NSMakeRange(str.length+ str1.length, resultstr.length-str1.length-str.length)];
+    [attrStr addAttribute:NSForegroundColorAttributeName
+                    value:ColorWithHexString(@"333333")
+                    range:NSMakeRange(0, str.length)];
     return attrStr;
 }
 

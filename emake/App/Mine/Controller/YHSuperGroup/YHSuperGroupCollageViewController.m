@@ -14,6 +14,8 @@
 #import "YHSuperGroupDetailViewController.h"
 #import "YHCommonWebViewController.h"
 #import "YHShareView.h"
+#import "YHOrderDetailViewController.h"
+#import "YHOrderContract.h"
 @interface YHSuperGroupCollageViewController ()<UITableViewDelegate ,UITableViewDataSource>
 {
     
@@ -30,6 +32,7 @@
 @property(nonatomic,strong)NSArray *groupLikeArr;//leftView
 
 @property(nonatomic,assign)NSInteger tableSection;//leftView
+@property(nonatomic,assign)YHOrderContract *contract;//
 
 @end
 
@@ -38,7 +41,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = @"拼团详情";
-    [self addRigthDetailButtonIsNotChat:false];
+    [self addRigthDetailButtonIsNotChat:YES];
 
     [self getMYSuperGroupDetailData];
 
@@ -53,7 +56,7 @@
         [self activeCountDownAction];
 
         [self congfigUI];
-        NSString *number = [NSString stringWithFormat:@"%@:%@",model.Day,model.Hour];
+        NSString *number = [NSString stringWithFormat:@"%@:%@",model.infoModel.Day,model.infoModel.Hour];
         NSString *time = [number stringByReplacingOccurrencesOfString:@":" withString:@""];
         if (model.infoModel.IsSuccess.integerValue == 0 && time.integerValue!=0) {
             [self getMYLikeSuperGroup];
@@ -70,16 +73,15 @@
 -(void)getMYLikeSuperGroup
 {
     [[YHJsonRequest shared] getAppMYLikeSuperGroupDetailWithSuperGroupIdS:@{@"SuperGroupId":self.model.SuperGroupId} SuccessBlock:^(NSArray *success) {
+        self.inviteButton.hidden = false;
+
         if (success.count == 0) {
             self.tableSection = 1;
-            self.inviteButton.hidden = YES;
         }else
         {
             self.tableSection = 2;
             self.groupLikeArr = [NSArray arrayWithArray:success];;
             [self.myTableView reloadData];
-            self.inviteButton.hidden = false;
-
 
         }
         
@@ -138,10 +140,33 @@
 
 -(void)lookOrderDetail
 {
-    YHOrderManageNewViewController *order = [[YHOrderManageNewViewController alloc] init];
-    order.OrderState = 0;
-    order.hidesBottomBarWhenPushed = YES;
-    [self.navigationController pushViewController:order animated:YES];
+    NSDictionary * paramDic =@{@"RequestType":@"1",@"OrderNo":self.OrderNo};
+
+    [[YHJsonRequest shared] userUseOrderManageParams:paramDic SucceededBlock:^(NSArray *orderArray) {
+        
+        if (orderArray.count ==1) {
+            YHOrderContract *contract = orderArray.firstObject;
+            
+            YHOrderDetailViewController *order = [[YHOrderDetailViewController alloc] init];
+            order.contract = contract;
+            order.hidesBottomBarWhenPushed = YES;
+            [self.navigationController pushViewController:order animated:YES];
+           
+        }else
+        {
+            [self.view makeToast:@"合同号异常" duration:1.5f position:CSToastPositionCenter];
+            
+        }
+        
+        
+        
+        
+    } failedBlock:^(NSString *errorMessage) {
+        
+        [self.view makeToast:errorMessage duration:1.5f position:CSToastPositionCenter];
+    }];
+
+
 }
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -205,16 +230,21 @@
             cell.successImageView.hidden = !self.model.infoModel.IsSuccess.boolValue;
             cell.successButton.hidden = !self.model.infoModel.IsSuccess.boolValue;
             [cell.successButton addTarget:self action:@selector(lookOrderDetail) forControlEvents:UIControlEventTouchUpInside];
-            cell.peopleTipLable.text = [NSString stringWithFormat:@"还差%ld人团成功",self.model.infoModel.PeopleNumber.integerValue-self.model.infoModel.PeopleReadyNumber.integerValue];
+            cell.peopleTipLable.text = [NSString stringWithFormat:@"还差%ld人拼团成功",self.model.infoModel.PeopleNumber.integerValue-self.model.infoModel.PeopleReadyNumber.integerValue];
             
             NSInteger totalNum =self.model.infoModel.PeopleNumber.integerValue;
             NSInteger readyNum =self.model.infoModel.PeopleReadyNumber.integerValue;
+            NSArray *smallwidthRateArr = @[@[@(3/6.)],
+                       @[@(2/5.),@(3/5.0)],
+                       @[@(2/6.),@(3/6.),@(4/6.)],
+                       @[@(1/5.),@(2/5.),@(3/5.),@(4/5.)]];
+           
             float height = 0;
             for (int i =0; i< totalNum; i++) {
                 int index  = i/5;
-                CGFloat width = ( ScreenWidth)/5;
-                
-                CGFloat leftSpace= totalNum  <5?((5-totalNum)/2*width+width*i):  width*(i%5);
+                CGFloat width = ( ScreenWidth)/5.5;
+                NSArray*arr =  totalNum  <5?smallwidthRateArr[totalNum-1]:nil;
+//                CGFloat leftSpace= totalNum  <5?(ScreenWidth*[arr[i] doubleValue]): ScreenWidth/(5-i);
                 CGFloat topH = index*HeightRate(35);
                 UIImageView *imageView = [[UIImageView alloc] init];
                 
@@ -228,14 +258,22 @@
                     
                 }
                 [cell.peopleView addSubview:imageView];
-                [imageView mas_makeConstraints:^(MASConstraintMaker *make) {
-                    make.width.mas_equalTo(width);
-                    make.top.mas_equalTo(HeightRate(topH));
-                    make.height.mas_equalTo(HeightRate(30));
-                    make.left.mas_equalTo(leftSpace);
-                }];
+//                [imageView mas_makeConstraints:^(MASConstraintMaker *make) {
+//                    make.width.mas_equalTo(width);
+//                    make.top.mas_equalTo(HeightRate(topH));
+//                    make.height.mas_equalTo(HeightRate(30));
+//                    make.centerX.mas_equalTo(leftSpace);
+//                }];
+                
+                CGFloat rate = totalNum<5?[arr[i] doubleValue]:((i%5+1))/6.0;
+                imageView.translatesAutoresizingMaskIntoConstraints= false;
+                [imageView PSSetTop:HeightRate(topH)];
+                [imageView PSSetSize:width Height:HeightRate(30)];
+                [imageView PSSetCenterXPercent:rate];
+         
                 height = topH+HeightRate(30);
             }
+            
             [cell.peopleView mas_updateConstraints:^(MASConstraintMaker *make) {
                 make.height.mas_equalTo(HeightRate(height));
                 
@@ -257,9 +295,9 @@
             }
             cell.productNameLable.text = self.model.GroupName;
             cell.lbOrderDetail.text = self.model.GoodsExplain;
-            cell.productPriceLable.text =[NSString stringWithFormat:@"¥%@",[Tools getHaveNum:self.model.GroupPrice.doubleValue]] ;
+            cell.productPriceLable.text =[NSString stringWithFormat:@"¥%@",[Tools getHaveNum:self.model.infoModel.GroupPrice.doubleValue]] ;
             cell.productNumberLable.text = [NSString stringWithFormat:@"x%@",self.model.infoModel.SetNum];
-            cell.smallPrice.text = [NSString stringWithFormat:@"¥%@",[Tools getHaveNum:self.model.GroupPrice.doubleValue*self.model.infoModel.SetNum.integerValue]];
+            cell.smallPrice.text = [NSString stringWithFormat:@"¥%@",[Tools getHaveNum:self.model.infoModel.GroupPrice.doubleValue*self.model.infoModel.SetNum.integerValue]];
             cell.TotalNumberName.text = [NSString stringWithFormat:@"共%@件商品 合计：",self.model.infoModel.SetNum];
             cell.lbtax.text = self.model.GoodsAddValue;
             
@@ -326,7 +364,7 @@
     if (indexPath.section==1) {
         YHSuperGroupModel *model = self.groupLikeArr[indexPath.row];
         
-        if (model.GroupState.integerValue==0) {
+        if (model.GroupState.integerValue==1) {
             [self.view makeToast:@"该团还未开始" duration:1.5 position:CSToastPositionCenter];
             
         } else if(model.GroupState.integerValue==2) {
@@ -382,7 +420,7 @@
     [companyLabelName PSSetRightAtItem:shopHeadImageView Length:WidthRate(5)];
     
     UILabel *shopGoodsInvoiceLable = [[UILabel alloc] init];
-    shopGoodsInvoiceLable.text = @"含税";
+    shopGoodsInvoiceLable.text = self.model.TaxDesc;
     shopGoodsInvoiceLable.textAlignment = NSTextAlignmentCenter;
     shopGoodsInvoiceLable.font = [UIFont systemFontOfSize:AdaptFont(9)];
     shopGoodsInvoiceLable.textColor = ColorWithHexString(@"ffffff");
@@ -393,7 +431,8 @@
     shopGoodsInvoiceLable.translatesAutoresizingMaskIntoConstraints= NO;
     [shopGoodsInvoiceLable PSSetRightAtItem:companyLabelName Length:WidthRate(5)];
     [shopGoodsInvoiceLable PSSetSize:WidthRate(33) Height:HeightRate(17)];
-//    shopGoodsInvoiceLable.hidden = boolUserdefault(IsIndustryCatagory)==YES?YES:[self.contract.IsIncludeTax isEqualToString:@"0"];
+    
+    shopGoodsInvoiceLable.hidden = [self.model.TaxDesc containsString:@"不"]?YES:false;
     
 
   
@@ -407,7 +446,7 @@
 {
     
     NSString *userID = Userdefault(LOGIN_USERID);
-    YHShareView *share = [[YHShareView alloc] initShareWithContentTitle:@"易智造" theOtherTitle:@"超级团详情" image:nil url:[NSString stringWithFormat:@"%@%@/%@",UserSuperGroupInfoSahreURL,self.SuperGroupDetailId,userID] withCancleTitle:@"取消"];
+    YHShareView *share = [[YHShareView alloc] initShareWithContentTitle:@"易智造" theOtherTitle:self.model.GroupName image:nil url:[NSString stringWithFormat:@"%@%@/%@",UserSuperGroupInfoSahreURL,self.SuperGroupDetailId,userID] withCancleTitle:@"取消"];
     [share showAnimated];
     
     
@@ -524,6 +563,7 @@
                             YHSuperGroupOrderDetailTableViewCell *cell =(YHSuperGroupOrderDetailTableViewCell *)[self.myTableView cellForRowAtIndexPath:path];
                             
                             cell.endDate.attributedText = att;
+                            weakSelf.inviteButton.hidden = YES;
                             return ;
                         }
                         if (days == 0) {

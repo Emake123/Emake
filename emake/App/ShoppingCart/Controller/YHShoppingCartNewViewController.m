@@ -71,9 +71,8 @@ static CGFloat const LineViewHeight = 1.0f;
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = TextColor_F5F5F5;
-    NSString *isStoreString = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
 
-    self.navigationItem.title = [NSString stringWithFormat: @"购物车(%ld)",(long)self.number];
+    self.navigationItem.title = [NSString stringWithFormat: @"购物车"];
     [self addRightNavBtn:@"编辑"];
 
     
@@ -230,19 +229,14 @@ static CGFloat const LineViewHeight = 1.0f;
 - (void)configUI{
     
     CGFloat TopViewHeight =0;
-    BOOL isIndustry = [[NSUserDefaults standardUserDefaults] boolForKey:IsIndustryCatagory];
 
-//    if (isIndustry ==false) {
         TopViewHeight = 50;
         self.TopTitleView.hidden = YES;
 
         self.TopTitleView = [[YHTitleView alloc]initWithFrame:CGRectMake(0, TOP_BAR_HEIGHT, ScreenWidth, HeightRate(TopViewHeight)) titleFont:16 delegate:self andTitleArray:self.TopTitleArray];
         self.TopTitleView.backgroundColor = ColorWithHexString(StatusAndTopBarBackgroundColor);
         [self.view addSubview:self.TopTitleView] ;
-//    }else
-//    {
-//        self.TopTitleView.hidden = YES;
-//    }
+
     
     CGFloat height = 0;
     if (self.isBottomViewLow) {
@@ -463,7 +457,7 @@ static CGFloat const LineViewHeight = 1.0f;
         vc.storeAvata = shoppingmodel.StorePhoto;
         vc.storePhoneNumber = @"";
         vc.StoreName    = shoppingmodel.StoreName;
-//vc
+        vc.CategoryBId = shoppingmodel.CategoryBId;
         [self.navigationController pushViewController:vc animated:YES];
     }
 }

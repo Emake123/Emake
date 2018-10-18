@@ -42,11 +42,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/ShoppingCart/Controller/YHShoppingCartConfirmViewController.m"
-            timestampString = "559657163.600879"
+            timestampString = "561491600.464321"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1002"
-            endingLineNumber = "1002">
+            startingLineNumber = "986"
+            endingLineNumber = "986">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -87,8 +87,8 @@
                   symbolName = "__46-[YHQualificationApplyViewController goCommit]_block_invoke"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/CompanyService/controller/YHQualificationApplyViewController.m"
-                  timestampString = "560486259.315416"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/CompanyService/controller/YHQualificationApplyViewController.m"
+                  timestampString = "561545263.087732"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "611"
@@ -102,8 +102,8 @@
                   symbolName = "__46-[YHQualificationApplyViewController goCommit]_block_invoke_2"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/CompanyService/controller/YHQualificationApplyViewController.m"
-                  timestampString = "560486259.317687"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/CompanyService/controller/YHQualificationApplyViewController.m"
+                  timestampString = "561545263.0896651"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "611"
@@ -117,8 +117,8 @@
                   symbolName = "__destroy_helper_block_.508"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/CompanyService/controller/YHQualificationApplyViewController.m"
-                  timestampString = "560486259.319973"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/CompanyService/controller/YHQualificationApplyViewController.m"
+                  timestampString = "561545263.091983"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "611"
@@ -150,8 +150,8 @@
                   symbolName = "-[YHQualificationApplyViewController goCommit]"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/CompanyService/controller/YHQualificationApplyViewController.m"
-                  timestampString = "560486259.327037"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/CompanyService/controller/YHQualificationApplyViewController.m"
+                  timestampString = "561545263.098628"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "609"
@@ -165,8 +165,8 @@
                   symbolName = "__46-[YHQualificationApplyViewController goCommit]_block_invoke"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/CompanyService/controller/YHQualificationApplyViewController.m"
-                  timestampString = "560486259.330169"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/CompanyService/controller/YHQualificationApplyViewController.m"
+                  timestampString = "561545263.100752"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "609"
@@ -180,8 +180,8 @@
                   symbolName = "__destroy_helper_block_.516"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/CompanyService/controller/YHQualificationApplyViewController.m"
-                  timestampString = "560486259.333921"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/CompanyService/controller/YHQualificationApplyViewController.m"
+                  timestampString = "561545263.102751"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "609"
@@ -277,8 +277,8 @@
                   symbolName = "-[YHChangePhoneNumberViewController commit:]"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/Mine/Controller/YHSetting/accountSecutity/YHChangePhoneNumberViewController.m"
-                  timestampString = "560486259.357721"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/Mine/Controller/YHSetting/accountSecutity/YHChangePhoneNumberViewController.m"
+                  timestampString = "561545263.119416"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "206"
@@ -292,8 +292,8 @@
                   symbolName = "__44-[YHChangePhoneNumberViewController commit:]_block_invoke"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/Mine/Controller/YHSetting/accountSecutity/YHChangePhoneNumberViewController.m"
-                  timestampString = "560486259.359666"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/Mine/Controller/YHSetting/accountSecutity/YHChangePhoneNumberViewController.m"
+                  timestampString = "561545263.121255"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "206"
@@ -307,8 +307,8 @@
                   symbolName = "__destroy_helper_block_.235"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/Mine/Controller/YHSetting/accountSecutity/YHChangePhoneNumberViewController.m"
-                  timestampString = "560486259.361702"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/Mine/Controller/YHSetting/accountSecutity/YHChangePhoneNumberViewController.m"
+                  timestampString = "561545263.123055"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "206"
@@ -325,11 +325,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.9371901"
+            timestampString = "561540562.293753"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1687"
-            endingLineNumber = "1687"
+            startingLineNumber = "1610"
+            endingLineNumber = "1610"
             landmarkName = "-putUserBusinessCategory:SuccessBlock:fialureBlock:"
             landmarkType = "7">
          </BreakpointContent>
@@ -341,7 +341,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/MainPage/Controller/YHDiscoverViewController.m"
-            timestampString = "556016760.206468"
+            timestampString = "561445702.115517"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "250"
@@ -612,8 +612,8 @@
                   symbolName = "-[YHAdviceFeedBackViewController commit]"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/Mine/Controller/YHSetting/advice/YHAdviceFeedBackViewController.m"
-                  timestampString = "560486259.400695"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/Mine/Controller/YHSetting/advice/YHAdviceFeedBackViewController.m"
+                  timestampString = "561545263.150852"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "197"
@@ -627,8 +627,8 @@
                   symbolName = "__40-[YHAdviceFeedBackViewController commit]_block_invoke"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/Mine/Controller/YHSetting/advice/YHAdviceFeedBackViewController.m"
-                  timestampString = "560486259.4028929"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/Mine/Controller/YHSetting/advice/YHAdviceFeedBackViewController.m"
+                  timestampString = "561545263.152657"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "197"
@@ -642,8 +642,8 @@
                   symbolName = "__destroy_helper_block_.235"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/Mine/Controller/YHSetting/advice/YHAdviceFeedBackViewController.m"
-                  timestampString = "560486259.404754"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/Mine/Controller/YHSetting/advice/YHAdviceFeedBackViewController.m"
+                  timestampString = "561545263.154514"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "197"
@@ -724,11 +724,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.938741"
+            timestampString = "561540562.294242"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1948"
-            endingLineNumber = "1948"
+            startingLineNumber = "1871"
+            endingLineNumber = "1871"
             landmarkName = "-getUserTeamLeaderDetailContribution:SuccessBlock:fialureBlock:"
             landmarkType = "7">
          </BreakpointContent>
@@ -740,11 +740,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.938848"
+            timestampString = "561540562.294312"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1950"
-            endingLineNumber = "1950"
+            startingLineNumber = "1873"
+            endingLineNumber = "1873"
             landmarkName = "-getUserTeamLeaderDetailContribution:SuccessBlock:fialureBlock:"
             landmarkType = "7">
          </BreakpointContent>
@@ -788,11 +788,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.939052"
+            timestampString = "561540562.29442"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2045"
-            endingLineNumber = "2045"
+            startingLineNumber = "1968"
+            endingLineNumber = "1968"
             landmarkName = "YHJsonRequest"
             landmarkType = "3">
          </BreakpointContent>
@@ -804,11 +804,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.939126"
+            timestampString = "561540562.294474"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2043"
-            endingLineNumber = "2043"
+            startingLineNumber = "1966"
+            endingLineNumber = "1966"
             landmarkName = "-joinTeam:SuccessBlock:fialureBlock:"
             landmarkType = "7">
          </BreakpointContent>
@@ -835,8 +835,8 @@
                   symbolName = "-[YHRegisterViewController sureBtnClick]"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/Login/Controller/YHRegisterViewController.m"
-                  timestampString = "560486259.460704"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/Login/Controller/YHRegisterViewController.m"
+                  timestampString = "561545263.1952"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "189"
@@ -850,8 +850,8 @@
                   symbolName = "__40-[YHRegisterViewController sureBtnClick]_block_invoke"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/Login/Controller/YHRegisterViewController.m"
-                  timestampString = "560486259.462568"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/Login/Controller/YHRegisterViewController.m"
+                  timestampString = "561545263.197212"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "189"
@@ -862,11 +862,11 @@
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "__destroy_helper_block_.233"
+                  symbolName = "__destroy_helper_block_.243"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/Login/Controller/YHRegisterViewController.m"
-                  timestampString = "560486259.464502"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/Login/Controller/YHRegisterViewController.m"
+                  timestampString = "561545263.199034"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "189"
@@ -995,11 +995,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/AppDelegate.m"
-            timestampString = "559969267.431761"
+            timestampString = "561533704.518556"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "183"
-            endingLineNumber = "183"
+            startingLineNumber = "248"
+            endingLineNumber = "248"
             landmarkName = "-application:openURL:sourceApplication:annotation:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1027,11 +1027,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.9411401"
+            timestampString = "561540562.29471"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1925"
-            endingLineNumber = "1925"
+            startingLineNumber = "1848"
+            endingLineNumber = "1848"
             landmarkName = "YHJsonRequest"
             landmarkType = "3">
          </BreakpointContent>
@@ -1043,11 +1043,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.9412121"
+            timestampString = "561540562.294764"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1940"
-            endingLineNumber = "1940"
+            startingLineNumber = "1863"
+            endingLineNumber = "1863"
             landmarkName = "-getUserTeamLeaderDetailContribution:SuccessBlock:fialureBlock:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1059,11 +1059,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.9412659"
+            timestampString = "561540562.294809"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2554"
-            endingLineNumber = "2554"
+            startingLineNumber = "2473"
+            endingLineNumber = "2473"
             landmarkName = "-deleteUserInvoiceManage:SuccessBlock:fialureBlock:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1075,11 +1075,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.941317"
+            timestampString = "561540562.294853"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2555"
-            endingLineNumber = "2555"
+            startingLineNumber = "2474"
+            endingLineNumber = "2474"
             landmarkName = "-deleteUserInvoiceManage:SuccessBlock:fialureBlock:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1091,11 +1091,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/Utilities/Tools.m"
-            timestampString = "559974281.02907"
+            timestampString = "561491600.468618"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "716"
-            endingLineNumber = "716"
+            startingLineNumber = "733"
+            endingLineNumber = "733"
             landmarkName = "+currentViewController"
             landmarkType = "7">
          </BreakpointContent>
@@ -1138,38 +1138,6 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "emake/App/Mine/Controller/YHCardFile/YHChangeNickNameViewController.m"
-            timestampString = "557291960.362874"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "40"
-            endingLineNumber = "40"
-            landmarkName = "-rightBtnClick:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "emake/App/Mine/Controller/YHCardFile/YHChangeNickNameViewController.m"
-            timestampString = "557291960.362928"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "118"
-            endingLineNumber = "118"
-            landmarkName = "-validateNickname:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "emake/ChatUI/IMUIMessageCollectionView/Views/IMUIBaseMessageCell.swift"
             timestampString = "560009768.194809"
             startingColumnNumber = "9223372036854775807"
@@ -1187,7 +1155,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.h"
-            timestampString = "559969267.432735"
+            timestampString = "561491600.4690731"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "88"
@@ -1203,11 +1171,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.94178"
+            timestampString = "561540562.295601"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1184"
-            endingLineNumber = "1184"
+            startingLineNumber = "1152"
+            endingLineNumber = "1152"
             landmarkName = "-shoppingCartDeleteOderNumber:Sucess:fialureBlock:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1219,11 +1187,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/Mine/Controller/YHMyCollection/YHMinwCollectionViewController.m"
-            timestampString = "559969267.4329031"
+            timestampString = "561491600.469312"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "340"
-            endingLineNumber = "340"
+            startingLineNumber = "306"
+            endingLineNumber = "306"
             landmarkName = "-CancelCollection:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1235,11 +1203,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/Mine/Controller/YHMyCollection/YHMinwCollectionViewController.m"
-            timestampString = "559969267.4329619"
+            timestampString = "561491600.4693739"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "318"
-            endingLineNumber = "318"
+            startingLineNumber = "284"
+            endingLineNumber = "284"
             landmarkName = "-CancelCollection:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1251,11 +1219,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/Mine/Controller/YHMyCollection/YHMinwCollectionViewController.m"
-            timestampString = "559969267.4330159"
+            timestampString = "561491600.469432"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "314"
-            endingLineNumber = "314"
+            startingLineNumber = "280"
+            endingLineNumber = "280"
             landmarkName = "-CancelCollection:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1298,28 +1266,12 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "emake/App/ShoppingCart/Controller/YHShoppingCartNewViewController.m"
-            timestampString = "559969267.433195"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "393"
-            endingLineNumber = "393"
-            landmarkName = "-tableView:editActionsForRowAtIndexPath:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "emake/App/MainPage/Controller/YHMainViewController.m"
-            timestampString = "560004939.957512"
+            timestampString = "561491600.4696389"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "633"
-            endingLineNumber = "633"
+            startingLineNumber = "522"
+            endingLineNumber = "522"
             landmarkName = "YHMainViewController"
             landmarkType = "3">
          </BreakpointContent>
@@ -1331,7 +1283,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHAFNetWorkingRequset.m"
-            timestampString = "559238647.6760941"
+            timestampString = "561488802.883327"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "144"
@@ -1347,7 +1299,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.942228"
+            timestampString = "561540562.295778"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "344"
@@ -1363,7 +1315,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/MainPage/Controller/YHMainChooseCatagoryViewController.m"
-            timestampString = "557219260.021263"
+            timestampString = "561491600.470113"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "56"
@@ -1426,11 +1378,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.942348"
+            timestampString = "561540562.295858"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1302"
-            endingLineNumber = "1302"
+            startingLineNumber = "1269"
+            endingLineNumber = "1269"
             landmarkName = "-applyInvoiceListsucess:fialureBlock:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1458,11 +1410,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.942489"
+            timestampString = "561540562.295938"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "522"
-            endingLineNumber = "522"
+            startingLineNumber = "520"
+            endingLineNumber = "520"
             landmarkName = "-getUseOrderContractNoParams:SucceededBlock:failedBlock:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1474,11 +1426,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.942548"
+            timestampString = "561540562.2959861"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "525"
-            endingLineNumber = "525"
+            startingLineNumber = "523"
+            endingLineNumber = "523"
             landmarkName = "-getUseOrderContractNoParams:SucceededBlock:failedBlock:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1490,7 +1442,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/ShoppingCart/Controller/YHContractCreatViewController.m"
-            timestampString = "557225446.859382"
+            timestampString = "561491600.470681"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "227"
@@ -1505,8 +1457,8 @@
                   symbolName = "-[YHContractCreatViewController alertViewRightBtnClick:]"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/ShoppingCart/Controller/YHContractCreatViewController.m"
-                  timestampString = "560486259.622539"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/ShoppingCart/Controller/YHContractCreatViewController.m"
+                  timestampString = "561545263.309454"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "227"
@@ -1520,8 +1472,8 @@
                   symbolName = "__56-[YHContractCreatViewController alertViewRightBtnClick:]_block_invoke"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/ShoppingCart/Controller/YHContractCreatViewController.m"
-                  timestampString = "560486259.624383"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/ShoppingCart/Controller/YHContractCreatViewController.m"
+                  timestampString = "561545263.312124"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "227"
@@ -1535,8 +1487,8 @@
                   symbolName = "__destroy_helper_block_.263"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/App/ShoppingCart/Controller/YHContractCreatViewController.m"
-                  timestampString = "560486259.626121"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/ShoppingCart/Controller/YHContractCreatViewController.m"
+                  timestampString = "561545263.3142149"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "227"
@@ -1544,22 +1496,6 @@
                   offsetFromSymbolStart = "16">
                </Location>
             </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.9426841"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1495"
-            endingLineNumber = "1495"
-            landmarkName = "-userSignContract:SuccessBlock:fialureBlock:"
-            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1601,7 +1537,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/MainPage/Controller/StoreFile/YHStoreViewController.m"
-            timestampString = "559969267.434364"
+            timestampString = "561379217.376404"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "142"
@@ -1633,11 +1569,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/OrderManage/Controller/YHOrderDetail/YHOrderDetailViewController.m"
-            timestampString = "559969267.434551"
+            timestampString = "561491600.471101"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "482"
-            endingLineNumber = "482"
+            startingLineNumber = "470"
+            endingLineNumber = "470"
             landmarkName = "-rightBtnAddInsuranceClick:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1649,11 +1585,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/OrderManage/Controller/YHOrderDetail/YHChatConfirmOrderViewController.m"
-            timestampString = "559977650.985949"
+            timestampString = "561491600.471179"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "59"
-            endingLineNumber = "59"
+            startingLineNumber = "57"
+            endingLineNumber = "57"
             landmarkName = "-getContractData"
             landmarkType = "7">
          </BreakpointContent>
@@ -1665,11 +1601,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/OrderManage/Controller/YHOrderDetail/YHOrderDetailViewController.m"
-            timestampString = "559969267.4347709"
+            timestampString = "561491600.4712321"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "495"
-            endingLineNumber = "495"
+            startingLineNumber = "483"
+            endingLineNumber = "483"
             landmarkName = "-uploadContractButtonClickedWithOrder"
             landmarkType = "7">
          </BreakpointContent>
@@ -1681,11 +1617,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.9432271"
+            timestampString = "561540562.296217"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "514"
-            endingLineNumber = "514"
+            startingLineNumber = "512"
+            endingLineNumber = "512"
             landmarkName = "-userUseOrderManageParams:SucceededBlock:failedBlock:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1745,11 +1681,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/Mine/Controller/YHSetting/personalFile/YHPersonalFileViewController.m"
-            timestampString = "559969267.435258"
+            timestampString = "561491600.471632"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "354"
-            endingLineNumber = "354"
+            startingLineNumber = "355"
+            endingLineNumber = "355"
             landmarkName = "-updateHeadImage"
             landmarkType = "7">
          </BreakpointContent>
@@ -1773,47 +1709,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "emake/App/CustomerService/Controller/YHMainMessageCenterViewController.m"
-            timestampString = "560486256.943585"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "66"
-            endingLineNumber = "66"
-            landmarkName = "-viewDidLoad"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "emake/App/CustomerService/Controller/YHMainMessageCenterViewController.m"
-            timestampString = "560486256.943657"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "273"
-            endingLineNumber = "273"
-            landmarkName = "-getMessageList"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.94372"
+            timestampString = "561540562.296357"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2210"
-            endingLineNumber = "2210"
+            startingLineNumber = "2133"
+            endingLineNumber = "2133"
             landmarkName = "-getMessageListSuccessBlock:fialureBlock:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1825,13 +1729,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/MainPage/Controller/StoreFile/YHStoreDetailViewController.m"
-            timestampString = "559969267.435653"
+            timestampString = "561491600.471905"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "559"
-            endingLineNumber = "559"
-            landmarkName = "-titleView:selectItemWithIndex:"
-            landmarkType = "7">
+            startingLineNumber = "560"
+            endingLineNumber = "560"
+            landmarkName = "YHStoreDetailViewController"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1873,7 +1777,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/Mine/View/YHMinePageView/YHMineFirstRowTableViewCell.m"
-            timestampString = "559221497.7192971"
+            timestampString = "561541979.864025"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "88"
@@ -1953,11 +1857,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/AppDelegate.m"
-            timestampString = "559969267.436255"
+            timestampString = "561533704.522346"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "152"
-            endingLineNumber = "152"
+            startingLineNumber = "182"
+            endingLineNumber = "182"
             landmarkName = "-application:openURL:sourceApplication:annotation:"
             landmarkType = "7">
          </BreakpointContent>
@@ -1969,11 +1873,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/AppDelegate.m"
-            timestampString = "559969267.4363199"
+            timestampString = "561533704.5226279"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "159"
-            endingLineNumber = "159"
+            startingLineNumber = "183"
+            endingLineNumber = "183"
             landmarkName = "-application:openURL:sourceApplication:annotation:"
             landmarkType = "7">
             <Locations>
@@ -1984,109 +1888,13 @@
                   symbolName = "-[AppDelegate application:openURL:sourceApplication:annotation:]"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/AppDelegate.m"
-                  timestampString = "560486259.755366"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/AppDelegate.m"
+                  timestampString = "561545263.386484"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "160"
-                  endingLineNumber = "160"
-                  offsetFromSymbolStart = "491">
-               </Location>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "__64-[AppDelegate application:openURL:sourceApplication:annotation:]_block_invoke_2"
-                  moduleName = "emake"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/AppDelegate.m"
-                  timestampString = "560486259.7590621"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "162"
-                  endingLineNumber = "162"
-                  offsetFromSymbolStart = "51">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "emake/AppDelegate.m"
-            timestampString = "559969267.436373"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "160"
-            endingLineNumber = "160"
-            landmarkName = "-application:openURL:sourceApplication:annotation:"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[AppDelegate application:openURL:sourceApplication:annotation:]"
-                  moduleName = "emake"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/AppDelegate.m"
-                  timestampString = "560486259.778788"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "160"
-                  endingLineNumber = "160"
-                  offsetFromSymbolStart = "491">
-               </Location>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "__64-[AppDelegate application:openURL:sourceApplication:annotation:]_block_invoke_2"
-                  moduleName = "emake"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/AppDelegate.m"
-                  timestampString = "560486259.78155"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "162"
-                  endingLineNumber = "162"
-                  offsetFromSymbolStart = "51">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "emake/AppDelegate.m"
-            timestampString = "559969267.43642"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "153"
-            endingLineNumber = "153"
-            landmarkName = "-application:openURL:sourceApplication:annotation:"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[AppDelegate application:openURL:sourceApplication:annotation:]"
-                  moduleName = "emake"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/AppDelegate.m"
-                  timestampString = "560486259.787222"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "153"
-                  endingLineNumber = "153"
-                  offsetFromSymbolStart = "249">
+                  startingLineNumber = "183"
+                  endingLineNumber = "183"
+                  offsetFromSymbolStart = "582">
                </Location>
                <Location
                   shouldBeEnabled = "Yes"
@@ -2095,13 +1903,28 @@
                   symbolName = "__64-[AppDelegate application:openURL:sourceApplication:annotation:]_block_invoke"
                   moduleName = "emake"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/zhangshichao/Desktop/emake/emake/AppDelegate.m"
-                  timestampString = "560486259.789202"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/AppDelegate.m"
+                  timestampString = "561545263.388438"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "155"
-                  endingLineNumber = "155"
+                  startingLineNumber = "185"
+                  endingLineNumber = "185"
                   offsetFromSymbolStart = "51">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__destroy_helper_block_.178"
+                  moduleName = "emake"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/AppDelegate.m"
+                  timestampString = "561545263.390368"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "183"
+                  endingLineNumber = "183"
+                  offsetFromSymbolStart = "16">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -2113,11 +1936,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/Mine/Controller/YHSuperGroup/YHMySuperGroupViewController.m"
-            timestampString = "559793010.169036"
+            timestampString = "561491600.472631"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "119"
-            endingLineNumber = "119"
+            startingLineNumber = "115"
+            endingLineNumber = "115"
             landmarkName = "-tableView:cellForRowAtIndexPath:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2129,7 +1952,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.9444489"
+            timestampString = "561540562.2965699"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "263"
@@ -2145,11 +1968,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.h"
-            timestampString = "559969267.436731"
+            timestampString = "561491600.472796"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "154"
-            endingLineNumber = "154"
+            startingLineNumber = "153"
+            endingLineNumber = "153"
             landmarkName = "-applyInvoice:sucess:fialureBlock:"
             landmarkType = "6">
          </BreakpointContent>
@@ -2161,11 +1984,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/Product/View/ProductParametersView.m"
-            timestampString = "560486256.94654"
+            timestampString = "561491600.472892"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "479"
-            endingLineNumber = "479"
+            startingLineNumber = "487"
+            endingLineNumber = "487"
             landmarkName = "-nextVipVC"
             landmarkType = "7">
          </BreakpointContent>
@@ -2177,28 +2000,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "emake/App/Product/View/ProductParametersView.m"
-            timestampString = "560486256.946702"
+            timestampString = "561491600.472964"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1101"
-            endingLineNumber = "1101"
+            startingLineNumber = "1109"
+            endingLineNumber = "1109"
             landmarkName = "-getinsrancePrice111"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "emake/App/Product/View/ProductParametersView.m"
-            timestampString = "560486256.946777"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1492"
-            endingLineNumber = "1492"
-            landmarkName = "-getResultProduct:row:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2224,28 +2031,12 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "emake/App/Mine/Controller/YHMineCityDelegate/YHMineCityDelegateApplyViewController.m"
-            timestampString = "559969267.438386"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "385"
-            endingLineNumber = "385"
-            landmarkName = "-customerSevicerClick"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "emake/App/Mine/Controller/YHMineViewController.m"
-            timestampString = "559998819.411477"
+            timestampString = "561546278.815975"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "571"
-            endingLineNumber = "571"
+            startingLineNumber = "605"
+            endingLineNumber = "605"
             landmarkName = "-getcertification"
             landmarkType = "7">
          </BreakpointContent>
@@ -2256,28 +2047,12 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "emake/App/Product/View/ProductParametersView.m"
-            timestampString = "560486256.947052"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "466"
-            endingLineNumber = "466"
-            landmarkName = "-nextVipVC"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "emake/App/Mine/Controller/YHSetting/YHSettingViewController.m"
-            timestampString = "559969267.4386851"
+            timestampString = "561491600.473237"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "203"
-            endingLineNumber = "203"
+            startingLineNumber = "204"
+            endingLineNumber = "204"
             landmarkName = "-tableView:didSelectRowAtIndexPath:"
             landmarkType = "7">
          </BreakpointContent>
@@ -2288,24 +2063,8 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "emake/App/CustomerService/Controller/YHMainMessageCenterViewController.m"
-            timestampString = "560486256.94719"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "271"
-            endingLineNumber = "271"
-            landmarkName = "-getMessageList"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "emake/App/OrderManage/Controller/OrderControllerFile/YHOrderContractViewController.m"
-            timestampString = "559969267.438987"
+            timestampString = "560827717.1130331"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "63"
@@ -2327,22 +2086,6 @@
             startingLineNumber = "102"
             endingLineNumber = "102"
             landmarkName = "-countDownWithPER_SEC::"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "emake/App/OrderManage/Controller/YHOrderDetail/YHOrderDetailViewController.m"
-            timestampString = "559969267.4395519"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "98"
-            endingLineNumber = "98"
-            landmarkName = "-tableView:cellForRowAtIndexPath:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2384,13 +2127,61 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
+            filePath = "emake/App/Mine/Controller/YHMYMemberInterest/YHMineMemberInterestViewController.m"
+            timestampString = "561491600.473567"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "642"
+            endingLineNumber = "642"
+            landmarkName = "-VipIntroductionButtonClick"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/App/Product/View/ProductParametersView.m"
+            timestampString = "561491600.473986"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1108"
+            endingLineNumber = "1108"
+            landmarkName = "-getinsrancePrice111"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/AppDelegate.m"
+            timestampString = "561533704.523134"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "270"
+            endingLineNumber = "270"
+            landmarkName = "-application:openURL:sourceApplication:annotation:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
             filePath = "emake/NetWorkRequset/YHJsonRequest.m"
-            timestampString = "560486256.9488831"
+            timestampString = "561540562.296828"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2967"
-            endingLineNumber = "2967"
-            landmarkName = "-getUserCollectionProductSuccessBlock:fialureBlock:"
+            startingLineNumber = "3189"
+            endingLineNumber = "3189"
+            landmarkName = "-getAppVipExperienceSuccessBlock:fialureBlock:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2400,13 +2191,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "emake/App/OrderManage/Controller/YHOrderManageNewViewController.m"
-            timestampString = "560486256.950384"
+            filePath = "emake/NetWorkRequset/YHJsonRequest.m"
+            timestampString = "561540562.296877"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "611"
-            endingLineNumber = "611"
-            landmarkName = "-rcommBtnClick:"
+            startingLineNumber = "2744"
+            endingLineNumber = "2744"
+            landmarkName = "-userSearchProductWithParameter:SuccessBlock:fialureBlock:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2416,13 +2207,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "emake/App/Mine/Controller/YHMYMemberInterest/YHPayViewController.m"
-            timestampString = "560486256.953337"
+            filePath = "emake/App/Mine/Controller/YHMineViewController.m"
+            timestampString = "561546278.816146"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "196"
-            endingLineNumber = "196"
-            landmarkName = "-doAPPayWithOrderString:"
+            startingLineNumber = "655"
+            endingLineNumber = "655"
+            landmarkName = "-goUserIntroductionVC"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -2432,13 +2223,492 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "emake/App/Mine/Controller/YHMineCityDelegate/YHMineCityDelegateSuccessViewController.m"
-            timestampString = "560486256.9534709"
+            filePath = "emake/App/Mine/Controller/YHSetting/personalFile/YHPersonalFileViewController.m"
+            timestampString = "561491600.475534"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "217"
-            endingLineNumber = "217"
-            landmarkName = "-CityDevelopBottonClick"
+            startingLineNumber = "298"
+            endingLineNumber = "298"
+            landmarkName = "-tableView:didSelectRowAtIndexPath:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/App/Mine/View/YHShareView.m"
+            timestampString = "560944710.3809299"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "88"
+            endingLineNumber = "88"
+            landmarkName = "-initShareWithContentTitle:theOtherTitle:image:url:withCancleTitle:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/App/Mine/Controller/YHMineCityDelegate/YHMineCityDelegateApplyViewController.m"
+            timestampString = "561491600.4756759"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "332"
+            endingLineNumber = "332"
+            landmarkName = "-commitApply"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/App/Mine/Controller/YHMineCityDelegate/YHMineCityDelegateApplyViewController.m"
+            timestampString = "561491600.475739"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "355"
+            endingLineNumber = "355"
+            landmarkName = "-commitApply"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "-[YHMineCityDelegateApplyViewController commitApply]"
+                  moduleName = "emake"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/Mine/Controller/YHMineCityDelegate/YHMineCityDelegateApplyViewController.m"
+                  timestampString = "561545263.488144"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "355"
+                  endingLineNumber = "355"
+                  offsetFromSymbolStart = "1958">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__52-[YHMineCityDelegateApplyViewController commitApply]_block_invoke"
+                  moduleName = "emake"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/Mine/Controller/YHMineCityDelegate/YHMineCityDelegateApplyViewController.m"
+                  timestampString = "561545263.490118"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "355"
+                  endingLineNumber = "355"
+                  offsetFromSymbolStart = "19">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__destroy_helper_block_.380"
+                  moduleName = "emake"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/zhangshichao/Desktop/EmakeGit/emake/App/Mine/Controller/YHMineCityDelegate/YHMineCityDelegateApplyViewController.m"
+                  timestampString = "561545263.4920501"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "355"
+                  endingLineNumber = "355"
+                  offsetFromSymbolStart = "16">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/NetWorkRequset/YHJsonRequest.m"
+            timestampString = "561540562.297001"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "3165"
+            endingLineNumber = "3165"
+            landmarkName = "-getAppAgentApply:SuccessBlock:fialureBlock:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/ChatUI/ChatNewViewController.m"
+            timestampString = "561491600.47588"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1240"
+            endingLineNumber = "1240"
+            landmarkName = "-didTapMessageBubbleWithModel:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/App/CustomerService/Controller/YHMainMessageCenterViewController.m"
+            timestampString = "561546278.81627"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "274"
+            endingLineNumber = "274"
+            landmarkName = "-getMessageList"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/ChatUI/ChatNewViewController.m"
+            timestampString = "561491600.476006"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "252"
+            endingLineNumber = "252"
+            landmarkName = "-postOrderEvent"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/ChatUI/IMFMDB/FMDBManager.m"
+            timestampString = "561546278.816607"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "704"
+            endingLineNumber = "704"
+            landmarkName = "-isChatDataExistWith:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/App/MainPage/Controller/StoreFile/YHStoreDetailViewController.m"
+            timestampString = "561491600.4761831"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "310"
+            endingLineNumber = "310"
+            landmarkName = "-getStoreDetailData"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/App/Mine/Controller/YHSetting/personalFile/YHPersonalFileViewController.m"
+            timestampString = "561491600.476275"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "306"
+            endingLineNumber = "306"
+            landmarkName = "-tableView:didSelectRowAtIndexPath:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/AppDelegate.m"
+            timestampString = "561533704.523582"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "280"
+            endingLineNumber = "280"
+            landmarkName = "-application:openURL:options:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/AppDelegate.m"
+            timestampString = "561533704.523791"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "178"
+            endingLineNumber = "178"
+            landmarkName = "-application:openURL:sourceApplication:annotation:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/NetWorkRequset/YHJsonRequest.m"
+            timestampString = "561540562.2972521"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "3234"
+            endingLineNumber = "3234"
+            landmarkName = "-getAppCheckVipCoupon:SuccessBlock:fialureBlock:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/Utilities/NSDate+Common.m"
+            timestampString = "561491600.476469"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "137"
+            endingLineNumber = "137"
+            landmarkName = "+isValideTimeDifferenceWithLastLoginTime:currentLoginTime:ValidTime:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/App/Mine/Controller/YHMYMemberInterest/YHMineMemberInterestViewController.m"
+            timestampString = "561491629.29453"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "65"
+            endingLineNumber = "65"
+            landmarkName = "-getUserInfo"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/App/Mine/Controller/YHMYMemberInterest/YHMineMemberInterestViewController.m"
+            timestampString = "561491635.929414"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "78"
+            endingLineNumber = "78"
+            landmarkName = "-getMyVipData"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/App/Mine/Controller/YHMineViewController.m"
+            timestampString = "561546278.816885"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "384"
+            endingLineNumber = "384"
+            landmarkName = "-tableView:cellForRowAtIndexPath:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/Base/PSVCBase.m"
+            timestampString = "561546278.816939"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "543"
+            endingLineNumber = "543"
+            landmarkName = "-onCommand:andTopic:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/Base/PSVCBase.m"
+            timestampString = "561546278.816991"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "529"
+            endingLineNumber = "529"
+            landmarkName = "-onMessgae:andTopic:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/Base/PSVCBase.m"
+            timestampString = "561546278.8170381"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "197"
+            endingLineNumber = "197"
+            landmarkName = "-refreshMesssageCount"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/Base/PSVCBase.m"
+            timestampString = "561546278.817085"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "525"
+            endingLineNumber = "525"
+            landmarkName = "-onMessgae:andTopic:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/Base/PSVCBase.m"
+            timestampString = "561546278.817129"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "528"
+            endingLineNumber = "528"
+            landmarkName = "-onMessgae:andTopic:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/ChatUI/IMFMDB/FMDBManager.m"
+            timestampString = "561546278.8171721"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "502"
+            endingLineNumber = "502"
+            landmarkName = "-deleteUserListWithListID:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/Base/PSVCBase.m"
+            timestampString = "561546278.817216"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "616"
+            endingLineNumber = "616"
+            landmarkName = "-addToFMDB:messageId:sender:sendTime:msgType:staffName:staffAvata:withListID:clientID:storeInfo:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/Base/PSVCBase.m"
+            timestampString = "561546278.81726"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "626"
+            endingLineNumber = "626"
+            landmarkName = "-addToFMDB:messageId:sender:sendTime:msgType:staffName:staffAvata:withListID:clientID:storeInfo:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/Base/PSVCBase.m"
+            timestampString = "561546278.817302"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "623"
+            endingLineNumber = "623"
+            landmarkName = "-addToFMDB:messageId:sender:sendTime:msgType:staffName:staffAvata:withListID:clientID:storeInfo:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "emake/Base/PSVCBase.m"
+            timestampString = "561546278.817344"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "619"
+            endingLineNumber = "619"
+            landmarkName = "-addToFMDB:messageId:sender:sendTime:msgType:staffName:staffAvata:withListID:clientID:storeInfo:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

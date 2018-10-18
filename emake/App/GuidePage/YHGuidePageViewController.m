@@ -25,29 +25,11 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor whiteColor];
-    [self getcatagoryID];
+   
 
     [self configSubViews];
 }
--(void)getcatagoryID
-{
-    [[YHJsonRequest shared] getCatagoryIDsSuccessBlock:^(NSArray *success) {
-        
-        if (success.count>0) {
-            [[NSUserDefaults standardUserDefaults] setObject:success forKey:CatagoryIDs];
-            
-            
-        }else
-        {
-            [self.view makeToast:@"数据异常" duration:1.5 position:CSToastPositionCenter];
-        }
-        
-    } fialureBlock:^(NSString *errorMessages) {
-        [self.view makeToast:errorMessages duration:1.5 position:CSToastPositionCenter];
-        
-    }];
-    
-}
+
 
 - (void)configSubViews{
     

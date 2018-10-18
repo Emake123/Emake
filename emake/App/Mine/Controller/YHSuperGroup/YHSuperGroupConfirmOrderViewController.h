@@ -11,6 +11,7 @@
 @interface YHSuperGroupConfirmOrderViewController : PSVCBase
 @property(nonatomic,strong)YHSuperGroupModel *supermodel;
 @property(nonatomic,strong)YHSuperGroupInfoModel *infomodel;
+@property(nonatomic,assign)NSInteger recordIdex;//
 
 //@property(nonatomic,strong)NSString *number;
 

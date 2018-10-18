@@ -15,7 +15,7 @@
 @property (nonatomic,copy)NSString *Text;
 @property (nonatomic,copy)NSString *Image;
 @property (nonatomic,copy)NSString *Voice;
-@property (nonatomic,copy)NSString *VoiceDuration;
+@property (nonatomic,assign)int VoiceDuration;
 @property (nonatomic,copy)NSString *Url;
 @property (nonatomic,copy)NSString *ImageUrl;
 @property (nonatomic,assign)NSInteger UserState;
@@ -46,7 +46,7 @@
 - (instancetype)initWithImage:(NSString *)Image Text:(NSString *)Text ImageUrl:(NSString *)ImageUrl Url:(NSString *)Url Type:(NSString *)Type ContractType:(NSString *)ContractType Contract:(NSString *)Contract ContractState:(NSString *)ContractState IsIncludeTax:(NSString *)isIncludeTax;
 
 //发送音频
-- (instancetype)initWithVoicePath:(NSString *)voicePath voiceDuration:(NSString *)duration Type:(NSString *)Type;
+- (instancetype)initWithVoicePath:(NSString *)voicePath voiceDuration:( int)duration Type:(NSString *)Type;
 
 
 //发送文件

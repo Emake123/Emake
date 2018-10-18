@@ -11,4 +11,6 @@
 @interface YHMineMemberInterestViewController : PSVCBase
 
 @property(nonatomic,assign)BOOL isExperienceVip;
+@property(nonatomic,assign)NSInteger vipcount;
+
 @end

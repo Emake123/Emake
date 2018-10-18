@@ -135,10 +135,10 @@
         UILabel *productTip = [[UILabel alloc]init];
         productTip.text =@"含税，不含运费";
         productTip.textColor = ColorWithHexString(@"FF9900");
-        productTip.font = [UIFont systemFontOfSize:AdaptFont(13)];
+        productTip.font = [UIFont systemFontOfSize:AdaptFont(11)];
         [self addSubview:productTip];
         [productTip mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.left.mas_equalTo(itemImage.mas_right).offset(WidthRate(5));
+            make.left.mas_equalTo(itemImage.mas_right).offset(WidthRate(2));
             make.top.mas_equalTo(originalPrice.mas_bottom).offset(5);
         }];
         self.productTip = productTip;
@@ -243,7 +243,13 @@
     if (imageArr.count>0) {
         [self.itemImage sd_setImageWithURL:[NSURL URLWithString:imageArr.firstObject]];
     }
-    self.freightPrice.text =[NSString stringWithFormat:@"¥%@ 起",[Tools getHaveNum:model.GroupPrice.doubleValue]] ;
+    
+    NSString *freightStr =  [NSString stringWithFormat:@"¥%@ 起",[Tools getHaveNum:model.GroupPrice.doubleValue]];
+    NSMutableAttributedString *attrStr1 = [[NSMutableAttributedString alloc] initWithString:freightStr];
+    [attrStr1 addAttribute:NSFontAttributeName
+                     value:[UIFont systemFontOfSize:AdaptFont(17)]
+                     range:NSMakeRange(freightStr.length-1, 1)];
+    self.freightPrice.attributedText = attrStr1 ;
     
     NSString *origianPrice =[NSString stringWithFormat:@"%@ 原价",[Tools getHaveNum:model.OldPrice.doubleValue]];
     NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:origianPrice];
@@ -253,11 +259,10 @@
     self.originalPrice.attributedText = attrStr;
     
     self.productTip.text = model.GoodsAddValue;
-    self.groupPrice.text = [NSString stringWithFormat:@"¥%@ ",[Tools getHaveNum:model.GroupPrice.doubleValue]];
-    self.dateEnd.text = [NSString stringWithFormat:@"距离结束%@天 %@时%@分%@秒",model.Day,model.Hour,@"0",@"0"];
+    self.groupPrice.text = [NSString stringWithFormat:@"¥%@ ",[Tools getHaveNum:model.infoModel.GroupPrice.doubleValue]];
     self.groupNmberLable.text = [NSString stringWithFormat:@"%@人团",model.infoModel.PeopleNumber];
     self.productCap1.text = [NSString stringWithFormat:@"还差%ld人拼成",(model.infoModel.PeopleNumber.integerValue-model.infoModel.PeopleReadyNumber.integerValue)];
-    self.dateEnd.text = [NSString stringWithFormat:@"还剩%@天 %@",model.Day,model.Hour];
+    self.dateEnd.text = [NSString stringWithFormat:@"还剩%@天 %@",model.infoModel.Day,model.infoModel.Hour];
     
     self.successImageView.hidden = !model.infoModel.IsSuccess.boolValue;
 }

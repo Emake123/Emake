@@ -29,8 +29,10 @@
 #import "YHSendMessageToStoreListViewController.h"
 #import "YHMainMessageCenterViewController.h"
 #import <AlipaySDK/AlipaySDK.h>
-
-@interface AppDelegate ()<UITabBarControllerDelegate,YHSendFileTipsViewDelegete,UNUserNotificationCenterDelegate>{
+#import "WXApi.h"
+#import "YHSuperGroupDetailViewController.h"
+#import "YHPayViewController.h"
+@interface AppDelegate ()<UITabBarControllerDelegate,YHSendFileTipsViewDelegete,UNUserNotificationCenterDelegate,WXApiDelegate>{
     // iOS 10通知中心
     UNUserNotificationCenter *_notificationCenter;
     NSTimer *_timer;
@@ -46,6 +48,9 @@ static NSUserDefaults * _Nonnull extracted() {
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    //获取首页云工厂的ids
+    [self getcatagoryID];
  
     //注册通知
     [[JZUserNotification sharedNotification] registerNotification];
@@ -56,6 +61,8 @@ static NSUserDefaults * _Nonnull extracted() {
     //shareSDK
     [self registerShareSDK];
     
+    [[NSUserDefaults standardUserDefaults] setObject:@(0) forKey:TitleIndex];
+
     //友盟统计
     UMConfigInstance.appKey = UMMobClikAPPKey;
     UMConfigInstance.channelId = @"App Store";
@@ -65,6 +72,7 @@ static NSUserDefaults * _Nonnull extracted() {
     //Bugly
     [Bugly startWithAppId:EmakeAppleID];
     
+
     
     /*----------   阿里Push  -----------*/
     // APNs注册，获取deviceToken并上报
@@ -110,6 +118,19 @@ static NSUserDefaults * _Nonnull extracted() {
     [self.window makeKeyAndVisible];
     return YES;
 }
+
+-(void)getcatagoryID
+{
+    [[YHJsonRequest shared] getCatagoryIDsSuccessBlock:^(NSArray *success) {
+        
+        [[NSUserDefaults standardUserDefaults] setObject:success forKey:CatagoryIDs];
+        
+    } fialureBlock:^(NSString *errorMessages) {
+        
+    }];
+    
+}
+
 - (void)applicationWillResignActive:(UIApplication *)application {
     
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -133,6 +154,10 @@ static NSUserDefaults * _Nonnull extracted() {
   
     if([CLOUD_URL(@"") containsString:@"mallapi.emake.cn"]){
         [self getAppVersion];
+    }else
+    {
+        [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:HidenCatagoryVip];//is_payment 是否展示付款信息 0 不展示 1 展示
+
     }
     
 }
@@ -148,19 +173,58 @@ static NSUserDefaults * _Nonnull extracted() {
 }
 //scheme打开APP调用
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-    
+    NSLog(@"appde==host=%@",url.host);
+
+    if ([url.host isEqualToString:@"pay"]) {
+        UIViewController *vc = [Tools currentViewController];
+        return [WXApi handleOpenURL:url delegate:vc];
+    }
     if ([url.host isEqualToString:@"safepay"]) {
         [[AlipaySDK defaultService] processOrderWithPaymentResult:url standbyCallback:^(NSDictionary *resultDic) {
             //【由于在跳转支付宝客户端支付的过程中，商户app在后台很可能被系统kill了，所以pay接口的callback就会失效，请商户对standbyCallback返回的回调结果进行处理,就是在这个方法里面处理跟callback一样的逻辑】
             NSLog(@"result = %@",resultDic);
+            NSString *resultStatus = resultDic[@"resultStatus"];
+            NSInteger successState = 0;
+            //8000 正在处理中 4000  订单支付失败 6001 用户中途取消/重复操作取消 6002  网络连接出错
+            
+            if([resultStatus isEqualToString:@"6001"])
+            {
+                successState =1;
+                
+            }else//取消
+            {
+                
+                successState = [resultStatus isEqualToString:@"9000"]==YES?2:0;
+                [self payState:successState];
+                
+            }
         }];
+        return YES;
+
     }
     if ([url.host isEqualToString:@"platformapi"]){//支付宝钱包快登授权返回authCode
         
         [[AlipaySDK defaultService] processAuthResult:url standbyCallback:^(NSDictionary *resultDic) {
             //【由于在跳转支付宝客户端支付的过程中，商户app在后台很可能被系统kill了，所以pay接口的callback就会失效，请商户对standbyCallback返回的回调结果进行处理,就是在这个方法里面处理跟callback一样的逻辑】
             NSLog(@"result = %@",resultDic);
+            NSString *resultStatus = resultDic[@"resultStatus"];
+            NSInteger successState = 0;
+            //8000 正在处理中 4000  订单支付失败 6001 用户中途取消/重复操作取消 6002  网络连接出错
+            
+            if([resultStatus isEqualToString:@"6001"])
+            {
+                successState =1;
+                
+            }else//取消
+            {
+                
+                successState = [resultStatus isEqualToString:@"9000"]==YES?2:0;
+                [self payState:successState];
+                
+            }
         }];
+        return YES;
+
     }
     if ([url.absoluteString containsString:@"emakeNice"]) {
         NSArray * array = [url.absoluteString componentsSeparatedByString:@"?"];
@@ -171,6 +235,7 @@ static NSUserDefaults * _Nonnull extracted() {
             [[NSUserDefaults standardUserDefaults] setObject:items[1] forKey:LOGIN_MOBILEPHONE];
             self.window.rootViewController = loginViewController;
         }
+        return YES;
     }
     if (self.window) {
         if (url) {
@@ -212,6 +277,35 @@ static NSUserDefaults * _Nonnull extracted() {
 }
 // NOTE:9.0以后使用新API接口
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<NSString*, id> *)options{
+    NSLog(@"appde==host=%@",url.host);
+    if ([url.host isEqualToString:@"pay"]) {
+        UIViewController *vc = [Tools currentViewController];
+        return [WXApi handleOpenURL:url delegate:vc];
+    }
+    if ([url.host isEqualToString:@"safepay"]) {
+        [[AlipaySDK defaultService] processOrderWithPaymentResult:url standbyCallback:^(NSDictionary *resultDic) {
+            //【由于在跳转支付宝客户端支付的过程中，商户app在后台很可能被系统kill了，所以pay接口的callback就会失效，请商户对standbyCallback返回的回调结果进行处理,就是在这个方法里面处理跟callback一样的逻辑】
+            
+            NSString *resultStatus = resultDic[@"resultStatus"];
+            NSInteger successState = 0;
+            //8000 正在处理中 4000  订单支付失败 6001 用户中途取消/重复操作取消 6002  网络连接出错
+            
+            if([resultStatus isEqualToString:@"6001"])
+            {
+                successState =1;
+                
+            }else//取消
+            {
+                
+                successState = [resultStatus isEqualToString:@"9000"]==YES?2:0;
+                [self payState:successState];
+                
+            }
+            NSLog(@"result = %@",resultDic);
+        }];
+        return YES;
+
+    }
     if ([url.absoluteString containsString:@"emakeNice"]) {
         NSArray * array = [url.absoluteString componentsSeparatedByString:@"?"];
         if (array[0]) {
@@ -222,6 +316,34 @@ static NSUserDefaults * _Nonnull extracted() {
             [[NSUserDefaults standardUserDefaults] synchronize];
             self.window.rootViewController = loginViewController;
         }
+        return YES;
+
+    }
+    if ([url.host isEqualToString:@"platformapi"]){//支付宝钱包快登授权返回authCode
+        
+        [[AlipaySDK defaultService] processAuthResult:url standbyCallback:^(NSDictionary *resultDic) {
+            //【由于在跳转支付宝客户端支付的过程中，商户app在后台很可能被系统kill了，所以pay接口的callback就会失效，请商户对standbyCallback返回的回调结果进行处理,就是在这个方法里面处理跟callback一样的逻辑】
+            
+            NSString *resultStatus = resultDic[@"resultStatus"];
+            NSInteger successState = 0;
+            //8000 正在处理中 4000  订单支付失败 6001 用户中途取消/重复操作取消 6002  网络连接出错
+            
+            if([resultStatus isEqualToString:@"6001"])
+            {
+                successState =1;
+                
+            }else//取消
+            {
+                
+                successState = [resultStatus isEqualToString:@"9000"]==YES?2:0;
+                [self payState:successState];
+                
+            }
+       
+            NSLog(@"result = %@",resultDic);
+        }];
+        return YES;
+
     }
     if (self.window) {
         if (url) {
@@ -605,6 +727,10 @@ static NSUserDefaults * _Nonnull extracted() {
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
     NSString *app_Version = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
     [[YHJsonRequest shared] getAppVersionSucceededBlock:^(NSDictionary *dict){
+        NSString *is_paymentstr =  dict[@"is_payment"];
+        [[NSUserDefaults standardUserDefaults] setObject:is_paymentstr forKey:HidenCatagoryVip];//is_payment 是否展示付款信息 0 不展示 1 展示
+        
+
         if (![[dict objectForKey:@"app_version"] isEqualToString:app_Version]) {
             if ([[dict objectForKey:@"is_update"] isEqualToString:@"2"]) {
                 if ([dict objectForKey:@"app_version"]&&[dict objectForKey:@"update_text"]) {
@@ -655,5 +781,43 @@ static NSUserDefaults * _Nonnull extracted() {
     _backIden = UIBackgroundTaskInvalid;
 }
 
-
+-(void)payState:(NSInteger )successState
+{
+    YHPayViewController *vc =( YHPayViewController *) [Tools currentViewController];
+    NSDictionary *dic;
+    dic = @{@"NsuserDefaultsPaySuccessState":@(successState),@"OrderNo":vc.OrderNo.length>0?vc.OrderNo:@""};
+    
+    if (vc.isHidenTopTitle==false) {//超级团付款
+        
+        
+        if (successState==2) {
+            for (UIViewController *vc2 in vc.navigationController.viewControllers) {
+                if ([vc2 isKindOfClass:[YHSuperGroupDetailViewController class]]) {
+                    YHSuperGroupDetailViewController *vc11 = (YHSuperGroupDetailViewController *)vc2;
+                    [[Tools currentNavigationController] popToViewController:vc11 animated:YES];
+                }
+            }
+            [[NSNotificationCenter defaultCenter] postNotificationName:NsuserDefaultsPaySuccessState object:nil userInfo:dic];
+        } else {
+            
+            [[Tools currentNavigationController] popViewControllerAnimated:YES];
+            [[NSNotificationCenter defaultCenter] postNotificationName:NsuserDefaultsPayFailState object:nil userInfo:dic];
+            
+        }
+    } else {//会员付款
+        if (successState==1) {
+            [vc.view makeToast:@"支付已取消，请重新支付" duration:2 position:CSToastPositionCenter];
+            return;
+        }
+        if (successState==-1) {
+            [vc.view makeToast:@"支付失败，请重新支付" duration:2 position:CSToastPositionCenter];
+            return;
+        }
+        [[NSNotificationCenter defaultCenter] postNotificationName:NsuserDefaultsPaySuccessState object:nil userInfo:dic];
+        
+        [[Tools currentNavigationController] popViewControllerAnimated:YES];
+        dic = @{@"NsuserDefaultsPaySuccessState":@(successState)};
+    }
+    
+}
 @end

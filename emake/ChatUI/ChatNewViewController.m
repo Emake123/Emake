@@ -52,6 +52,8 @@
 @property (nonatomic,copy)NSString *contractType;
 @property (nonatomic,assign)BOOL isMessageDisplay;
 @property (nonatomic,copy)NSString *lastTimeSendMessage;
+@property (nonatomic,copy)NSString *differentListID;
+
 @end
 
 @implementation ChatNewViewController
@@ -136,14 +138,17 @@
             if (self.page == 1 && self.isPostOrderDetail == true) {
                 [self didSelectProduct];
                 [self.messageList.messageCollectionView.mj_header endRefreshing];
+                self.isPostOrderDetail = false;
             }
             if (self.page == 1 && self.isPostOrder == true) {
                 [self postOrderEvent];
                 [self.messageList.messageCollectionView.mj_header endRefreshing];
+                self.isPostOrder = false;
+
             }else{
                 [self.messageList.messageCollectionView.mj_header endRefreshing];
             }
-            if (self.page == 1 && self.storeID == nil) {
+            if (self.page == 1 ) {
                 [self getMessageClassifyList];
             }
         });
@@ -166,6 +171,8 @@
 //快捷问题的问答
 - (void)getMessageClassifyList{
     if ([[FMDBManager sharedManager] classifyQuestionTodayMessageIsAlreadyExistWithListID:self.listID]) {
+        [self.messageList scrollToBottomWith:YES];
+
         return;
     }
     [[YHJsonRequest shared] getAppAdviceSuccessBlock:^(NSDictionary *dict) {
@@ -187,7 +194,7 @@
     [self.messageList scrollToBottomWith:YES];
 }
 //展示Tips消息
-- (void)displayMessageTipsEvent:(NSString *)tips{
+- (void)displayMessageTipsEvent:(NSString *)tips  isNotShow:(BOOL)isNotShow{
     NSString *messageIdString = [[NSUUID UUID] UUIDString];
     NSString *currentTime = [NSDate getCurrentTimeStr];
     NSString *showStr = [self autoReplyOnNight];
@@ -197,13 +204,21 @@
     }else{
         sendShowStr = tips;
     }
-    MessageEventTipsModel *eventModel = [[MessageEventTipsModel alloc] initWithMsgId:messageIdString eventText:tips];
-    [self.messageList appendMessageWith: eventModel];
-    [self.messageList scrollToBottomWith:YES];
-    //附加消息
-    //上个页面传过来的
-    [self addToAddtionalFMDB:tips messageId:messageIdString sender:@"0" sendTime:currentTime msgType:@"SEND_Tips" staffName:@"" staffAvata:@"" andListID:self.listID];
-    [self.messageList scrollToBottomWith:YES];
+    if (isNotShow==YES) { //当前页面要展示
+        MessageEventTipsModel *eventModel = [[MessageEventTipsModel alloc] initWithMsgId:messageIdString eventText:tips];
+        [self.messageList appendMessageWith: eventModel];
+        //附加消息
+        //上个页面传过来的
+        [self addToAddtionalFMDB:tips messageId:messageIdString sender:@"0" sendTime:currentTime msgType:@"SEND_Tips" staffName:@"" staffAvata:@"" andListID:self.listID];
+        [self.messageList scrollToBottomWith:YES];
+    }else//当前页面不需要展示
+    {
+       
+        [self addToAddtionalFMDB:tips messageId:messageIdString sender:@"0" sendTime:currentTime msgType:@"SEND_Tips" staffName:@"" staffAvata:@"" andListID:self.differentListID];
+        self.differentListID = self.listID;
+    }
+
+
 }
 //数据库拿取数据
 - (void)displayHistoryListWithPage{
@@ -243,7 +258,7 @@
     UserModel *user = [UserModel new];
     user.isOutgoing = true;
     NSString *CurrentTime = [NSDate getCurrentTimeStr];
-    NSString *timeStr = [self isNeedShowTime:CurrentTime lastSendMessageTime:self.lastTimeSendMessage];
+//    NSString *timeStr = [self isNeedShowTime:CurrentTime lastSendMessageTime:self.lastTimeSendMessage];
     NSString *messageIdString = [[NSUUID UUID] UUIDString];
     YHFileModel *fileModel = [[YHFileModel alloc]init];
     fileModel.FileName = self.fileName;
@@ -260,14 +275,14 @@
                     [self sendCMDRequestService];
                 }else{
                     self.lastTimeSendMessage = CurrentTime;
-                    MessageModel *message = [[MessageModel alloc] initWithFileText:jsonStr messageId:filePath fromUser:user timeString:timeStr isOutgoing:YES status:IMUIMessageStatusFailed];
+                    MessageModel *message = [[MessageModel alloc] initWithFileText:jsonStr messageId:filePath fromUser:user timeString:CurrentTime isOutgoing:YES status:IMUIMessageStatusFailed];
                     [_messageList appendMessageWith: message];
                     [self.messageList scrollToBottomWith:YES];
                 }
             }];
         }else{
             self.lastTimeSendMessage = CurrentTime;
-            MessageModel *message = [[MessageModel alloc] initWithFileText:jsonStr messageId:filePath fromUser:user timeString:timeStr isOutgoing:YES status:IMUIMessageStatusFailed];
+            MessageModel *message = [[MessageModel alloc] initWithFileText:jsonStr messageId:filePath fromUser:user timeString:CurrentTime isOutgoing:YES status:IMUIMessageStatusFailed];
             [_messageList appendMessageWith: message];
             [self.messageList scrollToBottomWith:YES];
         }
@@ -275,7 +290,7 @@
     } failBLock:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             self.lastTimeSendMessage = CurrentTime;
-            MessageModel *message = [[MessageModel alloc] initWithFileText:jsonStr messageId:filePath fromUser:user timeString:timeStr isOutgoing:YES status:IMUIMessageStatusFailed];
+            MessageModel *message = [[MessageModel alloc] initWithFileText:jsonStr messageId:filePath fromUser:user timeString:CurrentTime isOutgoing:YES status:IMUIMessageStatusFailed];
             [_messageList appendMessageWith: message];
             [self.messageList scrollToBottomWith:YES];
         });
@@ -286,7 +301,7 @@
 - (void)displayHistoryList:(NSArray *)insertListData{
     
     for (SDChatMessage *msg in insertListData){
-        NSString *timeString = [self isNeedShowTime:msg.sendTime lastSendMessageTime:self.lastTimeSendMessage];
+        NSString *timeString = [self isNeedShowTime:msg.sendTime lastSendMessageTime:[Tools getCurrentTimeInterval]];
         self.lastTimeSendMessage = msg.sendTime;
         if ([self.messageList.chatDataManager.allMsgidArr containsObject:msg.msgID]) {
             return;
@@ -322,7 +337,7 @@
                     [data writeToFile:[Tools getVoicePath:voiceLastComponent] atomically:YES];
                 }
             }
-            MessageModel *  message = [[MessageModel alloc] initWithVoicePath:[Tools getVoicePath:voiceLastComponent] duration:voiceModel.VoiceLength.integerValue  messageId:msg.msgID fromUser:user timeString:timeString isOutgoing:[msg.sender integerValue] status:IMUIMessageStatusSuccess];
+            MessageModel *  message = [[MessageModel alloc] initWithVoicePath:[Tools getVoicePath:voiceLastComponent] duration:voiceModel.VoiceLength  messageId:msg.msgID fromUser:user timeString:timeString isOutgoing:[msg.sender integerValue] status:IMUIMessageStatusSuccess];
             [_messageList insertMessageWith: message];
         }else if([msg.msgType isEqualToString:@"SEND_File"]){
             YHFileModel *fileModel = [YHFileModel mj_objectWithKeyValues:msg.msg];
@@ -345,12 +360,14 @@
         }
     }
     if (self.page == 1) {
-        [self.messageList scrollToBottomWith:YES];
+//        [self.messageList scrollToBottomWith:YES];
     }
 }
 //发送客服接入请求（待定）
 - (void)sendCMDRequestService{
     NSArray *customer_ids;
+  BOOL isCurrentChatRoom = [self.listID isEqualToString:self.differentListID];
+
     if ([self.listID containsString:@"_"]) {
         NSString *serverList = [[FMDBManager sharedManager] getServerListWithStoreID:self.storeID];
         customer_ids = [serverList mj_JSONObject];
@@ -359,7 +376,7 @@
     }
     if (customer_ids.count<=0) {
         dispatch_sync(dispatch_get_main_queue(), ^{
-            [self displayMessageTipsEvent:@"客服接入中"];
+            [self displayMessageTipsEvent:@"客服接入中" isNotShow:isCurrentChatRoom];
         });
         NSString *userID = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERID];
         NSString *topic = [NSString stringWithFormat:@"user/%@",userID];
@@ -370,7 +387,7 @@
                 storeID = array[0];
             }
         }
-        MQTTCommandModel *model = [[MQTTCommandModel alloc] creatRequestServiceCMD:userID andStoreId:storeID lastMessageId:0];
+        MQTTCommandModel *model = [[MQTTCommandModel alloc] creatRequestServiceCMD:userID andStoreId:storeID lastMessageId:0 catagoryParams:@{@"isCatagory":@(self.isCatagory)}];
         [[YHMQTTClient sharedClient] sendCommmand:[model mj_keyValues] withSelfTopic:topic complete:^(NSError *error) {
             
             
@@ -378,13 +395,17 @@
     }
 }
 //是否显示时间
-- (NSString *)isNeedShowTime:(NSString *)currentTime lastSendMessageTime:(NSString *)lastTime{
+- (NSString *)isNeedShowTime:(NSString *)lastTime lastSendMessageTime:(NSString *)currentTime{
+    if (lastTime.integerValue==0) {
+        lastTime = [Tools getCurrentTimeInterval];
+    }
+    NSLog(@" lastTime==%@---currentTime==%@ ",lastTime,currentTime);
     BOOL isNeedShow = [NSDate isValideTimeIntervalDifferenceWithTime:lastTime currentTime:currentTime];
-    self.lastTimeSendMessage = currentTime;
+    self.lastTimeSendMessage = lastTime;
     if (!isNeedShow) {
         return @"";
     }
-    return [Tools stringFromTimestamp:currentTime];
+    return [Tools stringFromTimestamp:lastTime];
 }
 
 - (void)clickMicBtn{
@@ -438,7 +459,7 @@
     //    1－－星期天/ 2－－星期一 /3－－星期二 /4－－星期三 /5－－星期四 /6－－星期五 /6－－星期五 /7－－星期六
     NSString *callStr = [self autoReplyOnNight];
     if (callStr.length>0) {
-        [self displayMessageTipsEvent:callStr];
+        [self displayMessageTipsEvent:callStr isNotShow:YES ];
     }
 }
 #pragma mark - IMUIInputViewDelegate
@@ -446,7 +467,7 @@
 - (void)sendTextMessage:(NSString * _Nonnull)messageText {
     NSString *messageIdString = [[NSUUID UUID] UUIDString];
     NSString *currentTime = [NSDate getCurrentTimeStr];
-    NSString *timeStr = [self isNeedShowTime:currentTime lastSendMessageTime:self.lastTimeSendMessage];
+//    NSString *timeStr = [self isNeedShowTime:currentTime lastSendMessageTime:self.lastTimeSendMessage];
     UserModel *user = [UserModel new];
     user.isOutgoing = YES;
     chatNewModel *model = [self creatMessageModelData:messageText andType:@"Text" messageIdString:messageIdString];
@@ -459,14 +480,14 @@
                 
             }else{
                 self.lastTimeSendMessage = currentTime;
-                MessageModel *message = [[MessageModel alloc] initWithText:messageText messageId:messageIdString fromUser:user timeString:timeStr isOutgoing:YES status:IMUIMessageStatusFailed];
+                MessageModel *message = [[MessageModel alloc] initWithText:messageText messageId:messageIdString fromUser:user timeString:currentTime isOutgoing:YES status:IMUIMessageStatusFailed];
                 [self.messageList appendMessageWith:message];
                 [self.messageList scrollToBottomWith:YES];
             }
         }];
     }else{
         self.lastTimeSendMessage = currentTime;
-        MessageModel *message = [[MessageModel alloc] initWithText:messageText messageId:messageIdString fromUser:user timeString:timeStr isOutgoing:YES status:IMUIMessageStatusFailed];
+        MessageModel *message = [[MessageModel alloc] initWithText:messageText messageId:messageIdString fromUser:user timeString:currentTime isOutgoing:YES status:IMUIMessageStatusFailed];
         [self.messageList appendMessageWith:message];
         [self.messageList scrollToBottomWith:YES];
     }
@@ -498,10 +519,10 @@
     user.isOutgoing = true;
     NSString *messageIdString = [[NSUUID UUID] UUIDString];
     NSString *currentTime = [NSDate getCurrentTimeStr];
-    NSString *timeStr = [self isNeedShowTime:currentTime lastSendMessageTime:self.lastTimeSendMessage];
+//    NSString *timeStr = //[self isNeedShowTime:currentTime lastSendMessageTime:self.lastTimeSendMessage];
     YHChatVoiceModel *voiceModel = [[YHChatVoiceModel alloc] init];
     voiceModel.VoiceFilePath = voicePath;
-    voiceModel.VoiceLength = [NSString stringWithFormat:@"%d",(int)durationTime];
+    voiceModel.VoiceLength = durationTime;
     NSURL *voicePathUrl = [NSURL URLWithString:voicePath];
     NSString *voiceDataStr = [voiceModel mj_JSONString];
     [[OSSClientLike sharedClient] uploadVoiceObjectAsync:voicePath withFileName:[voicePathUrl lastPathComponent] andType:voice succcessBlock:^{
@@ -513,14 +534,14 @@
                         [self sendCMDRequestService];
                     }else{
                         self.lastTimeSendMessage = currentTime;
-                        MessageModel *message = [[MessageModel alloc] initWithVoicePath:[Tools getVoicePath:voicePath] duration:durationTime messageId:model.MessageID fromUser:user timeString:timeStr isOutgoing:user.isOutgoing status:IMUIMessageStatusFailed];
+                        MessageModel *message = [[MessageModel alloc] initWithVoicePath:[Tools getVoicePath:voicePath] duration:durationTime messageId:model.MessageID fromUser:user timeString:currentTime isOutgoing:user.isOutgoing status:IMUIMessageStatusFailed];
                         [self.messageList appendMessageWith:message];
                         [self.messageList scrollToBottomWith:YES];
                     }
                 }];
             }else{
                 self.lastTimeSendMessage = currentTime;
-                MessageModel *message = [[MessageModel alloc] initWithVoicePath:[Tools getVoicePath:voicePath] duration:durationTime messageId:model.MessageID fromUser:user timeString:timeStr isOutgoing:user.isOutgoing status:IMUIMessageStatusFailed];
+                MessageModel *message = [[MessageModel alloc] initWithVoicePath:[Tools getVoicePath:voicePath] duration:durationTime messageId:model.MessageID fromUser:user timeString:currentTime isOutgoing:user.isOutgoing status:IMUIMessageStatusFailed];
                 [self.messageList appendMessageWith:message];
                 [self.messageList scrollToBottomWith:YES];
             }
@@ -530,7 +551,7 @@
     } failBLock:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             self.lastTimeSendMessage = currentTime;
-            MessageModel *message = [[MessageModel alloc] initWithVoicePath:voicePath duration:durationTime messageId:messageIdString fromUser:user timeString:timeStr isOutgoing:YES status:IMUIMessageStatusFailed];
+            MessageModel *message = [[MessageModel alloc] initWithVoicePath:voicePath duration:durationTime messageId:messageIdString fromUser:user timeString:currentTime isOutgoing:YES status:IMUIMessageStatusFailed];
             [_messageList appendMessageWith: message];
             [self.messageList scrollToBottomWith:YES];
         });
@@ -557,7 +578,7 @@
                     
                     NSString *messageIdString = [[NSUUID UUID] UUIDString];
                     NSString *CurrentTime = [NSDate getCurrentTimeStr];
-                    NSString *timeStr = [self isNeedShowTime:CurrentTime lastSendMessageTime:self.lastTimeSendMessage];
+//                    NSString *timeStr = [self isNeedShowTime:CurrentTime lastSendMessageTime:self.lastTimeSendMessage];
                     NSString *filePath = [self getPath:messageIdString];
                     UserModel *user = [UserModel new];
                     user.isOutgoing = true;
@@ -577,15 +598,15 @@
                                     if (!error) {
                                         [self sendCMDRequestService];
                                     }else{
-                                        self.lastTimeSendMessage = timeStr;
-                                        MessageModel *message = [[MessageModel alloc] initWithImagePath:[Tools getPath:fileName] messageId:model.MessageID fromUser:user timeString:timeStr isOutgoing:user.isOutgoing status:IMUIMessageStatusFailed];
+                                        self.lastTimeSendMessage = CurrentTime;
+                                        MessageModel *message = [[MessageModel alloc] initWithImagePath:[Tools getPath:fileName] messageId:model.MessageID fromUser:user timeString:CurrentTime isOutgoing:user.isOutgoing status:IMUIMessageStatusFailed];
                                         [self.messageList appendMessageWith:message];
                                         [self.messageList scrollToBottomWith:YES];
                                     }
                                 }];
                             }else{
-                                self.lastTimeSendMessage = timeStr;
-                                MessageModel *message = [[MessageModel alloc] initWithImagePath:[Tools getPath:fileName] messageId:model.MessageID fromUser:user timeString:timeStr isOutgoing:user.isOutgoing status:IMUIMessageStatusFailed];
+                                self.lastTimeSendMessage = CurrentTime;
+                                MessageModel *message = [[MessageModel alloc] initWithImagePath:[Tools getPath:fileName] messageId:model.MessageID fromUser:user timeString:CurrentTime isOutgoing:user.isOutgoing status:IMUIMessageStatusFailed];
                                 [self.messageList appendMessageWith: message];
                                 [self.messageList scrollToBottomWith:YES];
                             }
@@ -593,8 +614,8 @@
                         });
                     }failBLock:^{
                         dispatch_async(dispatch_get_main_queue(), ^{
-                            self.lastTimeSendMessage = timeStr;
-                            MessageModel *message = [[MessageModel alloc] initWithImagePath:[Tools getPath:fileName] messageId:messageIdString fromUser:user timeString:timeStr isOutgoing:true status:IMUIMessageStatusFailed];
+                            self.lastTimeSendMessage = CurrentTime;
+                            MessageModel *message = [[MessageModel alloc] initWithImagePath:[Tools getPath:fileName] messageId:messageIdString fromUser:user timeString:CurrentTime isOutgoing:true status:IMUIMessageStatusFailed];
                             [_messageList appendMessageWith: message];
                             [self.messageList scrollToBottomWith:YES];
                         });
@@ -618,7 +639,7 @@
     UserModel *user = [UserModel new];
     user.isOutgoing = true;
     NSString *CurrentTime = [NSDate getCurrentTimeStr];
-    NSString *timeStr = [self isNeedShowTime:CurrentTime lastSendMessageTime:self.lastTimeSendMessage];
+//    NSString *timeStr = [self isNeedShowTime:CurrentTime lastSendMessageTime:self.lastTimeSendMessage];
     UIImage *imgae =[UIImage imageWithData:picture];
     NSString *fileName = [NSString stringWithFormat:@"%@.png",messageIdString];
     if (![[NSFileManager defaultManager] fileExistsAtPath:[Tools getPath:fileName]]) {
@@ -637,14 +658,14 @@
                         [self sendCMDRequestService];
                     }else{
                         self.lastTimeSendMessage = CurrentTime;
-                        MessageModel *message = [[MessageModel alloc] initWithImagePath:[Tools getPath:fileName] messageId:messageIdString fromUser:user timeString:timeStr isOutgoing:true status:IMUIMessageStatusFailed];
+                        MessageModel *message = [[MessageModel alloc] initWithImagePath:[Tools getPath:fileName] messageId:messageIdString fromUser:user timeString:CurrentTime isOutgoing:true status:IMUIMessageStatusFailed];
                         [_messageList appendMessageWith:message];
                         [self.messageList scrollToBottomWith:YES];
                     }
                 }];
             }else{
                 self.lastTimeSendMessage = CurrentTime;
-                MessageModel *message = [[MessageModel alloc] initWithImagePath:[Tools getPath:fileName] messageId:messageIdString fromUser:user timeString:timeStr isOutgoing:true status:IMUIMessageStatusFailed];
+                MessageModel *message = [[MessageModel alloc] initWithImagePath:[Tools getPath:fileName] messageId:messageIdString fromUser:user timeString:CurrentTime isOutgoing:true status:IMUIMessageStatusFailed];
                 [_messageList appendMessageWith:message];
                 [self.messageList scrollToBottomWith:YES];
             }
@@ -656,7 +677,7 @@
             user.isOutgoing = true;
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.lastTimeSendMessage = CurrentTime;
-                MessageModel *message = [[MessageModel alloc] initWithImagePath:[Tools getPath:fileName] messageId:messageIdString fromUser:user timeString:timeStr isOutgoing:true status:IMUIMessageStatusFailed];
+                MessageModel *message = [[MessageModel alloc] initWithImagePath:[Tools getPath:fileName] messageId:messageIdString fromUser:user timeString:CurrentTime isOutgoing:true status:IMUIMessageStatusFailed];
                 [_messageList appendMessageWith:message];
                 [self.messageList scrollToBottomWith:YES];
             });
@@ -696,19 +717,17 @@
     NSString *phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
 //    NSString *userType = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERTYPE];
     NSString *nickName = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERNICKNAME];
+    NSString *userName = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERNAME];
+
     NSString *clientId = [NSString stringWithFormat:@"user/%@",userID];
     NSString *commonNameStr = [NSString stringWithFormat:@"用户%@",[phone substringFromIndex:7]];
-    NSString *ChatName = nickName.length>0?nickName:commonNameStr;
-    NSInteger Catagorynum = self.isCatagory+1;//1,2
+    NSString *ChatName =nickName.length>0?nickName:userName.length>0?userName:commonNameStr;
     NSNumber *catagoryState = Userdefault(CatagoryVipState);
-    NSString *vipStatestr = Userdefault(VipState);
     NSString *Type;
-    if (catagoryState.integerValue ==Catagorynum || catagoryState.integerValue==3) {
-        Type = vipStatestr;
-    }else{
-        Type = @"0";
-    }
-//    NSString *vipState = [NSString stringWithFormat:@"%d",(CatagoryVipState.integerValue==0?0)];
+    NSInteger vipStatess =  [Tools SaveLocalVipstateWithCatagory:nil];
+
+    Type = [NSString stringWithFormat:@"%ld",vipStatess];
+
     chatUserModel *userModel = [[chatUserModel alloc]initWith:[Tools getHeadImageURL] formId:userID displayName:ChatName phoneNumber:phone userType:Type clientID:clientId];
     NSDictionary *userDic = [userModel mj_keyValues];
     chatBodyModel *bodyModel = nil;
@@ -810,8 +829,9 @@
             self.messageMaxCount = [model.MessageID integerValue];
         }
         NSString *CurrentTime = model.Timestamp;
+//        NSString *timeString =  model.Timestamp;
         NSString *timeString = [self isNeedShowTime:CurrentTime lastSendMessageTime:self.lastTimeSendMessage];
-        self.lastTimeSendMessage = CurrentTime;
+//        self.lastTimeSendMessage = CurrentTime;
         if ([self.messageList.chatDataManager.allMsgidArr containsObject:model.MessageID]) {
             return;
         }
@@ -925,7 +945,7 @@
                 [self addToFMDB:voiceDataStr messageId:model.MessageID sender:@"0" sendTime:model.Timestamp msgType:@"SEND_Voice" staffName:form.DisplayName staffAvata:form.Avatar andListID:listID clientID:form.ClientID storeInfo:form.Group];
             }
             if ([self.listID isEqualToString:listID]) {
-                MessageModel *message = [[MessageModel alloc] initWithVoicePath:[Tools getVoicePath:voiceLastComponent] duration:body.VoiceDuration.integerValue messageId:model.MessageID fromUser:user timeString:timeString isOutgoing:user.isOutgoing status:IMUIMessageStatusSuccess];
+                MessageModel *message = [[MessageModel alloc] initWithVoicePath:[Tools getVoicePath:voiceLastComponent] duration:body.VoiceDuration messageId:model.MessageID fromUser:user timeString:timeString isOutgoing:user.isOutgoing status:IMUIMessageStatusSuccess];
                 [_messageList addMessageOrderWith: message];
             }
         }else if ([body.Type isEqualToString:@"File"]){
@@ -958,6 +978,12 @@
     NSDictionary *payload = [NSJSONSerialization JSONObjectWithData:message options:NSJSONReadingMutableLeaves error:nil];
     MQTTCommandModel *model = [MQTTCommandModel mj_objectWithKeyValues:payload];
     model.isCatagory = self.isCatagory;
+    BOOL isCurrentChatRoom = false ;//是否当前聊天室
+    NSString *chatroomID = [model.chatroom_id stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
+   NSArray *arr = [topic componentsSeparatedByString:@"/"];
+    NSString *chatroomid = [chatroomID containsString:@"chatroom_"]?[chatroomID substringFromIndex:9]:chatroomID;
+    isCurrentChatRoom = [self.listID isEqualToString:chatroomid];
+    self.differentListID = chatroomid;
     if ([model.cmd isEqualToString:@"UserMessageList"]) {
         if (self.page <=1) {
             self.messageMaxCount = model.message_id_last;
@@ -970,14 +996,14 @@
         if (array.count==2) {
             if (isRightMessage==YES) {
                 NSString *customer = [NSString stringWithFormat:@"客服：%@为你服务",array[1]];
-                [self displayMessageTipsEvent:customer];
+                [self displayMessageTipsEvent:customer isNotShow:isCurrentChatRoom ];
             }
            
         }else if (array.count==3) {
             if (isRightMessage==YES) {
 
             NSString *customer = [NSString stringWithFormat:@"客服：%@为你服务",array[2]];
-            [self displayMessageTipsEvent:customer];
+            [self displayMessageTipsEvent:customer isNotShow:isCurrentChatRoom];
             }
         }
         if ([self.listID containsString:@"_"]) {
@@ -994,11 +1020,15 @@
             }
 //            }
         }else{
-            NSArray *customer_ids = [[NSUserDefaults standardUserDefaults] objectForKey:USERREQUESTSERVER];
-            NSMutableArray *customers = [NSMutableArray arrayWithArray:customer_ids];
-            [customers addObject:model.customer_id];
-            [[NSUserDefaults standardUserDefaults] setObject:customers forKey:USERREQUESTSERVER];
-            [[NSUserDefaults standardUserDefaults] synchronize];
+            if(isCurrentChatRoom ==YES)
+            {
+                NSArray *customer_ids = [[NSUserDefaults standardUserDefaults] objectForKey:USERREQUESTSERVER];
+                NSMutableArray *customers = [NSMutableArray arrayWithArray:customer_ids];
+                [customers addObject:model.customer_id];
+                [[NSUserDefaults standardUserDefaults] setObject:customers forKey:USERREQUESTSERVER];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+            }
+           
         }
     }else if ([model.cmd isEqualToString:@"CustomerClosedService"]){
         if ([self.listID containsString:@"_"]) {
@@ -1008,17 +1038,23 @@
             [customers removeObject:model.customer_id];
             [[FMDBManager sharedManager] updateServerList:[customers mj_JSONString] withStoreId:self.storeID];
         }else{
-            NSArray *customer_ids = [[NSUserDefaults standardUserDefaults] objectForKey:USERREQUESTSERVER];
-            NSMutableArray *customers = [NSMutableArray arrayWithArray:customer_ids];
-            [customers removeObject:model.customer_id ];
-            [[NSUserDefaults standardUserDefaults] setObject:customers forKey:USERREQUESTSERVER];
-            [[NSUserDefaults standardUserDefaults] synchronize];
+            if (isCurrentChatRoom == YES) {
+                NSArray *customer_ids = [[NSUserDefaults standardUserDefaults] objectForKey:USERREQUESTSERVER];
+                NSMutableArray *customers = [NSMutableArray arrayWithArray:customer_ids];
+                [customers removeObject:model.customer_id ];
+                [[NSUserDefaults standardUserDefaults] setObject:customers forKey:USERREQUESTSERVER];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+            }
+          
         }
-        NSArray *array = [model.customer_id componentsSeparatedByString:@"/"];
-        if (array.count>1) {
-            NSString *customer = [NSString stringWithFormat:@"客服：%@已离开",array.lastObject];
-            [self displayMessageTipsEvent:customer];
+        if (isCurrentChatRoom == YES) {
+            NSArray *array = [model.customer_id componentsSeparatedByString:@"/"];
+            if (array.count>1) {
+                NSString *customer = [NSString stringWithFormat:@"客服：%@已离开",array.lastObject];
+                [self displayMessageTipsEvent:customer isNotShow:isCurrentChatRoom];
+            }
         }
+        
     }else if ([model.cmd isEqualToString:@"ChatroomCustomerList"]){
         if ([self.listID containsString:@"_"]) {
             if ([[FMDBManager sharedManager] serverLisIsAlreadyExist:self.storeID]) {
@@ -1027,8 +1063,11 @@
                 [[FMDBManager sharedManager] addServerListMessage:[model.customer_ids mj_JSONString] withStoreId:self.storeID];
             }
         }else{
-            [[NSUserDefaults standardUserDefaults] setObject:model.customer_ids forKey:USERREQUESTSERVER];
-            [[NSUserDefaults standardUserDefaults] synchronize];
+            if (isCurrentChatRoom == YES) {
+                [[NSUserDefaults standardUserDefaults] setObject:model.customer_ids forKey:USERREQUESTSERVER];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+            }
+          
         }
     }
 }
@@ -1194,11 +1233,11 @@
         [self.view makeToast:@"订单信息数据异常" duration:1.5 position:CSToastPositionCenter];
         return;
     }
-    BOOL isInduty = !Userdefault(IsIndustryCatagory);
+   
     YHChatConfirmOrderViewController *vc = [[YHChatConfirmOrderViewController alloc]init];
     
     vc.contractNo = contract.ContractNo;
-    vc.IsStore = [NSString stringWithFormat:@"%d",isInduty];
+    vc.IsStore =[NSString stringWithFormat:@"%ld",[contract.CategoryBName isEqualToString:@"输配电"]];
     vc.hidesBottomBarWhenPushed = YES;
     [self.navigationController pushViewController:vc animated:YES];
 }
@@ -1240,7 +1279,7 @@
         UserModel *user = [UserModel new];
         user.isOutgoing = true;
         NSString *currentTime = [NSDate getCurrentTimeStr];
-        NSString *timeStr = [self isNeedShowTime:currentTime lastSendMessageTime:self.lastTimeSendMessage];
+//        NSString *timeStr = [self isNeedShowTime:currentTime lastSendMessageTime:self.lastTimeSendMessage];
         chatNewModel *model = [self creatMessageModelData:self.jsonStr andType:@"Goods" messageIdString:messageIdString];
         if ([[YHMQTTClient sharedClient] isMQTTConnect]) {
             [[YHMQTTClient sharedClient] sendMessage:[model mj_keyValues] withTopic:self.MQTTTopic complete:^(NSError *error) {
@@ -1248,14 +1287,14 @@
                     [self sendCMDRequestService];
                 }else{
                     self.lastTimeSendMessage = currentTime;
-                    MessageModel *message = [[MessageModel alloc] initWithProductJsonText:self.jsonStr messageId:model.MessageID fromUser:user timeString:timeStr isOutgoing:user.isOutgoing status:IMUIMessageStatusFailed];
+                    MessageModel *message = [[MessageModel alloc] initWithProductJsonText:self.jsonStr messageId:model.MessageID fromUser:user timeString:currentTime isOutgoing:user.isOutgoing status:IMUIMessageStatusFailed];
                     [self.messageList addMessageOrderWith:message];
                     [self.messageList scrollToBottomWith:YES];
                 }
             }];
         }else{
             self.lastTimeSendMessage = currentTime;
-            MessageModel *message = [[MessageModel alloc] initWithProductJsonText:self.jsonStr messageId:model.MessageID fromUser:user timeString:timeStr isOutgoing:user.isOutgoing status:IMUIMessageStatusFailed];
+            MessageModel *message = [[MessageModel alloc] initWithProductJsonText:self.jsonStr messageId:model.MessageID fromUser:user timeString:currentTime isOutgoing:user.isOutgoing status:IMUIMessageStatusFailed];
             [self.messageList addMessageOrderWith:message];
             [self.messageList scrollToBottomWith:YES];
         }

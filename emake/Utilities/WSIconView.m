@@ -8,6 +8,8 @@
 
 #import "WSIconView.h"
 #import "UIImageView+WebCache.h"
+//#import <SVGKit/SVGKit.h>
+//#import "WXApi.h"
 #import <SVGKit/SVGKit.h>
 #import "chatUserModel.h"
 @implementation WSIconView

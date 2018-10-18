@@ -103,8 +103,8 @@
 
 - (void)configUI{
     WKWebView *wk =  [[WKWebView alloc] init];
-    NSString *catagoryId = [[NSUserDefaults standardUserDefaults] objectForKey:USERSELECCATEGORY];
-    NSString *url =[NSString stringWithFormat:@"%@/%@",TodayPriceUrl,catagoryId];
+//    NSString *catagoryId = [[NSUserDefaults standardUserDefaults] objectForKey:USERSELECCATEGORY];
+    NSString *url =[NSString stringWithFormat:@"%@",TodayPriceUrl];
     NSURLRequest *urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [wk loadRequest:urlRequest];
     wk.navigationDelegate = self;

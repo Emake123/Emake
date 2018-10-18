@@ -14,6 +14,8 @@
 #import "YHPayViewController.h"
 #import "YHProductDetailsViewController.h"
 #import "YHCommonWebViewController.h"
+#import "YHMemberExperienceViewController.h"
+#import "UserInfoModel.h"
 @interface YHMineMemberInterestViewController ()<UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate,UIScrollViewDelegate,YHAlertViewDelegete>
 
 @property(nonatomic,strong)TPKeyboardAvoidingScrollView *scroll;
@@ -28,6 +30,9 @@
 @property(nonatomic,strong)NSString * payfeightPrice;
 @property(nonatomic,strong) NSString * myVipState ;
 @property(nonatomic,strong) NSString * couponCodeStr ;
+@property(nonatomic,strong) NSArray * couponDicArr ;
+@property(nonatomic,strong) UserInfoModel * model ;
+
 
 @end
 
@@ -39,7 +44,7 @@
     self.CatagoryNameArray  = [NSMutableArray array];
     self.reordSelectDic  = [NSMutableDictionary dictionary];
     self.couponCodeStr = @"";
-    [self getMyVipData];
+    [self getUserInfo];
     self.myVipState =Userdefault(VipState);
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(payNotify:) name:NsuserDefaultsPaySuccessState object:nil];
     
@@ -47,16 +52,29 @@
 -(void)payNotify:(NSNotification *)notify
 {
     
-    BOOL isSuccess = notify.userInfo[@"NsuserDefaultsPaySuccessState"];
+    NSString *state = notify.userInfo[@"NsuserDefaultsPaySuccessState"];
    
-    YHAlertView *alert =  [[YHAlertView alloc] initWithDelegete:self Title:isSuccess?@"支付成功":@"支付失败" bottomTitle:@"客服热线：400-867-0211" ButtonTitle:isSuccess?@"会员开通成功":@"重新支付"];
+    YHAlertView *alert =  [[YHAlertView alloc] initWithDelegete:self Title:state.integerValue?@"支付成功":@"支付失败" bottomTitle:@"客服热线：400-867-0211" ButtonTitle:state.integerValue?@"会员开通成功":@"重新支付"];
     [alert showAnimated];
     
     
 }
+
+- (void)getUserInfo {
+    [[YHJsonRequest shared] getUserInfoSuccessBlock:^(UserInfoModel *userInfo) {
+        self.model = userInfo;
+        [self getMyVipData];
+
+    } fialureBlock:^(NSString *errorMessages) {
+        
+        [self.view makeToast:errorMessages duration:1.5 position:CSToastPositionCenter];
+    }];
+}
 -(void)getMyVipData{
     
     [[YHJsonRequest shared] getAppVipUserSuccessBlock:^(NSDictionary *success) {
+        self.isExperienceVip = self.model.VipCount.integerValue==0?YES:( self.model.UserIdentity.integerValue ==0?false:YES);
+
         self.getDataDic = success;
         [self configUI];
 
@@ -76,12 +94,13 @@
     TPKeyboardAvoidingScrollView *memberScrollView =[[TPKeyboardAvoidingScrollView alloc] init];
     memberScrollView.contentSize = CGSizeMake(ScreenWidth, ScreenHeight);
     memberScrollView.delegate = self;
+    memberScrollView.scrollEnabled = YES;
     [self.view addSubview:memberScrollView];
     [memberScrollView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(TOP_BAR_HEIGHT);
         make.left.mas_equalTo(0);
         make.width.mas_equalTo(ScreenWidth);
-        make.height.mas_equalTo(ScreenHeight);
+        make.height.mas_equalTo(ScreenHeight-(TOP_BAR_HEIGHT));
     }];
     self.scroll = memberScrollView;
     
@@ -143,7 +162,8 @@
     
     
 //    NSString *VipState = Userdefault(VipState);
-    if (IdentifyCategorys.count==0 || self.myVipState.integerValue==3) {
+    if (IdentifyCategorys.count==0 || self.model.UserIdentity.integerValue==0 || self.model.UserIdentity.integerValue==3 ) {
+        
         
         [memberInfoView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.top.mas_equalTo(topTitleImageView.mas_bottom).offset(HeightRate(10));
@@ -152,7 +172,7 @@
             make.height.mas_equalTo(HeightRate(60));
         }];
         
-        UIView *item1 = [self getCatagoryMemberInfoViewCatagoryName:@"未开通" memberinfo:@"会员权益：订单额9.7折"];
+        UIView *item1 = [self getCatagoryMemberInfoViewCatagoryName:@"未开通" memberinfo:@"会员权益：订单可享会员价"];
         [memberInfoView addSubview:item1];
         [item1 mas_makeConstraints:^(MASConstraintMaker *make) {
             make.top.mas_equalTo(HeightRate(10));
@@ -170,7 +190,7 @@
         }];
         
         NSDictionary *catagoryItem = IdentifyCategorys[0];
-        NSString *freightPrice =[Tools getHaveNum:([catagoryItem[@"DisCount"] doubleValue]*100)];
+        NSString *freightPrice =[Tools getHaveNum:([catagoryItem[@"DisCount"] doubleValue]*10)];
         NSString *endDate = catagoryItem[@"EndAt"];
         NSString *endAt = endDate.length>10?[endDate substringToIndex:10]:endDate;
         NSString *vipStr =[NSString stringWithFormat:@"会员权益：订单额%@折，%@到期",freightPrice ,endAt];
@@ -186,18 +206,19 @@
         
     }else
     {
+        
         [memberInfoView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.top.mas_equalTo(topTitleImageView.mas_bottom).offset(HeightRate(10));
             make.centerX.mas_equalTo(memberScrollView.mas_centerX);
             make.width.mas_equalTo(WidthRate(352));
-            make.height.mas_equalTo(HeightRate(90));
+            make.height.mas_equalTo(HeightRate(45)*IdentifyCategorys.count);
         }];
         for (int i= 0; i < IdentifyCategorys.count; i++) {
             NSDictionary *catagoryItem = IdentifyCategorys[i];
             CGFloat freightPrice =[catagoryItem[@"DisCount"] doubleValue] ;
             NSString *endDate = catagoryItem[@"EndAt"];
             NSString *endAt = endDate.length>10?[endDate substringToIndex:10]:endDate;
-            NSString *vipStr =[NSString stringWithFormat:@"会员权益：订单额%@折，%@到期",[Tools getHaveNum:freightPrice],endAt];
+            NSString *vipStr =[NSString stringWithFormat:@"会员权益：订单额%@折，%@到期",[Tools getHaveNum:freightPrice*10],endAt];
             UIView *item1 = [self getCatagoryMemberInfoViewCatagoryName:catagoryItem[@"CategoryBName"] memberinfo:vipStr];
             [memberInfoView addSubview:item1];
             [item1 mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -212,8 +233,8 @@
       
         
     }
-    
-    
+    self.scroll.contentSize = CGSizeMake(ScreenWidth, ScreenHeight+(IdentifyCategorys.count-3)*50);
+    NSArray *catagorys = self.getDataDic[@"Categorys"];
     UITableView *mytable = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];
     mytable.dataSource = self;
     mytable.delegate = self;
@@ -228,7 +249,7 @@
         make.top.mas_equalTo(memberInfoView.mas_bottom).offset(HeightRate(0));
         make.left.mas_equalTo(0);
         make.width.mas_equalTo(ScreenWidth);
-        make.height.mas_equalTo(HeightRate(150));
+        make.height.mas_equalTo(HeightRate(75)*4);
     }];
     
     UILabel *payBottomLine = [[UILabel alloc] init];
@@ -276,24 +297,26 @@
     freightPriceLable.hidden = YES;
     self.freightMoneyLable = freightPriceLable;
     
-    UIButton *tasteButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [tasteButton setTitle:@"免费领取30天体验" forState:UIControlStateNormal];
-    [tasteButton setTitleColor:ColorWithHexString(@"CC894F") forState:UIControlStateNormal];
-    tasteButton.layer.borderColor = ColorWithHexString(@"CC894F").CGColor ;
-//    [tasteButton addTarget:self action:@selector(memberExpericeButtonClick) forControlEvents:UIControlEventTouchUpInside];
-    tasteButton.layer.borderWidth = 1;
-    tasteButton.layer.cornerRadius = 6;
-    tasteButton.clipsToBounds = YES;
-    [tasteButton addTarget:self action:@selector(getMemberVibWithFreeInvalidTimeButtonClick)  forControlEvents:UIControlEventTouchUpInside];
-    [memberScrollView addSubview:tasteButton];
-    [tasteButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(textBottomLine.mas_bottom).offset(HeightRate(130));
-        make.centerX.mas_equalTo(self.view.mas_centerX);
-        make.width.mas_equalTo(WidthRate(310));
-        make.height.mas_equalTo(HeightRate(40));
+//    UIButton *tasteButton = [UIButton buttonWithType:UIButtonTypeCustom];
+//    [tasteButton setTitle:@"免费领取30天体验" forState:UIControlStateNormal];
+//    [tasteButton setTitleColor:ColorWithHexString(@"CC894F") forState:UIControlStateNormal];
+//    tasteButton.layer.borderColor = ColorWithHexString(@"CC894F").CGColor ;
+////    [tasteButton addTarget:self action:@selector(memberExpericeButtonClick) forControlEvents:UIControlEventTouchUpInside];
+//    tasteButton.layer.borderWidth = 1;
+//    tasteButton.layer.cornerRadius = 6;
+//    tasteButton.clipsToBounds = YES;
+//    [tasteButton addTarget:self action:@selector(getMemberVibWithFreeInvalidTimeButtonClick)  forControlEvents:UIControlEventTouchUpInside];
+//    [memberScrollView addSubview:tasteButton];
+//    [tasteButton mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.mas_equalTo(textBottomLine.mas_bottom).offset(HeightRate(130));
+//        make.centerX.mas_equalTo(self.view.mas_centerX);
+//        make.width.mas_equalTo(WidthRate(310));
+//        make.height.mas_equalTo(HeightRate(40));
+//
+//    }];
+//
 
-    }];
-    tasteButton.hidden = self.isExperienceVip;
+
     
     UIButton *payMoneyButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [payMoneyButton setTitle:@"需支付0元" forState:UIControlStateNormal];
@@ -306,11 +329,11 @@
     [memberScrollView addSubview:payMoneyButton];
     self.payMoneyButton = payMoneyButton ;
     [payMoneyButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(tasteButton.mas_bottom).offset(HeightRate(15));
+        make.top.mas_equalTo(freightPriceLable.mas_bottom).offset(HeightRate(10));
         make.centerX.mas_equalTo(self.view.mas_centerX);
         make.width.mas_equalTo(WidthRate(310));
         make.height.mas_equalTo(HeightRate(40));
-//        make.bottom.mas_equalTo(HeightRate(-40));
+        make.bottom.mas_equalTo(HeightRate(-20));
 
     }];
 }
@@ -328,7 +351,7 @@
         YHPayViewController *vc = [[YHPayViewController alloc] init];
         vc.isHidenTopTitle = YES;
         vc.payOrderMoney = self.payfeightPrice;
-        vc.payParams = @{@"TotalAmount":@"0.01",@"PayClass":@"1",@"Params":@{@"CategoryBIds":arr,@"CouponCode":self.couponCodeStr}};
+        vc.payParams = @{@"PayClass":@"1",@"Params":@{@"CategoryBIds":arr,@"CouponCode":self.couponCodeStr}};
         [self.navigationController pushViewController:vc animated:YES];
         
     }else
@@ -356,6 +379,31 @@
     [[YHJsonRequest shared] getAppCheckVipCoupon:@{@"CouponCode":couponStr} SuccessBlock:^(NSArray *success) {
         self.freightMoneyLable.hidden = false;
         self.couponCodeStr = couponStr;
+//        self.couponDicArr = [NSArray arrayWithArray:success];
+        NSMutableArray *arr= [NSMutableArray array];
+        for (NSDictionary *dic in success) {
+            NSString *endDate = dic[@"EndAt"];
+            BOOL isValid = [NSDate isValideTimeDifferenceWithLastLoginTime:endDate currentLoginTime:[NSDate getCurrentTime] ValidTime:@"0"];
+            if (isValid==YES) {
+                [arr addObject:dic];
+
+            }else
+            {
+                NSArray *catagorys = self.getDataDic[@"Categorys"];
+                for (NSDictionary *dictttt in catagorys) {
+                    NSString *str1 = dictttt[@"CategoryBId"];
+                    NSString *str2 = dic[@"CategoryBId"];
+
+                    if ([str1 isEqualToString:str2]) {
+                        [self.view makeToast:[NSString stringWithFormat:@"%@%@",dictttt[@"CategoryName"],@"优惠券有效期已经过期"] duration:1.5 position:CSToastPositionCenter];
+                        break;
+                    }
+                }
+
+
+            }
+        }
+        self.couponDicArr = [NSArray arrayWithArray:arr];
         [self conculatePrice:success];
        
     } fialureBlock:^(NSString *errorMessages) {
@@ -368,9 +416,13 @@
     double freightTotalMoney = self.totalPrice;
 
     double freightMoney = 0;
-    if (self.reordSelectDic.count ==2 ) {
+    if (self.reordSelectDic.count >1 ) {
+        NSArray *keys = self.reordSelectDic.allKeys;
         for (NSDictionary *dic in success) {
-            freightMoney += [dic[@"CouponPrice"] doubleValue];
+            if ([keys containsObject:dic[@"CategoryBId"]]) {
+                freightMoney += [dic[@"CouponPrice"] doubleValue];
+
+            }
             
         }
     }else if (self.reordSelectDic.count ==1)
@@ -460,11 +512,12 @@
             cell.memberView.backgroundColor = ColorWithHexString(@"ffffff");
 
         }
-        
-        [self conculatePrice:nil];
+      
+        [self conculatePrice:self.couponDicArr];
 
     cell.memberMoneyLable.text =[NSString stringWithFormat:@"¥%@／年",catagoryDict[@"VipFee"]] ;
-    cell.catagoryNameLable.text =catagoryDict[@"CategoryName"];
+    cell.catagoryNameLable.text = [NSString stringWithFormat:@"%@会员",catagoryDict[@"CategoryName"]];
+        
     return cell;
     }
 }
@@ -486,6 +539,9 @@
             cell.slectBgView =  !cell.slectBgView;
             self.totalPrice = 0;
             [tableView reloadData];
+        }else
+        {
+            [self.view makeToast:@"该品类已开通会员，将不能再开通" duration:1.5 position:CSToastPositionCenter];
         }
     }
     
@@ -496,7 +552,9 @@
     [[YHJsonRequest shared] getAppVipExperienceSuccessBlock:^(NSDictionary *success) {
         
         [self.view makeToast:@"领取成功" duration:1.5 position:CSToastPositionCenter];
-
+        
+//        YHMemberExperienceViewController *vc= [[YHMemberExperienceViewController alloc] init];
+//        vc.vi =
     } fialureBlock:^(NSString *errorMessages) {
         [self.view makeToast:errorMessages duration:1.5 position:CSToastPositionCenter];
     }];
@@ -546,6 +604,7 @@
 {
     if (self.reordSelectDic.count == 0) {
         [self.view makeToast:@"请先选择经营品类" duration:1.5 position:CSToastPositionCenter];
+        textField.text = @"";
         return;
     }
     [self CheckVipCoupon:textField.text];

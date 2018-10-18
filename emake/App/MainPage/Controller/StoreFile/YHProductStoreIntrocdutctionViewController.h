@@ -10,4 +10,6 @@
 #import "YHStoreDetailModel.h"
 @interface YHProductStoreIntrocdutctionViewController : PSVCBase
 @property(nonatomic,strong)YHStoreDetailModel *model;
+@property(nonatomic,assign)NSInteger recordIndex;
+
 @end

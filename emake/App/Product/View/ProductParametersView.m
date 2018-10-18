@@ -36,7 +36,7 @@ enum selectStyle
 
     UIView *bgFootView;
     UIScrollView *scrolview;
-    CGFloat productPrice;
+    double productPrice;
     CGFloat collectionFooterHeight;
     UIImageView *productImage;
     NSString *productId;
@@ -240,8 +240,7 @@ enum selectStyle
         
         
        
-//        NSString *IsStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-//        self.isStore  = [IsStore isEqualToString:@"1"];
+
         scrolview = [[UIScrollView alloc]init];
         scrolview.contentSize =CGSizeMake(ScreenWidth*2, 0);
         scrolview.pagingEnabled =YES;
@@ -258,19 +257,28 @@ enum selectStyle
             make.top.mas_equalTo(line.mas_bottom);
             make.bottom.mas_equalTo(0);
         }];
-        NSInteger vipStatess ;
+//        NSInteger vipStatess ;
 
-        NSInteger Catagorynum =  [dic[@"IsPriceTax"] integerValue]+1;//1,2
         NSNumber *catagoryState = Userdefault(CatagoryVipState);
-        if (catagoryState.integerValue ==Catagorynum || catagoryState.integerValue==3) {
-            vipStatess =1;
-        }else{
-            vipStatess=0;
+        NSInteger vipStatess =  [Tools SaveLocalVipstateWithCatagory:nil];
+
+//            vipStatess =catagoryState.integerValue;
+       
+        NSString *HidenVip = Userdefault(HidenCatagoryVip);
+        if (HidenVip.integerValue==0) {
+            self.isVip = 0;//0 bu 1vip
+            priceNameLable1.hidden = YES;
+            priceNameLable.hidden = YES;
+            self.theBottomlabelPrice.hidden = YES;
+        }else
+        {
+            self.isVip = vipStatess;//0 bu 1vip
+
         }
-        self.isVip = vipStatess;
+
         for (int i = 0; i<2; i++) {
             CGFloat vipHeight =0;
-            if (vipStatess==0) {
+            if (vipStatess==0 && HidenVip.integerValue==1) {
                 UIView *membershipView = [self getTheMemberShipView];
                 [membershipView addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(nextVipVC)]];
                 
@@ -439,7 +447,7 @@ enum selectStyle
     }];
     
     UILabel *membershipLable = [[UILabel alloc] init];
-    membershipLable.text = [NSString stringWithFormat:@"开通会员，下单最高享%@折优惠",[Tools getHaveNum:self.couponStr.doubleValue*10]] ;
+    membershipLable.text = [NSString stringWithFormat:@"开通会员，下单享会员价"] ;
     membershipLable.font = [UIFont systemFontOfSize:AdaptFont(10)];
     [membershipView addSubview:membershipLable];
     [membershipLable mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -1100,8 +1108,8 @@ enum selectStyle
         CGFloat insuranceFee= (self.GoodsInsuranceRate*productPrice*self.insuranceText.text.intValue*100);
         self.insurancePrice.text = [NSString stringWithFormat:@"¥%.2f",round(insuranceFee)/100.0];
         double price =(round(result)/100.0+round(result1)/100.0+round(insuranceFee)/100.0+round(productPrice*100)/100);
-        self.labelPrice.text =self.isVip == YES? [NSString stringWithFormat:@"¥%@",[Tools getHaveNum:price*self.couponStr.doubleValue]]:[NSString stringWithFormat:@"¥%.2f",price];
-        self.theBottomlabelPrice.text = self.isVip == YES?[NSString stringWithFormat:@"¥%.2f",price]:[NSString stringWithFormat:@"¥%@",[Tools getHaveNum:price*self.couponStr.doubleValue]];
+        self.labelPrice.text =self.isVip == YES? [NSString stringWithFormat:@"¥%@",[Tools getHaveNum: floorNumber(price*self.couponStr.doubleValue) ]]:[NSString stringWithFormat:@"¥%.2f",price];
+        self.theBottomlabelPrice.text = self.isVip == YES?[NSString stringWithFormat:@"¥%.2f",price]:[NSString stringWithFormat:@"¥%@",[Tools getHaveNum:floorNumber(price*self.couponStr.doubleValue)]];
 
     }
 }
@@ -1183,8 +1191,8 @@ enum selectStyle
             
             NSString *price = [self.isInVoice isEqualToString:@"0"]?[Tools getHaveNum:productPrice]: [Tools getHaveNum:productPrice*(self.InvoiceRate+1)];
             
-            self.labelPrice.text =self.isVip == YES? [NSString stringWithFormat:@"¥%@",[Tools getHaveNum:price.doubleValue*self.couponStr.doubleValue]]:[NSString stringWithFormat:@"¥%@",price];
-            self.theBottomlabelPrice.text = self.isVip == YES?[NSString stringWithFormat:@"¥%@",price]:[NSString stringWithFormat:@"¥%@",[Tools getHaveNum:price.doubleValue*self.couponStr.doubleValue]];
+            self.labelPrice.text =self.isVip == YES? [NSString stringWithFormat:@"¥%@",[Tools getHaveNum:floorNumber(price.doubleValue*self.couponStr.doubleValue) ]]:[NSString stringWithFormat:@"¥%@",price];
+            self.theBottomlabelPrice.text = self.isVip == YES?[NSString stringWithFormat:@"¥%@",price]:[NSString stringWithFormat:@"¥%@",[Tools getHaveNum:floorNumber(price.doubleValue*self.couponStr.doubleValue)]];
             
         }
         [self.otherCollection reloadData];
@@ -1482,15 +1490,15 @@ enum selectStyle
             productParamModel *paramsModel = dic.allValues[0];;
 //
 //            self.labelTax.text = paramsModel.GoodsTitle;
-            productPrice = paramsModel.PruductPrice.doubleValue;
+            productPrice =[[Tools getHaveNum:paramsModel.PruductPrice.doubleValue] doubleValue] ;
             self.saleOriginPrice = paramsModel.PruductPrice;
             if (self.isStore == YES && [self.isInVoice isEqualToString:@"1"]) {
              
                 
                 NSString *price = [Tools getHaveNum:floorNumber(paramsModel.PruductPrice.doubleValue*(1+self.InvoiceRate))];
                 
-                self.labelPrice.text =self.isVip == YES? [NSString stringWithFormat:@"¥%@",[Tools getHaveNum:price.doubleValue*self.couponStr.doubleValue]]:[NSString stringWithFormat:@"¥%@",price];
-                self.theBottomlabelPrice.text = self.isVip == YES?[NSString stringWithFormat:@"¥%@",price]:[NSString stringWithFormat:@"¥%@",[Tools getHaveNum:price.doubleValue*self.couponStr.doubleValue]];
+                self.labelPrice.text =self.isVip == YES? [NSString stringWithFormat:@"¥%@",[Tools getHaveNum:floorNumber(price.doubleValue*self.couponStr.doubleValue)]]:[NSString stringWithFormat:@"¥%@",price];
+                self.theBottomlabelPrice.text = self.isVip == YES?[NSString stringWithFormat:@"¥%@",price]:[NSString stringWithFormat:@"¥%@",[Tools getHaveNum:floorNumber(price.doubleValue*self.couponStr.doubleValue)]];
                 
 
             }else
@@ -1711,8 +1719,12 @@ enum selectStyle
 -(void)getPriceByConculateInvoiceState
 {
     
-    CGFloat result = 0.0;
-    CGFloat result1 = 0.0;
+    CGFloat result = 0.0;//附件价格
+    CGFloat result0 = 0.0;//附件价格
+
+    CGFloat result1 = 0.0;//品牌价格（普通）
+    CGFloat result11 = 0.0;//品牌价格（会员）
+
     NSString * resultstr1 ;
     NSMutableArray *storeStr= [[NSMutableArray alloc] init];
     
@@ -1721,10 +1733,10 @@ enum selectStyle
         for ( int i = 0;i< arr.count;i++) {
             YHProductAddSeviceModel *seviceModel = arr[i];
             if (seviceModel.isSelected == YES) {
-                CGFloat price = productPrice;
+                double price = [[Tools getHaveNum:productPrice] doubleValue];
                 if ([seviceModel.GoodsType isEqualToString:@"2"] ) {//附件的价格
                     result += [[Tools getHaveNum:seviceModel.GoodsPrice.doubleValue] doubleValue];
-                    
+                    result0 += [[Tools getHaveNum:floorNumber(seviceModel.GoodsPrice.doubleValue*self.couponStr.doubleValue) ] doubleValue];
                     if (storeStr.count == 0 ) {
                         NSString * resultTitle =[NSString stringWithFormat:@"%@:  %@          ¥%@",key,seviceModel.GoodsTitle ,[Tools getHaveNum:seviceModel.GoodsPrice.doubleValue]];
                         [storeStr addObject:resultTitle];
@@ -1742,17 +1754,23 @@ enum selectStyle
                         result1 = 0;
                     }else
                     {
+
+                        CGFloat sevicePrice = floorNumber(price*seviceModel.GoodsPrice.doubleValue);
+                        CGFloat sevicePrice1 = floorNumber(price* seviceModel.GoodsPrice.doubleValue*self.couponStr.doubleValue)
+                        ;
                         if ([self.isInVoice isEqualToString:@"1"] && self.isStore == YES) {
-                            result1 =[[Tools getHaveNum:price*(1+self.InvoiceRate)*seviceModel.GoodsPrice.doubleValue] doubleValue];
-                            
+                            result1 =[[Tools getHaveNum:floorNumber(sevicePrice*(1+self.InvoiceRate))] doubleValue];
+                            result11 = [[Tools getHaveNum:floorNumber(sevicePrice1*(1+self.InvoiceRate))] doubleValue];;
+
                         }else
                         {
-                            result1 =[[Tools getHaveNum:floorNumber(price*seviceModel.GoodsPrice.doubleValue) ] doubleValue];
                             
+                            result1 =[[Tools getHaveNum:sevicePrice] doubleValue];
+                            result11 = [[Tools getHaveNum:sevicePrice1] doubleValue];
                         }
                         
                     }
-                    resultstr1 = [NSString stringWithFormat:@"%@:%@          ¥%@",key,seviceModel.GoodsTitle,[Tools getHaveNum:result1]];
+                    resultstr1 = [NSString stringWithFormat:@"%@:%@          ¥%@",key,seviceModel.GoodsTitle,[Tools getHaveNum:self.isVip==YES?result11:result1]];
                 }
             }
             
@@ -1784,10 +1802,15 @@ enum selectStyle
         self.theBottomlabelPrice.text = self.isVip == YES?[NSString stringWithFormat:@"¥%@",price]:[NSString stringWithFormat:@"¥%@",[Tools getHaveNum:floorNumber(price.doubleValue*self.couponStr.doubleValue)]];
         
     }else{
-        NSString *price = [Tools getHaveNum:floorNumber((result+result1+productPrice))];
         
-        self.labelPrice.text =self.isVip == YES? [NSString stringWithFormat:@"¥%@",[Tools getHaveNum:floorNumber(price.doubleValue*self.couponStr.doubleValue)]]:[NSString stringWithFormat:@"¥%@",price];
-        self.theBottomlabelPrice.text = self.isVip == YES?[NSString stringWithFormat:@"¥%@",price]:[NSString stringWithFormat:@"¥%@",[Tools getHaveNum:floorNumber(price.doubleValue*self.couponStr.doubleValue)]];
+        NSString *price = [Tools getHaveNum: result+result1+productPrice];
+        CGFloat vipProductPrice =floorNumber(productPrice*self.couponStr.doubleValue) ;
+        CGFloat vipProductAuxiPrice = result0; //floorNumber(result*self.couponStr.doubleValue) ;
+
+        NSString *price1 = [Tools getHaveNum:(vipProductAuxiPrice+result11 +vipProductPrice )];
+
+        self.labelPrice.text =self.isVip == YES? [NSString stringWithFormat:@"¥%@",[Tools getHaveNum:price1.doubleValue]]:[NSString stringWithFormat:@"¥%@",price];
+        self.theBottomlabelPrice.text = self.isVip == YES?[NSString stringWithFormat:@"¥%@",price]:[NSString stringWithFormat:@"¥%@",[Tools getHaveNum:price1.doubleValue]];
     
         collectionFooterHeight = 130+recordAddAuStrHeight+recordAddBrandStrHeight+10;
 

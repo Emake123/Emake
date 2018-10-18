@@ -14,7 +14,6 @@
 @interface YHChatConfirmOrderViewController ()<UITableViewDelegate,UITableViewDataSource>
 @property(nonatomic,strong)UITableView *mytable;
 @property(nonatomic,assign)BOOL isShowInsuranceView;
-@property(nonatomic,assign)BOOL isIndustry;
 @property(nonatomic,assign)BOOL isShowAdress;
 @property(nonatomic,strong)YHOrderContract *contract ;
 
@@ -28,7 +27,6 @@
 
     
     self.title = @"订单详情";
-    self.isIndustry = [[NSUserDefaults standardUserDefaults] boolForKey:IsIndustryCatagory];
 
     self.view.backgroundColor = SepratorLineColor;
     
@@ -55,7 +53,7 @@
         
         if (orderArray.count ==1) {
             self.contract = orderArray.firstObject;
-            self.isShowInsuranceView =   self.isIndustry == YES && self.contract.InsurdAmount.floatValue > @"2000".floatValue;
+            self.isShowInsuranceView =  self.contract.InsurdAmount.floatValue > @"2000".floatValue;
             self.isShowAdress = self.contract.Address.length>0?YES:(self.contract.ShippingInfo.count>0?YES:false);
 
             [self.mytable reloadData];
@@ -416,7 +414,7 @@
     shopGoodsInvoiceLable.translatesAutoresizingMaskIntoConstraints= NO;
     [shopGoodsInvoiceLable PSSetRightAtItem:companyLabelName Length:WidthRate(5)];
     [shopGoodsInvoiceLable PSSetSize:WidthRate(33) Height:HeightRate(17)];
-    shopGoodsInvoiceLable.hidden = boolUserdefault(IsIndustryCatagory)==YES?YES:[self.contract.IsIncludeTax isEqualToString:@"0"];
+    shopGoodsInvoiceLable.hidden =[self.contract.IsIncludeTax isEqualToString:@"0"];
     
     //订单状态
     YHLabel *orderStatusLabel = [[YHLabel alloc] initWithTextColor:@"FA0C37"];
@@ -432,9 +430,6 @@
     orderStatusLabel.hidden = YES;
     orderStatusLabel.text = self.contract.OrderStateName;
         
-    
-    
-    
     
 }
 - (void)didReceiveMemoryWarning {

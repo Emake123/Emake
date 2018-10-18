@@ -12,5 +12,8 @@
 @property(nonatomic,strong)NSArray *groupList;
 @property(nonatomic,assign)NSInteger index;
 @property(nonatomic,assign)BOOL isFromMine;
+@property(nonatomic,assign)BOOL isShowPayAlert;
+@property(nonatomic,copy)NSString *mySuperid;
+@property(nonatomic,copy)NSString *orderNo;
 
 @end

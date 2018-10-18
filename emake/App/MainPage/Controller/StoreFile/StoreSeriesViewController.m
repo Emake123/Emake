@@ -92,73 +92,73 @@
     
     [self.view showWait:@"加载中" viewType:CurrentView];
     self.dataArr = [NSMutableArray array];
-    [[YHJsonRequest shared] getShoppingGoodCategoriesSeriesId:self.CategoryId  SuccessBlock:^(NSDictionary *successMessage) {
-        [self.view hideWait:CurrentView];
-        NSArray *listArr     = [NSArray arrayWithArray:successMessage[@"消费品"]];
-        if (listArr.count ==0) {
-            [self emptyViewWithNoneData];
-        }else{
-            BOOL isInlistArr = false;
-            for (NSDictionary *dict in listArr) {
-                YHStoreListModel *model = [YHStoreListModel mj_objectWithKeyValues:dict];
-                model.StoresArr = [NSMutableArray array];
-                
-                for (NSDictionary *storeDict in model.Stores) {
-                    YHStoreModel *storeModel = [YHStoreModel mj_objectWithKeyValues:storeDict];
-                    [model.StoresArr addObject:storeModel];
-                }
-                if([model.CategoryName isEqualToString:self.goodsName])
-                {
-                    
-                    [self ConfigGoodsListView:model];
-                    model.isSelect = YES;
-                    isInlistArr = YES;
-                    self.dataStoreArr = [NSArray arrayWithArray:model.StoresArr];
-                    if (self.dataStoreArr.count==0) {
-                        rightTableView.hidden = YES;
-                        [emptyBgView removeFromSuperview];
-                        [self emptyViewWithNoneData];
-                    }else
-                    {
-                        [emptyBgView removeFromSuperview];
-                        rightTableView.hidden = NO;
-                        [rightTableView reloadData];
-                        
-                    }
-                    
-                }
-                [self.dataArr addObject:model];
-            }
-            if(isInlistArr == false)
-            {
-                YHStoreListModel *model = self.dataArr.firstObject;
-                model.isSelect = YES;
-                [self ConfigGoodsListView:model];
-                
-                self.dataStoreArr = [NSArray arrayWithArray:model.StoresArr];
-                if (self.dataStoreArr.count==0) {
-                    rightTableView.hidden = YES;
-                    [emptyBgView removeFromSuperview];
-                    [self emptyViewWithNoneData];
-                }else
-                {
-                    [emptyBgView removeFromSuperview];
-                    rightTableView.hidden = NO;
-                    [rightTableView reloadData];
-                    
-                }
-                
-            }
-            
-        }
-        [leftTableView reloadData];
-        [rightTableView reloadData];
-
-    } fialureBlock:^(NSString *errorMessages) {
-
-        [self.view hideWait:CurrentView];
-        [self.view makeToast:errorMessages duration:1.0 position:CSToastPositionCenter];
-    }];
+//    [[YHJsonRequest shared] getShoppingGoodCategoriesSeriesId:self.CategoryId  SuccessBlock:^(NSDictionary *successMessage) {
+//        [self.view hideWait:CurrentView];
+//        NSArray *listArr     = [NSArray arrayWithArray:successMessage[@"消费品"]];
+//        if (listArr.count ==0) {
+//            [self emptyViewWithNoneData];
+//        }else{
+//            BOOL isInlistArr = false;
+//            for (NSDictionary *dict in listArr) {
+//                YHStoreListModel *model = [YHStoreListModel mj_objectWithKeyValues:dict];
+//                model.StoresArr = [NSMutableArray array];
+//                
+//                for (NSDictionary *storeDict in model.Stores) {
+//                    YHStoreModel *storeModel = [YHStoreModel mj_objectWithKeyValues:storeDict];
+//                    [model.StoresArr addObject:storeModel];
+//                }
+//                if([model.CategoryName isEqualToString:self.goodsName])
+//                {
+//                    
+//                    [self ConfigGoodsListView:model];
+//                    model.isSelect = YES;
+//                    isInlistArr = YES;
+//                    self.dataStoreArr = [NSArray arrayWithArray:model.StoresArr];
+//                    if (self.dataStoreArr.count==0) {
+//                        rightTableView.hidden = YES;
+//                        [emptyBgView removeFromSuperview];
+//                        [self emptyViewWithNoneData];
+//                    }else
+//                    {
+//                        [emptyBgView removeFromSuperview];
+//                        rightTableView.hidden = NO;
+//                        [rightTableView reloadData];
+//                        
+//                    }
+//                    
+//                }
+//                [self.dataArr addObject:model];
+//            }
+//            if(isInlistArr == false)
+//            {
+//                YHStoreListModel *model = self.dataArr.firstObject;
+//                model.isSelect = YES;
+//                [self ConfigGoodsListView:model];
+//                
+//                self.dataStoreArr = [NSArray arrayWithArray:model.StoresArr];
+//                if (self.dataStoreArr.count==0) {
+//                    rightTableView.hidden = YES;
+//                    [emptyBgView removeFromSuperview];
+//                    [self emptyViewWithNoneData];
+//                }else
+//                {
+//                    [emptyBgView removeFromSuperview];
+//                    rightTableView.hidden = NO;
+//                    [rightTableView reloadData];
+//                    
+//                }
+//                
+//            }
+//            
+//        }
+//        [leftTableView reloadData];
+//        [rightTableView reloadData];
+//
+//    } fialureBlock:^(NSString *errorMessages) {
+//
+//        [self.view hideWait:CurrentView];
+//        [self.view makeToast:errorMessages duration:1.0 position:CSToastPositionCenter];
+//    }];
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section

@@ -73,8 +73,9 @@
 @property(nonatomic, retain)UIView *seviceView;
 @property(nonatomic, retain)UILabel *memberShipLable;
 @property(nonatomic, retain)UIScrollView *imageScrollView;
+@property(nonatomic, retain)UIView *VipView;
 
-@property(nonatomic, assign)BOOL isStore;
+//@property(nonatomic, assign)BOOL isStore;
 
 @end
 
@@ -89,13 +90,15 @@
     self.listArray = [NSArray array];
     self.listNameArray = [NSArray array];
     // Do any additional setup after loading the view.
-    NSString *isstore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    self.isStore = [isstore isEqualToString:@"1"];
     [self configTopView];
     [self configSubViews];
     [self configBottomView];
     [self getProductDeatailsData];
-    
+    if (self.CategoryBId.length>0) {
+        [[NSUserDefaults standardUserDefaults] setObject:self.CategoryBId forKey:USERSELECCATEGORY];
+
+    }
+
 
 }
 #pragma mark--- 获取数据 并刷新UI
@@ -195,15 +198,24 @@
 
 - (void)updateData{
     
-    NSString *IsPriceTax = self.product_data[@"IsPriceTax"];
-
+    NSString *IsPriceTax = self.product_data[@"IsPriceTax"];//1 bian 0休闲食品
+    NSNumber *catagoryState = Userdefault(CatagoryVipState);
+//    NSInteger vipStatess = catagoryState.integerValue;
   
-
-  
+   NSInteger vipStatess =  [Tools SaveLocalVipstateWithCatagory:nil];
+    
+    NSString *HidenVip = Userdefault(HidenCatagoryVip);
+    if (vipStatess !=0 || HidenVip.integerValue==0) {
+        [self.VipView mas_updateConstraints:^(MASConstraintMaker *make) {
+            make.height.mas_equalTo(HeightRate(0.01));
+            
+        }];
+        self.VipView.hidden =  YES;
+    }
     
     
     NSArray *imageArr = [Tools stringToJSON:self.product_data[@"GoodsSeriesPhotos"]];
-     self.imageScrollView.contentSize =CGSizeMake(ScreenWidth*(imageArr.count>0?imageArr.count:1),0);
+     self.imageScrollView.contentSize = CGSizeMake(ScreenWidth*(imageArr.count>0?imageArr.count:1),0);
     UIImageView *itemImageView1;
     for (int i=0;i<imageArr.count;i++) {
         NSString *imageStr = imageArr[i];
@@ -240,8 +252,8 @@
     self.labelTax.text =IsPriceTax.integerValue==1? [self.product_data objectForKey:@"GoodsAddValue"]:[self.product_data objectForKey:@"GoodsAddValue2"];
     
     
-    if (self.isStore == YES) {
-        
+    if (IsPriceTax.boolValue == YES) {
+    
         NSString *GoodsQualityArrayStr =[self.product_data objectForKey:@"GoodsQuality"];
         CGFloat seviceItemHeight =    [self getSeviceView:GoodsQualityArrayStr ServersName:@"质量保障" imageName:@"zhiliangbaozhang-icon"  TopSpace:0];
         NSString *GoodsAfterSaleArrayStr =[self.product_data objectForKey:@"GoodsAfterSale"];
@@ -445,7 +457,9 @@
 
 - (void)showSelectView{
 
-    NSString *url= self.product_data[@"GoodsSeriesIcon"];
+    NSArray *imageArr = [Tools stringToJSON:self.product_data[@"GoodsSeriesPhotos"]];
+
+    NSString *url= imageArr.count>0?imageArr.firstObject:@"";
     NSString *Price =[self.product_data objectForKey:@"PriceRange"];
     
     if (self.listArray.count>0 && self.listNameArray.count>0) {
@@ -488,16 +502,11 @@
 
         return;
     }
-    NSDictionary *dic;
-    BOOL IsIndustry= [[NSUserDefaults standardUserDefaults] boolForKey:IsIndustryCatagory];
-    if (self.isStore == YES) {
+ 
         
-        dic = @{@"GoodsSeriesCode":self.GoodsSeriesCode,@"ProductIds":productIds,@"GoodsNumber":@(number),@"IsInvoice":IsIndustry==YES?@"0": isInvoice,@"StoreId":self.StoreID,@"SuperGroupDetailId":self.SuperGroupDetailId.length>0?self.SuperGroupDetailId:@""};
+       NSDictionary *  dic = @{@"GoodsSeriesCode":self.GoodsSeriesCode,@"ProductIds":productIds,@"GoodsNumber":@(number),@"IsInvoice": isInvoice,@"StoreId":self.StoreID,@"SuperGroupDetailId":self.SuperGroupDetailId.length>0?self.SuperGroupDetailId:@""};
 
-    } else {
-        dic = @{@"GoodsSeriesCode":self.GoodsSeriesCode,@"ProductIds":productIds,@"GoodsNumber":@(number),@"IsInvoice":@"0",@"SuperGroupDetailId":self.SuperGroupDetailId.length>0?self.SuperGroupDetailId:@""};
-
-    }
+   
 
     [[YHJsonRequest shared] addShoppinCartWithParams:dic SuccessBlock:^(NSString *successMessage){
         [self.ParametersView removeView];
@@ -991,8 +1000,7 @@
     }];
     self.lableQuality = labelQuilty;
     
-    if(self.isStore == YES)
-    {
+    
         PSButtonTextDonw *colletionButton  = [[PSButtonTextDonw alloc] init];
         //        colletionButton.backgroundColor = [UIColor yellowColor];
         
@@ -1012,28 +1020,7 @@
         }];
         self.collectionButton = colletionButton;
         
-//        PSButtonTextDonw *shareButton  = [[PSButtonTextDonw alloc] init];
-//        //        shareButton.backgroundColor = [UIColor redColor];
-//        [shareButton setTitle:@"分享" forState:UIControlStateNormal];
-//        shareButton.titleLabel.font =[UIFont systemFontOfSize:AdaptFont(13)] ;
-//        [shareButton setTitleColor:ColorWithHexString(@"000000") forState:UIControlStateNormal];
-//        [shareButton setImage:[UIImage imageNamed:@"wo_fenxiang"] forState:UIControlStateNormal];
-//        //                [button.imageView setContentMode:UIViewContentModeScaleAspectFill];
-//        
-//        [shareButton addTarget:self action:@selector(share) forControlEvents:UIControlEventTouchUpInside];
-//        [self.leftView addSubview:shareButton];
-//        [shareButton mas_makeConstraints:^(MASConstraintMaker *make) {
-//            make.centerY.mas_equalTo(self.labelName.mas_centerY).offset(HeightRate(5));
-//            make.right.mas_equalTo(colletionButton.mas_left).mas_offset(WidthRate(-10));
-//            make.height.mas_equalTo(HeightRate(50));
-//            make.width.mas_equalTo(WidthRate(50));
-//            
-//        }];
-//        self.shareButton = shareButton;
-//        
-        
-        
-    }
+       
     self.labelNumber = [[UILabel alloc]init];
     self.labelNumber.textColor = TextColor_BBBBBB;
     self.labelNumber.font = SYSTEM_FONT(AdaptFont(14));
@@ -1067,7 +1054,6 @@
         make.left.mas_equalTo(WidthRate(20));
         
     }];
-    NSString *vipStateStr = Userdefault(VipState);
     
     
     UIView *membershipView = [self getTheMemberShipView];
@@ -1080,13 +1066,9 @@
         make.top.mas_equalTo(self.labelTax.mas_bottom).offset(HeightRate(0));
     }];
     [membershipView addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(nextVipVC)]];
-    if (vipStateStr.integerValue !=0) {
-        [membershipView mas_updateConstraints:^(MASConstraintMaker *make) {
-            make.height.mas_equalTo(HeightRate(0.01));
-
-        }];
-        membershipView.hidden =  YES;
-    }
+    self.VipView = membershipView;
+    
+   
     self.labelParameter =[[UILabel alloc]init];
     self.labelParameter.textColor = TextColor_636263;
     self.labelParameter.font = SYSTEM_FONT(AdaptFont(13));
@@ -1296,8 +1278,17 @@
         make.centerY.mas_equalTo(membershipView.mas_centerY).offset(HeightRate(0));
     }];
     NSArray *cataGorys = Userdefault(CatagoryIDs);
-    NSDictionary *dic = cataGorys[0];
-    self.CouponNumberStr = dic[@"DisCount"];
+    for (int i=0;i<cataGorys.count;i++) {
+        NSDictionary *dic = cataGorys[i];
+//        NSString *CategoryBName = dic[@"CategoryBName"];//CategoryBId
+        NSString *CategoryBid = dic[@"CategoryBId"];
+   
+        if ([CategoryBid isEqualToString:self.CategoryBId]) {
+            self.CouponNumberStr =   dic[@"DisCount"];
+            
+        }
+        
+    }
     
     NSString *coupon = [Tools getHaveNum:self.CouponNumberStr.doubleValue*10];
     UILabel *membershipLable = [[UILabel alloc] init];

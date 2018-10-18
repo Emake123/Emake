@@ -9,5 +9,5 @@
 #import "PSVCBase.h"
 
 @interface YHBrandQulificationViewController : PSVCBase
-
+@property(nonatomic,strong)NSString *categoryID;
 @end

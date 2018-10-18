@@ -17,5 +17,6 @@
 @property(nonatomic,strong)UIImageView *DownImageView;
 @property(nonatomic,strong)UIButton *getCodeButton;
 @property(nonatomic,strong)UILabel *lineLable;
+@property(nonatomic,strong)UIView *catagoryView;
 
 @end

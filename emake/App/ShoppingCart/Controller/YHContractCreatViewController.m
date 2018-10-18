@@ -183,7 +183,7 @@
 -(void)creatOrder{
   BOOL  IsIncludeTax = YES;
     NSString *title = IsIncludeTax==YES?@"签订合同":@"确认订单";
-    NSArray  *tipArr = IsIncludeTax==YES?@[@"合同签订成功，平台电子合同获得法律效力",@"合同签订成功，30天内未付预付款，合同视为无效"]:@[@"确认销售订单，30天内未付预付款，合同视为无效"] ;
+    NSArray  *tipArr = IsIncludeTax==YES?@[@"合同签订成功，平台电子合同获得法律效力",@"合同签订成功，72小时内未付预付款，合同视为无效"]:@[@"确认销售订单，72小时内未付预付款，合同视为无效"] ;
   YHAlertView *alrt =  [[YHAlertView alloc] initWithAlertViewTipsTDelegete:self Title:title tips:tipArr rightButtonTitle:@"确定"];
 
     [alrt showAnimated];

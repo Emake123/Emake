@@ -12,7 +12,7 @@
 
 +(NSMutableAttributedString*)getFrontStr:(NSString *)TimeFrontStr day:(NSString *)day time:(NSString *)time isShowSecond:(BOOL)isShowSecond;
 
-+(void)SaveLocalVipstateWithCatagory:(NSArray*)IdentityCategorys;
++(NSInteger)SaveLocalVipstateWithCatagory:(NSArray*)IdentityCategorys;
 
 +(void)jumpIntoOnlyVC:(UINavigationController *)currentNav destnationViewController:(UIViewController *)destnationVC;
 

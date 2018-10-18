@@ -16,6 +16,9 @@
 #import "UIButton+WebCache.h"
 #import "YHProductStoreIntrocdutctionViewController.h"
 @interface YHProductCloudsViewController ()<YHTitleViewViewDelegete,UITableViewDelegate,UITableViewDataSource,UICollectionViewDelegate,UICollectionViewDataSource>
+{
+    UIView *emptyBgView;
+}
 @property (nonatomic,strong)UIButton *storeCollect;
 @property (nonatomic,strong)UITableView *leftTableView;
 @property (nonatomic,strong)UICollectionView *rightCollectionView;
@@ -52,41 +55,49 @@
     self.catagoryIds  = Userdefault(CatagoryIDs);
     for (NSDictionary *cataDic in self.catagoryIds) {
         NSString *catagoryname =  cataDic[@"CategoryBName"];
-        if ([catagoryname containsString:@"休闲"]) {
-            [titleArr addObject:@"休闲食品"];
-        }else
-        {
-            [titleArr addObject:@"输配电"];
+        [titleArr addObject:catagoryname];
 
-        }
-        if (titleArr.count==2) {
-            break;
-        }
     }
     NSDictionary *selectCatagoryDic = self.catagoryIds[self.recordIndex];
     
+    
+//    CGFloat width = titleArr.count>3?WidthRate(100):(ScreenWidth/titleArr.count);
    
-  
-    YHTitleView * titleView = [[YHTitleView alloc] initWithFrame:CGRectMake(0, TOP_BAR_HEIGHT, ScreenWidth, HeightRate(39)) titleFont:AdaptFont(14) delegate:self andTitleArray:titleArr];
+//    UIScrollView *cloudTitleScrollView = [[UIScrollView alloc] init];
+//    cloudTitleScrollView.showsVerticalScrollIndicator = false;
+//    cloudTitleScrollView.alwaysBounceVertical = false;
+//    cloudTitleScrollView.alwaysBounceHorizontal = YES;
+//    [self.view addSubview:cloudTitleScrollView];
+//    [cloudTitleScrollView mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.mas_equalTo(TOP_BAR_HEIGHT);
+//        make.width.mas_equalTo(ScreenWidth);
+//        make.height.mas_equalTo(HeightRate(39));
+//        make.left.mas_equalTo(WidthRate(0));
+//
+//    }];
+    YHTitleView * titleView = [[YHTitleView alloc] initWithTitleFont:AdaptFont(14) delegate:self andTitleArray:titleArr andTitleHeight:HeightRate(39) andScrolweight:ScreenWidth];
     [self.view addSubview:titleView];
     
     [titleView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(0);
-        make.right.mas_equalTo(0);
+        make.right.mas_equalTo(titleView.titleViewWidth);
         make.top.mas_equalTo(TOP_BAR_HEIGHT);
-        make.height.mas_equalTo(HeightRate(36));
+        make.height.mas_equalTo(HeightRate(39));
     }];
- 
-    [titleView selectItemWithIndex:self.recordIndex];
-    
-    
+//    cloudTitleScrollView.contentSize = CGSizeMake(titleView.titleViewWidth,HeightRate(39));
+    self.recordIndex = [Userdefault(TitleIndex) integerValue];
+
+//    [titleView selectItemWithIndex:self.recordIndex];
+    [titleView hidenBottonline];
+
+    [titleView selectTitleItemWithIndex:self.recordIndex];
     UIView *topView = [[UIView alloc] init];
     topView.backgroundColor = ColorWithHexString(@"4EBFCD");
     [self.view addSubview:topView];
     [topView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.mas_equalTo(0);
         make.right.mas_equalTo(0);
-        make.top.mas_equalTo(titleView.mas_bottom).offset(0);
+        make.top.mas_equalTo(titleView.mas_bottom).offset(-1);
         make.height.mas_equalTo(HeightRate(54));
     }];
     
@@ -177,18 +188,33 @@
        
         self.storeNameLable.text = name;
         self.leftClassArray = [NSMutableArray arrayWithArray:model.SeriesArr];
-        if (self.recordIndex <model.SeriesArr.count) {
+        if (self.recordItemIndex <model.SeriesArr.count) {
             YHProductCatagoryModel *seriesModel = model.SeriesArr[self.recordItemIndex];
             seriesModel.select = YES;
             
             self.dataArray =seriesModel.GoodsArr;
-
+            if (self.dataArray.count==0) {
+                [self emptyViewWithNoneData:0.6];
+            }else
+            {
+                self.rightCollectionView.hidden=false;
+                emptyBgView.hidden = YES;
+                
+            }
         }else
         {
             YHProductCatagoryModel *seriesModel = model.SeriesArr[0];
             seriesModel.select = YES;
             
             self.dataArray =seriesModel.GoodsArr;
+            
+            if (self.dataArray.count==0) {
+                [self emptyViewWithNoneData:0.6];
+            }else
+            {
+                self.rightCollectionView.hidden=false;
+                emptyBgView.hidden = YES;
+            }
         }
      
         
@@ -203,10 +229,52 @@
         [self.view makeToast:errorMessages duration:1 position:CSToastPositionCenter];
     }];
 }
+-(void)emptyViewWithNoneData:(CGFloat)showHpercentPosition
+{
+    self.rightCollectionView.hidden = YES;
+    showHpercentPosition = 0.6;
+    if (emptyBgView==nil) {
+        UIView *emptyView = [[UIView alloc] init];
+        emptyView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self.view addSubview:emptyView];
+        
+        [emptyView PSSetCenterXPercent:showHpercentPosition];
+        [emptyView PSSetCenterHorizontalAtItem:self.view];
+        
+        [emptyView PSSetSize:WidthRate(200) Height:HeightRate(230)];
+        emptyBgView = emptyView;
+        UIImageView *imageView = [[UIImageView alloc] init];
+        imageView.translatesAutoresizingMaskIntoConstraints = NO;
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
+        imageView.autoresizesSubviews = YES;
+        imageView.autoresizingMask =
+        UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;    imageView.image = [UIImage imageNamed:@"zanwupinpai"];
+        [emptyView addSubview:imageView];
+        [imageView PSSetConstraint:0 Right:0 Top:0 Bottom:HeightRate(20)];
+        
+        UILabel *lable = [[UILabel alloc] init];
+        lable.translatesAutoresizingMaskIntoConstraints = NO;
+        lable.text = @"正在上架中，敬请期待";
+        lable.textAlignment = NSTextAlignmentCenter;
+        [emptyView addSubview:lable];
+        [lable PSSetBottomAtItem:imageView Length:0];
+        [lable PSSetLeft:0];
+        [lable PSSetRight:0];
+        [lable PSSetHeight:HeightRate(20)];
+    }else
+    {
+        emptyBgView.hidden = false;
+        
+    }
+    
+    
+    
+}
 -(void)goIntroductionVC
 {
     YHProductStoreIntrocdutctionViewController *vc = [[YHProductStoreIntrocdutctionViewController alloc] init];
     vc.model = self.model;
+    vc.recordIndex = self.recordIndex;
     [self.navigationController pushViewController:vc animated:YES];
 }
 - (void)goChatVC{
@@ -265,6 +333,15 @@
         if ([model.CategoryName isEqualToString:model1.CategoryName]) {
             model.select = YES;
             self.dataArray = model.GoodsArr;
+            if (self.dataArray.count==0) {
+//                self.rightCollectionView.hidden = YES
+                [self emptyViewWithNoneData:0.6];
+            }else
+            {
+                self.rightCollectionView.hidden=false;
+                emptyBgView.hidden = YES;
+                
+            }
         }else
         {
             model1.select = false;
@@ -352,6 +429,7 @@
     vc.StoreName = self.model.StoreName;
     vc.storeAvata = self.model.StorePhoto;
     vc.storePhoneNumber = @"";
+    vc.CategoryBId = dic[@"CategoryBId"];
     //    [Tools jumpIntoOnlyVC:self.navigationController destnationViewController:vc];
     [self.navigationController pushViewController:vc animated:YES];
 }
@@ -412,11 +490,15 @@
 #pragma mark - YHTitleViewViewDelegete
 - (void)titleView:(id)titleView selectItemWithIndex:(NSInteger)index{
     if (self.catagoryIds.count>0) {
+        self.recordItemIndex = self.recordIndex ==index?self.recordItemIndex:0;
+
         self.recordIndex = index;
         self.leftSelectIndex = 0;
         NSDictionary *dic =  self.catagoryIds[index];
         
         [self getStoreDetailData:dic];
+        [[NSUserDefaults standardUserDefaults] setObject:dic[@"CategoryBId"] forKey:USERSELECCATEGORY];
+        [[NSUserDefaults standardUserDefaults] setObject:@(self.recordIndex) forKey:TitleIndex];
 
     }
 

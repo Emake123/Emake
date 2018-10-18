@@ -465,8 +465,6 @@
 		5F25C4CD2150EAF100770322 /* YHSuperGroupModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F25C4CC2150EAF100770322 /* YHSuperGroupModel.m */; };
 		5F25C4D0215236E700770322 /* YHJoinInSuperGroupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F25C4CF215236E700770322 /* YHJoinInSuperGroupViewController.m */; };
 		5F25C4D32152383500770322 /* YHJoinSuperGroupView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F25C4D22152383500770322 /* YHJoinSuperGroupView.m */; };
-		5F25C4D6215379EE00770322 /* AlipaySDK.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5F25C4D4215379ED00770322 /* AlipaySDK.bundle */; };
-		5F25C4D7215379EE00770322 /* AlipaySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F25C4D5215379ED00770322 /* AlipaySDK.framework */; };
 		5F25C4D921537A6700770322 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F25C4D821537A6600770322 /* CoreMotion.framework */; };
 		5F25C4DB21537A8000770322 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F25C4DA21537A8000770322 /* CFNetwork.framework */; };
 		5F25C4DD21537AB900770322 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F25C4DC21537AB900770322 /* CoreText.framework */; };
@@ -503,6 +501,8 @@
 		5F645833204E29DA003E8133 /* YHContractSighSuccessViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F645832204E29DA003E8133 /* YHContractSighSuccessViewController.m */; };
 		5F64AE2B209966EF00C12C5B /* YHMainChooseCatagoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F64AE2A209966EF00C12C5B /* YHMainChooseCatagoryViewController.m */; };
 		5F64AE2E209ACF4700C12C5B /* YHMainCatagoryModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F64AE2D209ACF4700C12C5B /* YHMainCatagoryModel.m */; };
+		5F854D8E217833CF00D0AB2A /* AlipaySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F854D8C217833CE00D0AB2A /* AlipaySDK.framework */; };
+		5F854D8F217833CF00D0AB2A /* AlipaySDK.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5F854D8D217833CE00D0AB2A /* AlipaySDK.bundle */; };
 		5F8E67B620F52F7F008D345F /* MQTTStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F8E67B520F52F7F008D345F /* MQTTStatus.m */; };
 		5F94B32220D100770005C581 /* test.caf in Resources */ = {isa = PBXBuildFile; fileRef = 5F94B32120D100770005C581 /* test.caf */; };
 		5F9A2F4D207B0E500072356A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5F9A2F4C207B0E500072356A /* Assets.xcassets */; };
@@ -521,6 +521,7 @@
 		5FE0183D215CD2BF00C3E34E /* YHMySettingVipTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FE0183C215CD2BF00C3E34E /* YHMySettingVipTableViewCell.m */; };
 		5FE018432160B84600C3E34E /* YHCityDelegateMOdel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FE018422160B84600C3E34E /* YHCityDelegateMOdel.m */; };
 		5FE018462160C02600C3E34E /* YHProductStoreIntrocdutctionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FE018452160C02600C3E34E /* YHProductStoreIntrocdutctionViewController.m */; };
+		5FE018592175A22400C3E34E /* YHMainLastWeekCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FE018582175A22400C3E34E /* YHMainLastWeekCollectionViewCell.m */; };
 		5FE8384220A449D000743780 /* YHDiscoverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FE8384120A449D000743780 /* YHDiscoverViewController.m */; };
 		5FF6A234210870D700221F74 /* StoreSeriesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FF6A233210870D700221F74 /* StoreSeriesViewController.m */; };
 		5FF6A2372108963B00221F74 /* YHStoreCloudTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FF6A2362108963B00221F74 /* YHStoreCloudTableViewCell.m */; };
@@ -1392,8 +1393,6 @@
 		5F25C4CF215236E700770322 /* YHJoinInSuperGroupViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YHJoinInSuperGroupViewController.m; sourceTree = "<group>"; };
 		5F25C4D12152383500770322 /* YHJoinSuperGroupView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YHJoinSuperGroupView.h; sourceTree = "<group>"; };
 		5F25C4D22152383500770322 /* YHJoinSuperGroupView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YHJoinSuperGroupView.m; sourceTree = "<group>"; };
-		5F25C4D4215379ED00770322 /* AlipaySDK.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AlipaySDK.bundle; sourceTree = "<group>"; };
-		5F25C4D5215379ED00770322 /* AlipaySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AlipaySDK.framework; sourceTree = "<group>"; };
 		5F25C4D821537A6600770322 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		5F25C4DA21537A8000770322 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		5F25C4DC21537AB900770322 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
@@ -1461,6 +1460,8 @@
 		5F64AE2A209966EF00C12C5B /* YHMainChooseCatagoryViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YHMainChooseCatagoryViewController.m; sourceTree = "<group>"; };
 		5F64AE2C209ACF4600C12C5B /* YHMainCatagoryModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YHMainCatagoryModel.h; sourceTree = "<group>"; };
 		5F64AE2D209ACF4700C12C5B /* YHMainCatagoryModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YHMainCatagoryModel.m; sourceTree = "<group>"; };
+		5F854D8C217833CE00D0AB2A /* AlipaySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AlipaySDK.framework; path = emake/Frameworks/AlipaySDK.framework; sourceTree = "<group>"; };
+		5F854D8D217833CE00D0AB2A /* AlipaySDK.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = AlipaySDK.bundle; path = emake/Frameworks/AlipaySDK.bundle; sourceTree = "<group>"; };
 		5F8E67B420F52F7F008D345F /* MQTTStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MQTTStatus.h; sourceTree = "<group>"; };
 		5F8E67B520F52F7F008D345F /* MQTTStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MQTTStatus.m; sourceTree = "<group>"; };
 		5F94B32120D100770005C581 /* test.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = test.caf; sourceTree = "<group>"; };
@@ -1494,6 +1495,8 @@
 		5FE018422160B84600C3E34E /* YHCityDelegateMOdel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YHCityDelegateMOdel.m; sourceTree = "<group>"; };
 		5FE018442160C02600C3E34E /* YHProductStoreIntrocdutctionViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YHProductStoreIntrocdutctionViewController.h; sourceTree = "<group>"; };
 		5FE018452160C02600C3E34E /* YHProductStoreIntrocdutctionViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YHProductStoreIntrocdutctionViewController.m; sourceTree = "<group>"; };
+		5FE018572175A22400C3E34E /* YHMainLastWeekCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YHMainLastWeekCollectionViewCell.h; sourceTree = "<group>"; };
+		5FE018582175A22400C3E34E /* YHMainLastWeekCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YHMainLastWeekCollectionViewCell.m; sourceTree = "<group>"; };
 		5FE8384020A449D000743780 /* YHDiscoverViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YHDiscoverViewController.h; sourceTree = "<group>"; };
 		5FE8384120A449D000743780 /* YHDiscoverViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YHDiscoverViewController.m; sourceTree = "<group>"; };
 		5FF6A232210870D700221F74 /* StoreSeriesViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StoreSeriesViewController.h; sourceTree = "<group>"; };
@@ -1574,6 +1577,7 @@
 			files = (
 				189BB01E1F4D2E1600272259 /* libz.tbd in Frameworks */,
 				5F25C4E121537ADF00770322 /* libc++.tbd in Frameworks */,
+				5F854D8E217833CF00D0AB2A /* AlipaySDK.framework in Frameworks */,
 				5F25C4DF21537AC700770322 /* CoreGraphics.framework in Frameworks */,
 				5F25C4DD21537AB900770322 /* CoreText.framework in Frameworks */,
 				189BB0201F4D2E2D00272259 /* CoreTelephony.framework in Frameworks */,
@@ -1604,7 +1608,6 @@
 				C0220A691F57B0BB00E1B78E /* WechatConnector.framework in Frameworks */,
 				5E8BAE3C1FAD7D45009BF93C /* UMMobClick.framework in Frameworks */,
 				C0220A681F57B0BB00E1B78E /* TwitterConnector.framework in Frameworks */,
-				5F25C4D7215379EE00770322 /* AlipaySDK.framework in Frameworks */,
 				5E183A1C20CA713D0041F083 /* CloudPushSDK.framework in Frameworks */,
 				189BB02A1F4D315F00272259 /* UTDID.framework in Frameworks */,
 				C0220A611F57B0BB00E1B78E /* ShareSDKUI.framework in Frameworks */,
@@ -1636,8 +1639,8 @@
 				5F25C4DC21537AB900770322 /* CoreText.framework */,
 				5F25C4DA21537A8000770322 /* CFNetwork.framework */,
 				5F25C4D821537A6600770322 /* CoreMotion.framework */,
-				5F25C4D4215379ED00770322 /* AlipaySDK.bundle */,
-				5F25C4D5215379ED00770322 /* AlipaySDK.framework */,
+				5F854D8D217833CE00D0AB2A /* AlipaySDK.bundle */,
+				5F854D8C217833CE00D0AB2A /* AlipaySDK.framework */,
 				5E7EC24E20CE0AED000EBC2C /* Bugly.framework */,
 				5E183A1B20CA713D0041F083 /* AlicloudUtils.framework */,
 				5E183A1A20CA713D0041F083 /* CloudPushSDK.framework */,
@@ -1920,6 +1923,8 @@
 				5EA26D2821006F85007DA1B8 /* YHStoreListCollectionViewCell.m */,
 				5FF6A2352108963B00221F74 /* YHStoreCloudTableViewCell.h */,
 				5FF6A2362108963B00221F74 /* YHStoreCloudTableViewCell.m */,
+				5FE018572175A22400C3E34E /* YHMainLastWeekCollectionViewCell.h */,
+				5FE018582175A22400C3E34E /* YHMainLastWeekCollectionViewCell.m */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -3760,6 +3765,7 @@
 				E53814FE1F148BB000B11B0D /* Resources */,
 				E5E533281F46EA5800B566D8 /* Embed Frameworks */,
 				A3E38023975F2E8116385514 /* [CP] Embed Pods Frameworks */,
+				898E78EAD24E04024C72520D /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -3848,6 +3854,7 @@
 				5E4B713321240D970032AF1E /* dianpuicon_fang.svg in Resources */,
 				5EF2DD131FE11F7E0035F917 /* MainInterface.storyboard in Resources */,
 				5EC894081FA893500007EED6 /* Chat.storyboard in Resources */,
+				5F854D8F217833CF00D0AB2A /* AlipaySDK.bundle in Resources */,
 				18560C3D1F46B62B0000E2D3 /* OrderEmptyView.xib in Resources */,
 				5EC6656E1F7A1B010034F146 /* HYPersonalFileHeaderTableViewCell.xib in Resources */,
 				5E1AE0331F7F963C0002D4A2 /* EMakeLocalizable.strings in Resources */,
@@ -3856,7 +3863,6 @@
 				5EC894231FA893500007EED6 /* IMUIEmojiCell.xib in Resources */,
 				5EC6657A1F7A1B010034F146 /* YHMineCommonCell.xib in Resources */,
 				C0220A6D1F57B0BB00E1B78E /* WeiboSDK.bundle in Resources */,
-				5F25C4D6215379EE00770322 /* AlipaySDK.bundle in Resources */,
 				3F5B185E1F185B1200A08BAE /* Info.plist in Resources */,
 				5EC8944B1FA893500007EED6 /* IMUIMessageCollectionView.xib in Resources */,
 				5E0E98E51FC3B0C200459EDE /* LaunchScreen.storyboard in Resources */,
@@ -3886,6 +3892,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		898E78EAD24E04024C72520D /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-emake/Pods-emake-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		A3E38023975F2E8116385514 /* [CP] Embed Pods Frameworks */ = {
@@ -4093,6 +4114,7 @@
 				3F5B18211F17658100A08BAE /* TADotView.m in Sources */,
 				5E3298011FB03DA9009926FE /* MSSBrowseLocalViewController.m in Sources */,
 				5F25C6F621550D5600770322 /* productParamModel.m in Sources */,
+				5FE018592175A22400C3E34E /* YHMainLastWeekCollectionViewCell.m in Sources */,
 				5E50EA09203EBCD10026738C /* TZPhotoPreviewController.m in Sources */,
 				5EA943DC1F5538CF002F866A /* ChatOfficialListCell.m in Sources */,
 				5EE2DDA01F8CB01100DC4B77 /* UIView+WZLBadge.m in Sources */,

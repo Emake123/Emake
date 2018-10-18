@@ -50,18 +50,19 @@
     // Do any additional setup after loading the view.
     self.title = @"消息";
     self.view.backgroundColor = TextColor_F5F5F5;
-    NSString *isStoreStr = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    self.isSotre = [isStoreStr isEqualToString:@"1"];
+
     [self configSubViews];
    
 
-    if (self.isSotre) {
-        NSArray *listArray = [[FMDBManager sharedManager] getAllMessageChatList];
-        self.chatListArray = [NSMutableArray arrayWithArray:listArray];
-//        [self configTableView];
-    }else{
-        [self getMessageList];
-    }
+    NSArray *listArray = [[FMDBManager sharedManager] getAllMessageChatList];
+    self.chatListArray = [NSMutableArray arrayWithArray:listArray];
+    [self messageRefresh];
+
+//    if (self.chatListArray.count==0) {
+//        [self getMessageList];
+//
+//    };
+
     [self configTableView];
     [self getLogistInfoMessageList];
 
@@ -70,7 +71,7 @@
 
 - (void)configSubViews{
     
-    self.inviteView = [self getPictureWithTextViewWithTag:0 andText:self.isSotre==YES?@"消息":@"邀请" imageString:self.isSotre==YES?@"xiaoxi_xiaoxis":@"xiaoxi-yaoqings"];
+    self.inviteView = [self getPictureWithTextViewWithTag:0 andText:@"消息"imageString:@"xiaoxi_xiaoxis"];
     self.inviteView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:self.inviteView];
     
@@ -265,7 +266,7 @@
             break;
     }
 }
-- (void)getMessageList{
+- (void)getMessageList{//邀请消息列表
     _recordTopButtonPosition = 0;
     [self.view showWait:@"加载中" viewType:CurrentView];
     self.infoArray = [NSMutableArray arrayWithCapacity:0];
@@ -329,11 +330,11 @@
     self.chatListArray = [NSMutableArray arrayWithArray:listArray];
     SDChatMessage * msg = [[FMDBManager sharedManager] getMessageChatListWithOffcial];
     msg.staffName = @"易智造客服";
-    if (msg.msg.length>0 ) {
-        
-        [self.chatListArray addObject:msg];
-        
-    }
+//    if (msg.msg.length>0 ) {
+//
+//        [self.chatListArray addObject:msg];
+//
+//    }
     NSMutableDictionary *messageCountDic = [YHMQTTClient sharedClient].messageCountDic;
     if ([messageCountDic.allKeys containsObject:@"官方客服"]) {
          [self.messageTable reloadData];
@@ -354,7 +355,6 @@
     
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    if (self.isSotre) {
         if (self.recordTopButtonPosition == 0) {
             
 //            if (section == 0) {
@@ -379,13 +379,11 @@
         {
             return 0;
         }
-    }else{
-        return self.infoArray.count;
-    }
+   
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    if (self.isSotre) {
-        if (self.recordTopButtonPosition == 0) {
+  
+        if (self.recordTopButtonPosition == 0) {//聊天消息列表
             NSMutableDictionary *messageCountDic = [YHMQTTClient sharedClient].messageCountDic;
             self.messageCountDic = messageCountDic;
             ChatCommmonListCell *cell = nil;
@@ -395,8 +393,8 @@
             SDChatMessage *msg = self.chatListArray[indexPath.row];
             if (msg.userId.length>0) {
                 if ([msg.staffName isEqualToString:@"易智造客服"]) {
-                    msg.messageCount = messageCountDic[@"官方客服"];
-                    
+                    msg.messageCount = msg.messageCount;//messageCountDic[@"官方客服"];
+
                 }else
                 {
                     msg.messageCount = messageCountDic[msg.userId];
@@ -407,7 +405,7 @@
             [cell setData:msg];
             cell.selectionStyle  = UITableViewCellSelectionStyleNone;
             return cell;
-        }else if(self.recordTopButtonPosition == 1)
+        }else if(self.recordTopButtonPosition == 1)//物流消息列表
         {
             YHMessageLogistTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"YHMessageLogistTableViewCell"];
             if (cell ==nil) {
@@ -427,18 +425,7 @@
         }
             
         
-    }else{
-        InviteMessageCellTableViewCell *cell = nil;
-        if (cell == nil) {
-            cell = [[InviteMessageCellTableViewCell alloc]init];
-        }
-        YHInviteMessageModel *model = self.infoArray[indexPath.row];
-        [cell setData:model];
-        cell.agree.tag = 1000 +indexPath.row;
-        [cell.agree addTarget:self action:@selector(joinTeam:) forControlEvents:UIControlEventTouchUpInside];
-        cell.selectionStyle  = UITableViewCellSelectionStyleNone;
-        return cell;
-    }
+  
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -452,9 +439,7 @@
     return UITableViewCellEditingStyleNone;
 }
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{
-    if (self.isSotre) {
-        
-    }else{
+   
         [self.view showWait:@"请等待" viewType:CurrentView];
         YHInviteMessageModel *model = self.infoArray[indexPath.row];
         [[YHJsonRequest shared] deleteInfomationList:model.RefNo SuccessBlock:^(NSString *successMessage) {
@@ -467,7 +452,7 @@
             [self.view makeToast:errorMessages duration:1.0 position:CSToastPositionCenter];
             [self.view hideWait:CurrentView];
         }];
-    }
+    
 }
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
@@ -563,7 +548,6 @@
     {
         vc.storeName = msg.staffName;
         vc.storeAvata = msg.staffAvata;
-        vc.storeName = msg.staffName;
         if ([msg.userId containsString:@"_"]) {
             NSArray *array = [msg.userId componentsSeparatedByString:@"_"];
             if (array.count == 2) {
@@ -572,6 +556,7 @@
 
             }
         }
+        vc.isCatagory = [msg.staffName containsString:@"输配电"];
     }
     self.fileNameStr = @"";
     self.urlStr =@"";

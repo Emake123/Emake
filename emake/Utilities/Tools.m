@@ -49,32 +49,49 @@
     }
     
 }
-+(void)SaveLocalVipstateWithCatagory:(NSArray*)IdentityCategorys
++(NSInteger)SaveLocalVipstateWithCatagory:(NSArray*)IdentityCategorys
 {
    
     NSInteger CatagoryVip =0;
     NSInteger RecordCatagoryVip =0;
-    
-    for (int i=0;i<IdentityCategorys.count;i++) {
-        NSDictionary *dic = IdentityCategorys[i];
-        NSString *CategoryBName = dic[@"CategoryBName"];
-        if([CategoryBName containsString:@"输配电"])
-        {
-            RecordCatagoryVip++;
-            CatagoryVip = 2;
-        }else if([CategoryBName containsString:@"食品"])
-        {
-            RecordCatagoryVip++;
-            CatagoryVip = 1;
+    NSString *state = Userdefault(VipState);//
+    NSString *catagoryid = Userdefault(USERSELECCATEGORY);
+    if (state.integerValue ==0) {
+        CatagoryVip = 0;
+    }else{
+        NSArray *arr = IdentityCategorys.count==0?Userdefault(UserVipIdentityCategorys):IdentityCategorys;
+        for (int i=0;i<arr.count;i++) {
+            NSDictionary *dic = arr[i];
+//            NSString *CategoryBName = dic[@"CategoryBName"];//CategoryBId
+            NSString *CategoryBid = dic[@"CategoryBId"];
+//            if([CategoryBName containsString:@"输配电"])
+//            {
+//                RecordCatagoryVip++;
+//                CatagoryVip = 2;
+//            }else if([CategoryBName containsString:@"食品"])
+//            {
+//                RecordCatagoryVip++;
+//                CatagoryVip = 1;
+//            }
+            
+
+            if ([CategoryBid isEqualToString:catagoryid]) {
+
+                CatagoryVip = state.integerValue;
+                
+                break;
+                
+            }
+            
         }
         
     }
-    if (RecordCatagoryVip==2) {
-        CatagoryVip = 3;
-    }
+    
     
     [[NSUserDefaults standardUserDefaults] setObject:@(CatagoryVip) forKey:CatagoryVipState];
     
+    
+    return CatagoryVip;
 
 }
 +(void)jumpIntoOnlyVC:(UINavigationController *)currentNav destnationViewController:(UIViewController *)destnationVC

@@ -13,6 +13,7 @@
 #import "YHPayViewController.h"
 #import "YHSuperGroupCollageViewController.h"
 #import "YHAlertView.h"
+#import "YHSuperGroupDetailViewController.h"
 @interface YHSuperGroupConfirmOrderViewController ()<UITableViewDelegate ,UITableViewDataSource,YHAlertViewDelegete>
 {
     
@@ -43,22 +44,29 @@
 
   
     [self activeCountDownAction];
-//  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(payNotify:) name:NsuserDefaultsPaySuccessState object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(payNotify:) name:NsuserDefaultsPayFailState object:nil];
 }
-//-(void)payNotify:(NSNotification *)notify
-//{
-//    
-//   
-//  
-//    NSNumber *SuccessState = notify.userInfo[@"NsuserDefaultsPaySuccessState"];
-//    self.block(SuccessState);
-//    [self.navigationController  popViewControllerAnimated:YES];
-//   
-//    
-//        
-//
-//   
-//}
+-(void)payNotify:(NSNotification *)notify
+{
+    YHAlertView *alert =  [[YHAlertView alloc] initWithDelegete:self Title:@"支付失败" bottomTitle:@"客服热线：400-867-0211" ButtonTitle:@"重新支付"];
+    [alert showAnimated];
+}
+-(void)alertViewRightBtnClick:(id )alertView  currentTitle:(NSString *)currentTitle
+{
+    if ([currentTitle isEqualToString:@"支付失败"]) {
+        YHAlertView *alertViewS = (YHAlertView *)alertView;
+        [alertViewS closeAnimated];
+    } else {
+        for (UIViewController *vc in self.navigationController.viewControllers) {
+            if ([vc isKindOfClass:[YHSuperGroupDetailViewController class]]) {
+                YHSuperGroupDetailViewController *vc11 = (YHSuperGroupDetailViewController *)vc;
+                [self.navigationController popToViewController:vc11 animated:YES];
+            }
+        }
+    }
+
+}
+
 -(void)congfigUI
 {
    self.myTableView = [[UITableView alloc]initWithFrame:CGRectZero style:UITableViewStyleGrouped];
@@ -247,7 +255,7 @@
     [companyLabelName PSSetRightAtItem:shopHeadImageView Length:WidthRate(5)];
     
     UILabel *shopGoodsInvoiceLable = [[UILabel alloc] init];
-    shopGoodsInvoiceLable.text = @"含税";
+    shopGoodsInvoiceLable.text = self.supermodel.TaxDesc;
     shopGoodsInvoiceLable.textAlignment = NSTextAlignmentCenter;
     shopGoodsInvoiceLable.font = [UIFont systemFontOfSize:AdaptFont(9)];
     shopGoodsInvoiceLable.textColor = ColorWithHexString(@"ffffff");
@@ -258,7 +266,7 @@
     shopGoodsInvoiceLable.translatesAutoresizingMaskIntoConstraints= NO;
     [shopGoodsInvoiceLable PSSetRightAtItem:companyLabelName Length:WidthRate(5)];
     [shopGoodsInvoiceLable PSSetSize:WidthRate(33) Height:HeightRate(17)];
-    //        shopGoodsInvoiceLable.hidden = self.isIndustry==YES?YES:[model.IsInvoice isEqualToString:@"0"];
+    shopGoodsInvoiceLable.hidden = [self.supermodel.TaxDesc containsString:@"不"]?YES:false;
     
     return customHeadView;
     
@@ -360,6 +368,12 @@
 
 -(void)discussContractButtonClicked
 {
+    NSString *HidenVip = Userdefault(HidenCatagoryVip);
+    if (HidenVip.integerValue==0) {
+        
+        return;
+    }
+
     //
     NSArray *array = @[@{@"ProductId":self.supermodel.ProductId,@"ProductNumber":@"1"}];
     
@@ -373,43 +387,51 @@
 
     NSString *adressStr = self.adressModel?[self.adressModel mj_JSONString]:@"";
 
-[[YHJsonRequest shared] addShoppinCartWithParams:dic SuccessBlock:^(NSString *successMessage){
-    NSMutableArray *paramsdicArr = [NSMutableArray array];
-    NSDictionary * paramsDic=@{@"OrderNos":@[successMessage],@"IsInvoice":self.supermodel.IsInvoice,@"InsurdAmount":@"0",@"StoreId":self.supermodel.StoreId,@"Address":adressStr,@"SuperGroupDetailId":self.infomodel.SuperGroupDetailId,@"CategoryBId":self.supermodel.CategoryBId};
-    [paramsdicArr addObject:paramsDic];
-   NSDictionary * dic =@{@"MakeOrders":paramsdicArr};
-    
-    [[YHJsonRequest shared] makeShoppingCartOderParams:dic SuccessBlock:^(NSArray *successMessage) {
-        
-//        YHSuperGroupConfirmOrderViewController *weakSelf = self;
-        YHPayViewController *vc = [[YHPayViewController alloc] init];
-        vc.isHidenTopTitle = false;
-        vc.payOrderMoney = self.supermodel.FrontMoney;
-        vc.payParams = @{@"TotalAmount":@"0.01",@"PayClass":@"2",@"Params":@{@"OrderNo":successMessage.firstObject[@"OrderNo"]}};
-        vc.OrderNo = successMessage.firstObject[@"OrderNo"];
-       
-        [self.navigationController pushViewController:vc animated:YES];
+    [[YHJsonRequest shared] getAppSuperGroupSubmitWithparams:@{@"SuperGroupDetailId":self.infomodel.SuperGroupDetailId} SuccessBlock:^(NSString *success) {
+        [[YHJsonRequest shared] addShoppinCartWithParams:dic SuccessBlock:^(NSString *successMessage){
+            NSMutableArray *paramsdicArr = [NSMutableArray array];
+            NSDictionary * paramsDic=@{@"OrderNos":@[successMessage],@"IsInvoice":self.supermodel.IsInvoice,@"InsurdAmount":@"0",@"StoreId":self.supermodel.StoreId,@"Address":adressStr,@"SuperGroupDetailId":self.infomodel.SuperGroupDetailId,@"CategoryBId":self.supermodel.CategoryBId};
+            [paramsdicArr addObject:paramsDic];
+            NSDictionary * dic =@{@"MakeOrders":paramsdicArr};
+            
+            [[YHJsonRequest shared] makeShoppingCartOderParams:dic SuccessBlock:^(NSArray *successMessage) {
+                
+                //        YHSuperGroupConfirmOrderViewController *weakSelf = self;
+                YHPayViewController *vc = [[YHPayViewController alloc] init];
+                vc.isHidenTopTitle = false;
+                vc.payOrderMoney = self.supermodel.FrontMoney;
+                vc.payParams = @{@"PayClass":@"2",@"Params":@{@"OrderNo":successMessage.firstObject[@"OrderNo"]}};//"TotalAmount":@"0.01",
+                vc.OrderNo = successMessage.firstObject[@"OrderNo"];
+                vc.recordIndex = self.recordIdex;
+                [self.navigationController pushViewController:vc animated:YES];
+                
+            } fialureBlock:^(NSString *errorMessages) {
+                
+                [self.view hideWait:CurrentView];
+                [self.view makeToast:errorMessages duration:1 position:CSToastPositionCenter];
+                
+            }];
+            
+        } fialureBlock:^(NSString *errorMessages){
+            [self.view makeToast:errorMessages duration:1 position:CSToastPositionCenter];
+        }];
         
     } fialureBlock:^(NSString *errorMessages) {
-        
-        [self.view hideWait:CurrentView];
-        [self.view makeToast:errorMessages duration:1 position:CSToastPositionCenter];
-        
+        if ([errorMessages containsString:@"-1"]) {
+     NSString *tips =  [errorMessages stringByReplacingOccurrencesOfString:@"-1" withString:@""];
+            YHAlertView *alert =  [[YHAlertView alloc] initWithDelegete:self  bottomTitle:tips ButtonTitle:@"确定"];
+            [alert showAnimated];
+            
+        } else {
+            [self.view makeToast:errorMessages duration:1.0 position:CSToastPositionCenter];
+        }
     }];
-  
-} fialureBlock:^(NSString *errorMessages){
-    [self.view makeToast:errorMessages duration:1 position:CSToastPositionCenter];
-}];
+
     
     
     
 }
 
--(void)getOrder
-{
-  
-
-}
 
 
 #pragma mark - 倒计时计数
@@ -486,6 +508,8 @@
         }
     }
 }
+
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

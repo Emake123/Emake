@@ -59,6 +59,8 @@ typedef void(^CallBackBlcok) (NSString *text);//1
 
 - (instancetype)initWithDelegete:(id)delegate Title:(NSString *)title bottomTitle:(NSString *)bottomTitle ButtonTitle:(NSString *)ButtonTitle;
 
+- (instancetype)initWithDelegete:(id)delegate  bottomTitle:(NSString *)Title ButtonTitle:(NSString *)ButtonTitle;
+
 - (void)showAnimated;   
 - (void)closeAnimated;
 

@@ -65,7 +65,7 @@
             NSDictionary *dic = lastWeekArray.firstObject;
             NSString *name = dic[@"RealName"];
             NSString *resultStr = @"";
-            if (name.length>2) {
+            if (name.length>1) {
                 resultStr =[NSString stringWithFormat:@"%@**",[name substringToIndex:1]];
             }else
             {
@@ -122,7 +122,7 @@
 
     NSDictionary *dic = self.lastWeekArray[index];
     NSString *name = dic[@"RealName"];
-    if (name.length>2) {
+    if (name.length>1) {
         resultStr =[NSString stringWithFormat:@"%@**",[name substringToIndex:1]];
     }else
     {
@@ -132,7 +132,7 @@
     NSString *totalPrice = [NSString stringWithFormat:@"已获得%@元现金",[Tools getHaveNum:[dic[@"TotalCashIn"] doubleValue]]];
 
     self.commpanyLabel.text = resultStr;
-    self.Amount.text = [NSString stringWithFormat:@"¥%@",totalPrice];
+    self.Amount.text = [NSString stringWithFormat:@"%@",totalPrice];
     
     
     

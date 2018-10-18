@@ -64,7 +64,6 @@
 #define PathDocument [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject]
 #define PathDocumentCache [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject]
 
-//#define ISstore [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
 
 //shared
 #define DEFINE_SINGLETON_FOR_CLASS(className) \
@@ -103,6 +102,7 @@ enum WebType
 
 #define NsuserDefaultsChatMessagesdict           @"messageCount"
 #define NsuserDefaultsPaySuccessState           @"NsuserDefaultsPaySuccessState"
+#define NsuserDefaultsPayFailState           @"NsuserDefaultsPayfailState"
 
 //字体适配
 #define SYSTEM_FONT(systemSize)   [UIFont systemFontOfSize:systemSize]
@@ -171,18 +171,21 @@ static inline CGFloat FontSize(CGFloat fontSize){\
 #define USERSCardName                           @"USERSCardName"
 #define USERSISCHECK                            @"USERSISCHECK" //用户是否查看
 #define USERREQUESTSERVER                       @"USERREQUESTSERVER"
-#define LOGIN_ISSTORE                           @"LOGIN_ISSTORE"
 #define LOGIN_Access_Token                      @"LOGIN_access_token"
 #define LOGIN_Refresh_Token                     @"refresh_token"
 
 #define LOGIN_UserStyle                         @"LOGIN_UserStyle"
-#define IsIndustryCatagory                      @"IsIndustryCatagory"
+//#define IsIndustryCatagory                      @"IsIndustryCatagory"
 #define LOGIN_UserStoreID                       @"LOGIN_UserStoreID"
 #define CatagoryIDs                             @"CatagoryIDs"
 #define VipState                                @"VipState"
+#define UserVipIdentityCategorys              @"UserVipIdentityCategorys"
 
 #define DelegateMyMoney                         @"DelegateMyMoney"
-#define CatagoryVipState                        @"CatagoryVip"// 0普通 1 输配电会员2休闲食品3 输配电会员和休闲食品
+#define CatagoryVipState                        @"CatagoryVip"// (0普通 1 会员) ;;1休闲食品3 输配电会员和休闲食品
+#define HidenCatagoryVip                        @"HidenCatagoryVip"// 
+#define ISRegisterUser                       @"ISRegisterUser"//
+#define TitleIndex                       @"TitleIndex"//
 
 //热门搜索关键词
 #define  USERSSearchKeywords                          @"USERSSearchKeywords"

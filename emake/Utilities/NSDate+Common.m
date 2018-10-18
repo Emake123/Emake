@@ -122,7 +122,7 @@
 //时间戳比较
 +(BOOL)isValideTimeIntervalDifferenceWithTime:(NSString *)lastTime currentTime:(NSString *)currentTime{
     NSTimeInterval value = [currentTime integerValue] - [lastTime integerValue];
-    if (value > 3*60) {
+    if (fabs(value) > 1*60) {
         return YES;
     }
     else return NO;
@@ -137,8 +137,8 @@
     NSTimeInterval last = [startD timeIntervalSince1970]*1;
     NSTimeInterval current = [endD timeIntervalSince1970]*1;
     NSTimeInterval value = current - last;
-    int day = (int)value / (24 * 3600);
-    if (day < 30 ) {
+//    int day = (int)value / (24 * 3600);
+    if (value < validTime.integerValue ) {
         return YES;
     }
     else return NO;

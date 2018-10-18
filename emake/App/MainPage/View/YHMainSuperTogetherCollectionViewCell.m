@@ -131,7 +131,7 @@
 
             make.right.mas_equalTo(WidthRate(-15));
             make.width.mas_equalTo(WidthRate(80));
-            make.height.mas_equalTo(WidthRate(30));
+            make.height.mas_equalTo(HeightRate(30));
 
         }];
         self.togetherBtn = togetherButton;
@@ -141,7 +141,7 @@
 
 -(void)superGroupData:(YHSuperGroupModel *)model
 {
-    NSString *origianPrice =[NSString stringWithFormat:@"%@ 原价",[Tools getHaveNum:model.OldPrice.doubleValue]];
+    NSString *origianPrice =[NSString stringWithFormat:@"¥%@ 原价",[Tools getHaveNum:model.OldPrice.doubleValue]];
     NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:origianPrice];
     [attrStr addAttribute:NSStrikethroughStyleAttributeName
                     value:[NSNumber numberWithInteger:NSUnderlineStyleSingle]
@@ -153,10 +153,10 @@
     }
     self.productName.text = model.GroupName;
     
-    if (model.GroupState.integerValue==0) {
+    if (model.GroupState.integerValue==1) {
         self.togetherBtn.backgroundColor = ColorWithHexString(StandardBlueColor);
         [self.togetherBtn setTitle:@"即将开始" forState:UIControlStateNormal];
-    }else if(model.GroupState.integerValue==1)
+    }else if(model.GroupState.integerValue==0)
     {
         self.togetherBtn.backgroundColor = ColorWithHexString(@"F8695D");
         [self.togetherBtn setTitle:@"去拼团" forState:UIControlStateNormal];
@@ -165,6 +165,12 @@
         self.togetherBtn.backgroundColor = ColorWithHexString(@"C9C9C9");
         [self.togetherBtn setTitle:@"拼团结束" forState:UIControlStateNormal];
     }
-    self.freightPrice.text = [NSString stringWithFormat:@"¥%@ 起 拼团价",[Tools getHaveNum:model.GroupPrice.doubleValue]];
+    
+    NSString *freightStr =  [NSString stringWithFormat:@"¥%@ 起 拼团价",[Tools getHaveNum:model.GroupPrice.doubleValue]];
+    NSMutableAttributedString *attrStr1 = [[NSMutableAttributedString alloc] initWithString:freightStr];
+    [attrStr1 addAttribute:NSFontAttributeName
+                    value:[UIFont systemFontOfSize:AdaptFont(11)]
+                    range:NSMakeRange(freightStr.length-5, 1)];
+    self.freightPrice.attributedText = attrStr1;
 }
 @end

@@ -60,7 +60,7 @@ NSString * FootCell = @"footCell";
 @property (assign, nonatomic) NSInteger expandSectionIndex;
 @property (assign, nonatomic) BOOL isExpandSection;
 @property (assign, nonatomic) NSInteger recordSectionIndex;
-@property (assign, nonatomic) BOOL isStore;
+//@property (assign, nonatomic) BOOL isStore;
 @end
 
 @implementation YHOrderManageNewViewController
@@ -72,8 +72,7 @@ NSString * FootCell = @"footCell";
 //    [self addRigthDetailButtonIsShowCart:false];
     self.view.backgroundColor = TextColor_F5F5F5;
     self.navigationItem.title = @"全部订单";
-    NSString *isStoreString = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    self.isStore = [isStoreString isEqualToString:@"1"];
+ 
     _dataArray = [NSMutableArray array];
     _totalArray = [NSMutableArray array];
     [self configUI];
@@ -92,17 +91,10 @@ NSString * FootCell = @"footCell";
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     
-    NSString *isStoreString = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    self.isStore = [isStoreString isEqualToString:@"1"];
-    if (self.isStore==YES) {
-        [MobClick event:@"Order" label:@"我的订单-输配电"];
+    [MobClick event:@"Order" label:@"我的订单-输配电"];
 
-    }else
-    {
-        [MobClick event:@"Order_B" label:@"我的订单-休闲食品"];
-    }
+   
 
-    self.isStore = [isStoreString isEqualToString:@"1"];
 
     [self configTopView];
     [titleView selectItemWithIndex:self.OrderState];
@@ -134,32 +126,11 @@ NSString * FootCell = @"footCell";
 
 - (void)getOrderData{
 //    PageIndex
-//    [self.view showWait:@"加载中" viewType:CurrentView];//,@"PageIndex":@"",@"PageSize":@""
-//    NSDictionary *paramDic;
-//    if (lastSelectIndex ==0) {
-//
-//        if (self.isStore ==YES) {
-//             paramDic =@{@"RequestType":@"1",@"PageIndex":@"1",@"PageSize":[NSString stringWithFormat:@"%ld",page]};
-//        }else
-//        {
-//             paramDic =@{@"PageIndex":@"1",@"PageSize":[NSString stringWithFormat:@"%ld",page]};
-//        }
-//
-//    }else
-//    {
-//        if (self.isStore ==YES) {
-//            NSInteger orderStateNum =self.titleSelectArray[self.expandSectionIndex];
-//            paramDic =@{@"RequestType":@"1",@"OrderState":[NSString stringWithFormat:@"%ld",orderStateNum],@"PageIndex":@"1",@"PageSize":[NSString stringWithFormat:@"%ld",page]};
-//
-//        }else
-//        {
-//            paramDic =@{@"RequestType":@"1",@"OrderState":[NSString stringWithFormat:@"%ld",(lastSelectIndex-1)],@"PageIndex":@"1",@"PageSize":[NSString stringWithFormat:@"%ld",page]};
-//        }
-//    }
+
     NSString *orderStateNumStr =self.titleSelectArray[lastSelectIndex] ;
     NSDictionary* paramDic = lastSelectIndex==0?@{@"RequestType":@"1",@"PageIndex":@"1",@"PageSize":[NSString stringWithFormat:@"%ld",page]} :@{@"RequestType":@"1",@"OrderState":[NSString stringWithFormat:@"%@",orderStateNumStr],@"PageIndex":@"1",@"PageSize":[NSString stringWithFormat:@"%ld",page]};
     [[YHJsonRequest shared] userUseOrderManageParams:paramDic SucceededBlock:^(NSArray *orderArray) {
-        BOOL isCanOut =self.isStore==YES?(lastSelectIndex==2?YES:(lastSelectIndex==1?YES:false)):lastSelectIndex==1;
+        BOOL isCanOut =lastSelectIndex==2?YES:(lastSelectIndex==1?YES:false);
 
         if (isCanOut == YES) {//未付款的才有已失效
             NSMutableArray * selectArray= [NSMutableArray array];
@@ -206,24 +177,18 @@ NSString * FootCell = @"footCell";
 -(void)configTopView
 {
     [titleView removeFromSuperview];
-    if (self.isStore == YES) {
-        if (TopScroView == nil) {
-            TopScroView = [[UIScrollView alloc] init];
-            TopScroView.frame = CGRectMake(0, TOP_BAR_HEIGHT, ScreenWidth, HeightRate(35));
-            TopScroView.showsHorizontalScrollIndicator = false;
-            TopScroView.backgroundColor = ColorWithHexString(@"ffffff");
-//            TopScroView.contentSize = CGSizeMake(WidthRate(481), HeightRate(35));
-            [self.view addSubview:TopScroView];
-        }
-        self.titleSelectArray = [NSArray arrayWithObjects:@"0",@"-2",@"012",@"3", nil];
-        self.titleArray = [NSArray arrayWithObjects:@"全  部",@"待签订",@"待付款",@"已发货", nil];
-        titleView = [[YHTitleView alloc]initWithFrame:CGRectMake(0, 0, ScreenWidth, HeightRate(35)) titleFont:14 delegate:self andTitleArray:self.titleArray];
-        [TopScroView addSubview:titleView];
-    }else{
-        self.titleArray = [NSArray arrayWithObjects:@"全  部",@"待付款",@"生产中",@"生产完成",@"已发货", nil];
-        titleView = [[YHTitleView alloc]initWithFrame:CGRectMake(0, TOP_BAR_HEIGHT, ScreenWidth, HeightRate(35)) titleFont:14 delegate:self andTitleArray:self.titleArray];
-        [self.view addSubview:titleView];
+    if (TopScroView == nil) {
+        TopScroView = [[UIScrollView alloc] init];
+        TopScroView.frame = CGRectMake(0, TOP_BAR_HEIGHT, ScreenWidth, HeightRate(35));
+        TopScroView.showsHorizontalScrollIndicator = false;
+        TopScroView.backgroundColor = ColorWithHexString(@"ffffff");
+        [self.view addSubview:TopScroView];
     }
+    self.titleSelectArray = [NSArray arrayWithObjects:@"0",@"-2",@"012",@"3", nil];
+    self.titleArray = [NSArray arrayWithObjects:@"全  部",@"待签订",@"待付款",@"已发货", nil];
+    titleView = [[YHTitleView alloc]initWithFrame:CGRectMake(0, 0, ScreenWidth, HeightRate(35)) titleFont:14 delegate:self andTitleArray:self.titleArray];
+    [TopScroView addSubview:titleView];
+
 }
 - (void)configUI {
     
@@ -289,7 +254,8 @@ NSString * FootCell = @"footCell";
     page = 3;
     self.OrderState = index;
     lastSelectIndex =  index;
-   
+    [[NSUserDefaults standardUserDefaults] setObject:@(index) forKey:TitleIndex];
+
 //    CGFloat indext =(index-2)>0?(index>3?1.25:(NSInteger)(index-2)):0;
 //    [TopScroView setContentOffset:CGPointMake(80*indext, 0) animated:YES];
     [self getOrderData];
@@ -317,20 +283,12 @@ NSString * FootCell = @"footCell";
     YHOrderContract *contract = self.dataArray[indexPath.section];
     if (indexPath.row<contract.goodsModelArr.count) {
         YHOrder *order = contract.goodsModelArr[indexPath.row];
-        if (self.isStore ==YES) {
-            YHStoreOrderNewTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cell];
-            cell = [[YHStoreOrderNewTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cell];
-            
-            [cell setRequestData:order ];
-            return cell;
-        }else
-        {
-            YHOrderTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cell];
-            cell = [[YHOrderTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cell];
-            
-            [cell setRequestData:order withIsStore:self.isStore isHidenFreight:(contract.OrderState.integerValue == -2?YES:NO)];
-            return cell;
-        }
+        YHStoreOrderNewTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:Cell];
+        cell = [[YHStoreOrderNewTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:Cell];
+        
+        [cell setRequestData:order ];
+        return cell;
+       
         
     }else if (indexPath.row ==contract.goodsModelArr.count)
     {
@@ -346,7 +304,7 @@ NSString * FootCell = @"footCell";
         cell.rightBtn.tag = indexPath.section+100;
         cell.customerServiceButton.tag = indexPath.section+100;
         cell.logisticsDetailButton.tag = indexPath.section+100;
-        [cell setData:contract withIsStore:self.isStore];
+        [cell setData:contract withIsStore:0];
         return cell;
     }
     else
@@ -389,7 +347,7 @@ NSString * FootCell = @"footCell";
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return HeightRate(36);
+    return HeightRate(62);
 }
 -(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
 {
@@ -601,7 +559,7 @@ NSString * FootCell = @"footCell";
         vc.isCatagory =![contract.CategoryBName containsString:@"输配电"];
         YHOrder *order = contract.goodsModelArr.firstObject;
         vc.isFromCartConfirm = YES;
-        YHChatOrderContract *chatOrder = [YHChatOrderContract initWithContractNo:contract.ContractNo GoodsTitle:order.GoodsTitle ContractAmount:contract.ContractAmount ContractQuantity:contract.ContractQuantity GoodsSeriesIcon:order.GoodsSeriesIcon GoodsExplain:order.GoodsExplain IsStore:[NSString stringWithFormat:@"%d",(!Userdefault(IsIndustryCatagory))]];
+        YHChatOrderContract *chatOrder = [YHChatOrderContract initWithContractNo:contract.ContractNo GoodsTitle:order.GoodsTitle ContractAmount:contract.ContractAmount ContractQuantity:contract.ContractQuantity GoodsSeriesIcon:order.GoodsSeriesIcon GoodsExplain:order.GoodsExplain IsStore:[NSString stringWithFormat:@"%d",(![contract.CategoryBName containsString:@"输配电"])]];
         NSString *jsonstr = [chatOrder mj_JSONString];
         vc.storeName = contract.StoreName;
         vc.storeID =contract.StoreId;
@@ -694,8 +652,7 @@ NSString * FootCell = @"footCell";
             [lineBottomView PSSetHeight:HeightRate(5)];
             
         }
-        if (self.isStore == YES) {
-            
+        
             UIView *companyView = [[UIView alloc] init];//WithFrame:CGRectMake(0, 0, ScreenWidth, HeightRate(30))];
             companyView.backgroundColor = ColorWithHexString(@"FAFAFA");
             [orderTopView addSubview:companyView];
@@ -703,7 +660,7 @@ NSString * FootCell = @"footCell";
             [companyView PSSetBottomAtItem:lineBottomView Length:3];
             
             [companyView PSSetLeft:0];
-            [companyView PSSetSize:ScreenWidth Height:HeightRate(30)];
+            [companyView PSSetSize:ScreenWidth Height:HeightRate(60)];
             
             UIImageView * shopHeadImageView = [[UIImageView alloc] init];
             //        shopHeadImageView.image = [UIImage imageNamed:@"placehold"];
@@ -712,8 +669,8 @@ NSString * FootCell = @"footCell";
             shopHeadImageView.translatesAutoresizingMaskIntoConstraints = NO;
             [companyView addSubview:shopHeadImageView ];
             [shopHeadImageView PSSetLeft:WidthRate(10)];
-            [shopHeadImageView PSSetSize:WidthRate(20) Height:HeightRate(20)];
-            [shopHeadImageView PSSetCenterHorizontalAtItem:companyView];
+            [shopHeadImageView PSSetSize:WidthRate(20) Height:HeightRate(30)];
+            [shopHeadImageView PSSetTop:0];
             
             UILabel *companyLabelName = [[UILabel alloc] init];
             companyLabelName.text = order.StoreName;
@@ -738,7 +695,7 @@ NSString * FootCell = @"footCell";
             shopGoodsInvoiceLable.translatesAutoresizingMaskIntoConstraints= NO;
             [shopGoodsInvoiceLable PSSetRightAtItem:companyLabelName Length:WidthRate(5)];
             [shopGoodsInvoiceLable PSSetSize:WidthRate(33) Height:HeightRate(17)];
-            shopGoodsInvoiceLable.hidden =boolUserdefault(IsIndustryCatagory)==YES?YES:[order.IsIncludeTax isEqualToString:@"0"];
+            shopGoodsInvoiceLable.hidden =!order.IsIncludeTax.boolValue;
 
             if (shopGoodsInvoiceLable.hidden==false ) {
                 [shopGoodsInvoiceLable PSSetSize:WidthRate(33) Height:HeightRate(17)];
@@ -758,7 +715,7 @@ NSString * FootCell = @"footCell";
             superGroupLable.backgroundColor = ColorWithHexString(@"F8695D");
             [companyView addSubview:superGroupLable];
             superGroupLable.translatesAutoresizingMaskIntoConstraints= NO;
-            superGroupLable.hidden =order.OrderState.integerValue <= 0?(order.SuperGroupDetailId.length>0?false:YES):YES;
+            superGroupLable.hidden =order.SuperGroupDetailId.length>0?false:YES;
             [superGroupLable PSSetRightAtItem:shopGoodsInvoiceLable Length:WidthRate(5)];
             [superGroupLable PSSetSize:WidthRate(14) Height:HeightRate(17)];
 
@@ -778,7 +735,7 @@ NSString * FootCell = @"footCell";
             superOrder.translatesAutoresizingMaskIntoConstraints= NO;
             [superOrder PSSetRightAtItem:superGroupLable Length:WidthRate(5)];
             [superOrder PSSetSize:WidthRate(55) Height:HeightRate(17)];
-            superOrder.hidden =order.OrderState.integerValue <= 0?(order.SuperGroupDetailId.length>0?false:YES):YES;;
+            superOrder.hidden =order.SuperGroupDetailId.length>0?false:YES;;
             //订单状态
             YHLabel *orderStatusLabel = [[YHLabel alloc] initWithTextColor:@"FA0C37"];
             orderStatusLabel.translatesAutoresizingMaskIntoConstraints = NO;
@@ -790,48 +747,26 @@ NSString * FootCell = @"footCell";
             [orderStatusLabel PSSetCenterHorizontalAtItem:shopGoodsInvoiceLable];
             [orderStatusLabel PSSetWidth:WidthRate(55)];
             orderStatusLabel.text = order.OrderStateName;
-                
             
-                
-        }else
-        {
-            YHLabel *orderIdItemLabel = [[YHLabel alloc] initWithText: NSLanguageLocalizedString(@"order id") textColor:BASE_FAINTLY_COLOR];
-            orderIdItemLabel.translatesAutoresizingMaskIntoConstraints   = NO;
-            orderIdItemLabel.font =[UIFont systemFontOfSize:AdaptFont(12)];
-            [orderTopView addSubview:orderIdItemLabel];
-            
-            [orderIdItemLabel PSSetLeft:WidthRate(12)];
-            [orderIdItemLabel PSSetBottomAtItem:lineBottomView Length:HeightRate(8)];
-            
+            UILabel *line = [[UILabel alloc] init];
+            line.backgroundColor = SepratorLineColor;
+            line.translatesAutoresizingMaskIntoConstraints = false;
+            [orderTopView addSubview:line];
+            [line PSSetLeft:WidthRate(10)];
+            [line PSSetSize:ScreenWidth-WidthRate(20) Height:HeightRate(1)];
+            [line PSSetBottomAtItem:shopHeadImageView Length:0];
+
             //订单号
             YHLabel *orderIdLabel = [[YHLabel alloc] initWithTextColor:BASE_FAINTLY_COLOR];
             orderIdLabel.translatesAutoresizingMaskIntoConstraints = NO;
-            orderIdLabel.text = [NSString stringWithFormat:@"%@",order.ContractNo] ;
+            orderIdLabel.text = [NSString stringWithFormat:@"订单号：%@",order.ContractNo] ;
             orderIdLabel.font =[UIFont systemFontOfSize:AdaptFont(12)];
             [orderTopView addSubview:orderIdLabel];
-            [orderIdLabel PSSetRightAtItem:orderIdItemLabel Length:WidthRate(5)];
-            
-            //订单日期
-            YHLabel *orderDateLabel = [[YHLabel alloc] initWithTextColor:BASE_FAINTLY_COLOR];
-            orderDateLabel.translatesAutoresizingMaskIntoConstraints = NO;
-            orderDateLabel.font =[UIFont systemFontOfSize:AdaptFont(12)];
-            orderDateLabel.text = order.AddWhen;
-            [orderTopView addSubview:orderDateLabel];
-            [orderDateLabel PSSetRightAtItem:orderIdLabel Length:WidthRate(36)];
-            
-            //订单状态
-            YHLabel *orderStatusLabel = [[YHLabel alloc] initWithTextColor:@"FA0C37"];
-            orderStatusLabel.translatesAutoresizingMaskIntoConstraints = NO;
-            orderStatusLabel.font =[UIFont systemFontOfSize:AdaptFont(12)];
-            [orderTopView addSubview:orderStatusLabel];
-            orderStatusLabel.textAlignment = NSTextAlignmentRight;
-            [orderStatusLabel PSSetRight:WidthRate(10)];
-            [orderStatusLabel PSSetCenterHorizontalAtItem:orderDateLabel];
-            [orderStatusLabel PSSetWidth:WidthRate(55)];
-            orderStatusLabel.text = order.OrderStateName;
-                
-            
-        }
+            [orderIdLabel PSSetLeft:WidthRate(10)];
+            [orderIdLabel PSSetSize:ScreenWidth-WidthRate(20) Height:HeightRate(30)];
+            [orderIdLabel PSSetBottomAtItem:shopHeadImageView Length:0];
+
+      
     }
     
     return orderTopView;

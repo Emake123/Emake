@@ -59,7 +59,7 @@
         UILabel *moneyTip = [[UILabel alloc] init];
         moneyTip.backgroundColor = ColorWithHexString(@"FFFFCC");
         moneyTip.textColor = ColorWithHexString(@"FF9900");
-        moneyTip.text = @"   付1000元定金，即可参与拼团，拼团不成功，立即全额退款 ";
+        moneyTip.text = @"   付定金，即可参与拼团，拼团不成功，立即全额退款 ";
         moneyTip.font = [UIFont systemFontOfSize:AdaptFont(13)];
         moneyTip.numberOfLines = 0;
         [self addSubview:moneyTip];

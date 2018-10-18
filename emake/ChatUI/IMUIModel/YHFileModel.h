@@ -32,7 +32,7 @@
 
 @interface YHChatVoiceModel : NSObject
 
-@property (nonatomic,copy)NSString *VoiceLength;
+@property (nonatomic,assign) int VoiceLength;
 @property (nonatomic,copy)NSString *VoiceFilePath;
 
 @end

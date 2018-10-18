@@ -57,8 +57,8 @@
     }
     
     [self.view showWait:@"加载中" viewType:CurrentView];
-    [[YHJsonRequest shared] getuserBrand:^(NSArray *shoppingCartArray) {
-        _brandArray  = [NSArray arrayWithArray:shoppingCartArray];
+    [[YHJsonRequest shared] getuserBrandParams:@{@"BusinessCategory":self.categoryID} success:^(NSArray *shoppingCartArray) {
+         _brandArray  = [NSArray arrayWithArray:shoppingCartArray];
         [self.view hideWait:CurrentView];
 
         if (shoppingCartArray.count == 0) {

@@ -22,7 +22,7 @@
         [self.itemImage mas_makeConstraints:^(MASConstraintMaker *make) {
             make.centerX.mas_equalTo(self.contentView.mas_centerX);
             make.width.mas_equalTo(WidthRate(38));
-            make.height.mas_equalTo(HeightRate(40));
+            make.height.mas_equalTo(HeightRateCommon(40));
             make.top.mas_equalTo(0);
         }];
         
@@ -44,14 +44,15 @@
     if (isLastObject == YES) {
         [self.itemImage sd_setImageWithURL:[NSURL URLWithString:[dict objectForKey:@"FactoryIcon"]] placeholderImage:nil];
         [self.itemImage mas_updateConstraints:^(MASConstraintMaker *make) {
-            make.height.mas_equalTo(HeightRate(60));
+            make.height.mas_equalTo(HeightRateCommon(40));
             
         }];
-        self.label.hidden = YES;
+        self.label.hidden = false;
+        self.label.text = @"更多";
     }else
     {
         [self.itemImage mas_updateConstraints:^(MASConstraintMaker *make) {
-            make.height.mas_equalTo(HeightRate(40));
+            make.height.mas_equalTo(HeightRateCommon(40));
             
         }];
         self.label.hidden = false;

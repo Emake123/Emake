@@ -53,6 +53,7 @@
         [nameLable PSSetLeft:WidthRate(20)];
         
         [nameLable PSSetCenterHorizontalAtItem:self];
+        nameLable.hidden = YES;
         
         UILabel *line = [[UILabel alloc] init];
         line.backgroundColor = ColorWithHexString(@"F2F2F2");

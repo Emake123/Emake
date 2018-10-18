@@ -7,7 +7,7 @@
 //
 
 #import "YHProductStoreIntrocdutctionViewController.h"
-
+#import "ChatNewViewController.h"
 @interface YHProductStoreIntrocdutctionViewController ()
 
 @end
@@ -55,9 +55,44 @@
         make.top.mas_equalTo(lineV.mas_bottom).offset(HeightRate(10));
     }];
 
+    
+    UIButton *serverStore = [UIButton buttonWithType:UIButtonTypeCustom];
+    [serverStore setTitle:@"联系小二" forState:UIControlStateNormal];
+    [serverStore setTitleColor:ColorWithHexString(@"ffffff") forState:UIControlStateNormal];
+    serverStore.titleLabel.font = SYSTEM_FONT(AdaptFont(16));
+    serverStore.layer.cornerRadius = 6;
+    serverStore.clipsToBounds = YES;
+    serverStore.backgroundColor = ColorWithHexString(StandardBlueColor);
+    [serverStore addTarget:self action:@selector(goChatVC) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:serverStore];
+    
+    [serverStore mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(WidthRate(32));
+        make.width.mas_equalTo(WidthRate(310));
+        make.height.mas_equalTo(HeightRate(45));
+        make.bottom.mas_equalTo(-10);
+    }];
    
 }
-
+- (void)goChatVC{
+    BOOL isVisit = [self isVisitorLoginByPhoneNumberExits];
+    if (isVisit==false) {
+        return;
+    }
+    
+    //    NSString *storeID = dic[@"StoreId"];
+    NSString *userID = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERID];
+    [[YHMQTTClient sharedClient] sendRequestChatroomCustomerListCMDWith:userID andStoreId:self.model.StoreId];
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Chat" bundle:nil];
+    ChatNewViewController *vc = [storyboard instantiateViewControllerWithIdentifier:@"Chat"];
+    vc.hidesBottomBarWhenPushed = YES;
+    vc.listID = [NSString stringWithFormat:@"%@_%@",self.model.StoreId,userID];
+    vc.storeID = self.model.StoreId;
+    vc.isCatagory = !self.recordIndex;
+    vc.storeName =self.model.StoreName;
+    vc.storeAvata =self.model.StorePhoto;
+    [self.navigationController pushViewController:vc animated:YES];
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

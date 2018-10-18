@@ -36,19 +36,18 @@
 #import "YHSuperGroupViewController.h"
 #import "YHMainSeviceCollectionViewCell.h"
 #import "YHSuperGroupModel.h"
+#import "FMDBManager.h"
+#import "YHMainLastWeekCollectionViewCell.h"
 @interface YHMainViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,SDCycleScrollViewDelegate,YHAlertViewDelegete,YHTitleViewViewDelegete>{
     NSString *phone;
     HRAdView *adView;
+    YHTitleView *title;
 }
 //@property (nonatomic,strong)NSMutableDictionary *dataArrayDic;
 @property (nonatomic,strong)NSMutableArray *CatagoryDataArray;
 
 @property (nonatomic,strong)UIScrollView *CatagoryScrolView;
-@property (nonatomic,strong)UILabel *labelTotal;
-@property (nonatomic,strong)UILabel *labelItem1;
-@property (nonatomic,strong)UILabel *labelItem2;
 
-@property (nonatomic,strong)UITableView *lastWeekTableView;
 @property (nonatomic,copy)NSString *all_Prices;
 @property(nonatomic,strong)NSMutableArray *lastOrderArray;
 @property(nonatomic,retain)NSArray *ScrolCategoryData;
@@ -65,6 +64,8 @@
 @property(nonatomic,strong)UIButton *afterSaleButton;
 @property(nonatomic,strong)UIView *commpanyServersView;
 @property(nonatomic,strong)UIScrollView *mainScrollView;
+@property(nonatomic,strong)UIScrollView *cloudTitleScrollView;
+
 @property(nonatomic,strong)UICollectionView *storeCollectionView;
 @property(nonatomic,strong)UICollectionView *CatagoryCollectionView;
 
@@ -73,7 +74,9 @@
 @property(nonatomic,copy)NSString *storeID;
 @property(nonatomic,strong)NSArray *CatagorydictArray;
 @property(nonatomic,strong)NSArray *superGroupList;
-@property(nonatomic,assign)NSInteger recordIndex;
+
+@property(nonatomic,strong)NSDictionary *lastweekDic;
+
 
 @end
 
@@ -81,8 +84,11 @@
 - (void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
     self.navigationItem.leftBarButtonItem = nil;
-//    self.isInstore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
 
+    self.recordIndex = [Userdefault(TitleIndex) integerValue];
+    if (title) {
+        [title selectItemWithIndex:self.recordIndex];
+    }
     phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
     [self.navigationController setNavigationBarHidden:YES animated:NO];
     [self RefreshMesssageCount];
@@ -90,7 +96,7 @@
     [self getMainPageAdd];
     [self getLastWeekData];
     [self getStoreData];//餐
-    if (self.CatagorydictArray.count>0) {
+    if (self.CatagorydictArray.count>1) {
         NSDictionary *dic = self.CatagorydictArray[self.recordIndex];
         [self getCateGoryData: dic];
         [self getCommpanyServerData: dic];
@@ -115,18 +121,19 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     self.view.backgroundColor = TextColor_F5F5F5;
-    self.isInstore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
     self.bannerImageGroup = [[NSMutableArray alloc]initWithCapacity:0];
     self.bannerInstuition = [[NSMutableArray alloc]initWithCapacity:0];
     [self configSubViews];
 
-    
+
 }
 
 -(void)RefreshMesssageCount
 {
     NSDictionary *messageCountDic = [YHMQTTClient sharedClient].messageCountDic;
    NSInteger eventCount =[ messageCountDic[@"messageCount"] integerValue];
+//   NSInteger eventCount = [[FMDBManager sharedManager] getUserMessageCount:@""];
+//    NSLog(@"获取总消息个数= %ld=%ld",eventCount1,eventCount);
     UIImageView *infomationImage = (UIImageView *)[self.infomationView viewWithTag:1100];
     
     if (eventCount>0) {
@@ -237,36 +244,9 @@
         make.height.mas_equalTo(HeightRateCommon(30));
     }];
     
-    NSArray *array;
-    if (self.CatagorydictArray.count == 2) {
-        NSDictionary *dict = self.CatagorydictArray[0];
-        NSDictionary *dict1 = self.CatagorydictArray[1];
-        array = @[dict[@"CategoryBName"],dict1[@"CategoryBName"] ];
-    }else
-    {
-        array = @[@"输配电云工厂",@"休闲食品云工厂"];
-    }
-    YHTitleView *title  =  [[YHTitleView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, HeightRate(45)) titleFont:14 delegate:self andTitleArray:array];
-    [self.mainScrollView addSubview:title];
-    [title mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(self.cycleview.mas_bottom).offset(0);
-        //        make.bottom.mas_equalTo(self.commpanyServersView.mas_top).offset(0);
-        make.width.mas_equalTo(ScreenWidth);
-        make.height.mas_equalTo(HeightRate(45));
-        make.centerX.mas_equalTo(self.mainScrollView.mas_centerX);
-        
-    }];
+   
     
-    UILabel *titleLine = [[UILabel alloc] init];
-    titleLine.backgroundColor = ColorWithHexString(@"F2F2F2");
-    [self.mainScrollView addSubview:titleLine];
-    [titleLine mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(title.mas_bottom).offset(-1);
-        make.width.mas_equalTo(ScreenWidth-WidthRate(20));
-        make.height.mas_equalTo(HeightRate(2));
-        make.left.mas_equalTo(WidthRate(10));
-        
-    }];
+    
 //    //品类
 //    UIScrollView *CatagoryScrolView = [[UIScrollView alloc] init];
 //    CatagoryScrolView.pagingEnabled = YES;
@@ -292,15 +272,19 @@
     [self.mainScrollView addSubview:CatogoryCollectionView];
     [CatogoryCollectionView registerClass:[YHMainPageCategoryCell class] forCellWithReuseIdentifier:@"MainPageCategoryCell"];
     [CatogoryCollectionView registerClass:[YHMainSuperTogetherCollectionViewCell class] forCellWithReuseIdentifier:@"YHMainSuperTogetherCollectionViewCell"];
+    [CatogoryCollectionView registerClass:[YHMainLastWeekCollectionViewCell class] forCellWithReuseIdentifier:@"YHMainLastWeekCollectionViewCell"];
     [CatogoryCollectionView registerClass:[YHMainSeviceCollectionViewCell class] forCellWithReuseIdentifier:@"YHMainSeviceCollectionViewCell"];
+
     [CatogoryCollectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"LsatCategoryCell"];
-    [CatogoryCollectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"header"];
+    [CatogoryCollectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"Header11"];//Header11YHMainLastWeekCollectionViewCell
+    
+    
     CatogoryCollectionView.alwaysBounceHorizontal = YES;
     CatogoryCollectionView.showsHorizontalScrollIndicator = NO;
     self.CatagoryCollectionView = CatogoryCollectionView;
     CGFloat collectionwidth =HeightRateCommon(165)+HeightRateCommon(120)+HeightRateCommon(50) ;
     [CatogoryCollectionView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(titleLine.mas_bottom).offset(-1);
+        make.top.mas_equalTo(self.cycleview.mas_bottom).offset(-1);
         make.width.mas_equalTo(ScreenWidth);
         make.height.mas_equalTo(collectionwidth);
         make.left.mas_equalTo(0);
@@ -311,76 +295,6 @@
 
 
 
-    //上周订单
-    self.viewLastWeek = [[UIView alloc]init];
-    self.viewLastWeek.backgroundColor = [UIColor whiteColor];
-    self.viewLastWeek.layer.cornerRadius = WidthRate(4);
-
-    [self.mainScrollView addSubview:self.viewLastWeek];
-    [self.viewLastWeek mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(CatogoryCollectionView.mas_bottom).offset(0);
-        make.width.mas_equalTo(ScreenWidth);
-        make.height.mas_equalTo(HeightRate(199));
-        make.left.mas_equalTo(0);
-        
-    }];
-
-    UIImageView *orderImage = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"dingdanicon"]];
-    orderImage.frame = CGRectMake(WidthRate(25), HeightRate(6.5), WidthRate(18), HeightRate(18));
-    [self.viewLastWeek addSubview:orderImage];
-
-
-    UILabel *labelTitle = [[UILabel alloc]init];
-    labelTitle.text = @"上周订单";
-    labelTitle.font = [UIFont systemFontOfSize:AdaptFont(13)];
-    labelTitle.frame = CGRectMake(WidthRate(53), HeightRate(8.5), WidthRate(60), HeightRate(14));
-    [self.viewLastWeek addSubview:labelTitle];
-
-    
-    self.labelTotal = [[UILabel alloc]init];
-    self.labelTotal.font = [UIFont systemFontOfSize:AdaptFont(12)];
-    self.labelTotal.textAlignment = NSTextAlignmentRight;
-    self.labelTotal.textColor = [UIColor blackColor];
-    self.labelTotal.frame = CGRectMake(0, HeightRate(8.5), ScreenWidth - WidthRate(20), HeightRate(14));
-    [self.viewLastWeek addSubview:self.labelTotal];
-
-    
-    self.labelItem1 = [[UILabel alloc]init];
-    self.labelItem1.font = [UIFont systemFontOfSize:AdaptFont(12)];
-//    self.labelItem1.textAlignment = NSTextAlignmentRight;
-    self.labelItem1.textColor = [UIColor blackColor];
-    self.labelItem1.frame = CGRectMake(0, HeightRate(8.5), ScreenWidth - WidthRate(20), HeightRate(14));
-    [self.viewLastWeek addSubview:self.labelItem1];
-    [self.labelItem1 mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(labelTitle.mas_bottom).offset(HeightRate(15));
-        make.width.mas_equalTo(ScreenWidth);
-        make.height.mas_equalTo(HeightRate(40));
-        make.left.mas_equalTo(WidthRate(0));
-        
-    }];
-
-    self.labelItem2 = [[UILabel alloc]init];
-    self.labelItem2.font = [UIFont systemFontOfSize:AdaptFont(12)];
-//    self.labelItem2.textAlignment = NSTextAlignmentRight;
-    self.labelItem2.textColor = [UIColor blackColor];
-    [self.viewLastWeek addSubview:self.labelItem2];
-    [self.labelItem2 mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(self.labelItem1.mas_bottom).offset(HeightRate(0));
-        make.width.mas_equalTo(ScreenWidth);
-        make.height.mas_equalTo(HeightRate(40));
-        make.left.mas_equalTo(WidthRate(0));
-        
-    }];
-    UILabel *storeline = [[UILabel alloc]init];
-    storeline.backgroundColor = SepratorLineColor;
-    [self.viewLastWeek addSubview:storeline];
-
-    [storeline mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.mas_equalTo(WidthRate(20));
-        make.height.mas_equalTo(1.5);
-        make.right.mas_equalTo(WidthRate(-15));
-        make.top.mas_equalTo(HeightRate(34));
-    }];
     
 }
 
@@ -437,8 +351,11 @@
     switch (index) {
         case 1:{
             
+            NSDictionary *dic=  self.CatagorydictArray[self.recordIndex];
             
             YHBrandQulificationViewController *vc = [[YHBrandQulificationViewController alloc]init];
+            
+            vc.categoryID =  dic[@"CategoryBId"];
             vc.hidesBottomBarWhenPushed = YES;
             [self.navigationController pushViewController:vc animated:YES];
         }
@@ -485,34 +402,15 @@
 - (void)getLastWeekData{
     
     [[YHJsonRequest shared] getuserLastweekOrder:^(NSDictionary *shoppingCartDict) {
-        self.all_Prices = [shoppingCartDict objectForKey:@"all_price"];
-        NSString *allPrice = [Tools getNsstringFromDouble:self.all_Prices.doubleValue isShowUNIT:NO];
-        NSString *str = [NSString stringWithFormat:@"总额  ¥%@",allPrice];
-        NSMutableAttributedString *AttributedStr = [[NSMutableAttributedString alloc]initWithString:str];
-        [AttributedStr addAttribute:NSForegroundColorAttributeName value:ColorWithHexString(APP_THEME_MAIN_COLOR) range:NSMakeRange(3,str.length-3)];
-        [AttributedStr addAttribute:NSFontAttributeName value:SYSTEM_FONT(AdaptFont(14)) range:NSMakeRange(3,str.length-3)];
-        self.labelTotal.attributedText = AttributedStr;
+        self.lastweekDic = [NSDictionary dictionaryWithDictionary:shoppingCartDict];
+        [self.CatagoryCollectionView reloadData];
+        [self.CatagoryCollectionView mas_updateConstraints:^(MASConstraintMaker *make) {
+            make.height.mas_equalTo(900);
+            
+        }];
+        self.mainScrollView.contentSize = CGSizeMake(ScreenWidth, HeightRateCommon(250)+self.CatagoryCollectionView.contentSize.height);
         
-        NSArray *array = shoppingCartDict[@"party_list"];
-        for (int i=0;i<array.count;i++) {
-            NSDictionary *dic = array[i];
-            NSString *price = [Tools getHaveNum:[dic[@"TotalPrice"] doubleValue]];
-//            NSString *str1 = [NSString stringWithFormat:@"\t%@\t\t\t%@笔   \t\t\t¥%@",dic[@"CategoryName"],dic[@"GoodsNumber"],price];
-            NSString *str1 = [NSString stringWithFormat:@"        %@                       %@笔                   ¥%@",dic[@"CategoryName"],dic[@"GoodsNumber"],price];
-
-            NSMutableAttributedString *AttributedStr1 = [[NSMutableAttributedString alloc]initWithString:str1];
-            [AttributedStr1 addAttribute:NSForegroundColorAttributeName value:ColorWithHexString(APP_THEME_MAIN_COLOR) range:NSMakeRange(str1.length-(price.length+1),price.length+1)];
-            if (i==0) {
-                self.labelItem1.attributedText = AttributedStr1;
-            }else
-            {
-                self.labelItem2.attributedText = AttributedStr1;
-
-            }
-        }
-       
         
-
     } fialureBlock:^(NSString *errorMessages) {
         [self.view hideWait:CurrentView];
         [self.view makeToast:errorMessages duration:1.0 position:CSToastPositionCenter];
@@ -544,17 +442,7 @@
 {
     [[YHJsonRequest shared] getAppSuperGroup:@{@"CategoryBId":dic[@"CategoryBId"]} SuccessBlock:^(NSArray *success) {
         self.superGroupList = [NSArray arrayWithArray:success];
-        if (success.count==0) {
-            [self.CatagoryCollectionView mas_updateConstraints:^(MASConstraintMaker *make) {
-                make.height.mas_equalTo(HeightRateCommon(170+54));
-            }];
-        }else
-        {
-            [self.CatagoryCollectionView mas_updateConstraints:^(MASConstraintMaker *make) {
-                make.height.mas_equalTo(HeightRateCommon(165+130+54));
-            }];
-        }
-      
+    
         [self.CatagoryCollectionView reloadData];
     } fialureBlock:^(NSString *errorMessages) {
         [self.view makeToast:errorMessages duration:1.0 position:CSToastPositionCenter];
@@ -564,7 +452,8 @@
 - (void)getCateGoryData:(NSDictionary *)dic{
     [self.view showWait:@"加载中" viewType:CurrentView];
     
-    
+    [[NSUserDefaults standardUserDefaults] setObject:dic[@"CategoryBId"] forKey:USERSELECCATEGORY];
+
     [[YHJsonRequest shared] getMainPageCategory:@{@"CategoryBId":dic[@"CategoryBId"]} SuccessBlock:^(NSArray *categoryDict) {
         [self.view hideWait:CurrentView];
         self.CatagoryDataArray = [NSMutableArray arrayWithArray:categoryDict];
@@ -656,10 +545,10 @@
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
 
    
-    NSInteger sectionNum = self.superGroupList.count>0?section:(section==1?section+1:section);
-    if (sectionNum == 1) {
-        
-        return 1;
+    NSInteger sectionNum = self.superGroupList.count>0?section:(section>=1?section+1:section);
+    if (sectionNum == 3) {
+//        return 1;
+        return self.lastweekDic.count>0?1:0;
     }else if( sectionNum == 0)
     {
         if (self.CatagoryDataArray.count<=10) {
@@ -668,23 +557,35 @@
         {
             return 10;
         }
-    }else
+    }else if(sectionNum == 2)
     {
         return   self.commpanyServersArray.count;
+    }else
+    {
+        return 1;
     }
 }
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
     if (self.superGroupList.count>0) {
-        return 3;
+        return 4;
     }
-    return 2;
+    return 3;
 }
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
 
-    NSInteger sectionNum = self.superGroupList.count>0?indexPath.section:(indexPath.section==1?indexPath.section+1:indexPath.section);
-
-    if (sectionNum == 2) {
+    NSInteger sectionNum = self.superGroupList.count>0?indexPath.section:(indexPath.section>=1?indexPath.section+1:indexPath.section);
+    if (sectionNum == 3) {
+        
+        YHMainLastWeekCollectionViewCell *cell =(YHMainLastWeekCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:@"YHMainLastWeekCollectionViewCell" forIndexPath:indexPath];
+        if (!cell) {
+            cell = [[YHMainLastWeekCollectionViewCell alloc]initWithFrame:CGRectMake(0, 0, ScreenWidth,  HeightRateCommon(160))];
+        }
+       
+        [cell setDataDict:self.lastweekDic];
+        
+        return cell;
+    }else if (sectionNum == 2) {
         
         YHMainSeviceCollectionViewCell *cell =(YHMainSeviceCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:@"YHMainSeviceCollectionViewCell" forIndexPath:indexPath];
         if (!cell) {
@@ -724,8 +625,10 @@
     }
 }
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
-    NSInteger sectionNum = self.superGroupList.count>0?indexPath.section:(indexPath.section==1?indexPath.section+1:indexPath.section);
-    if (sectionNum ==2) {
+    NSInteger sectionNum = self.superGroupList.count>0?indexPath.section:(indexPath.section>=1?indexPath.section+1:indexPath.section);
+    if (sectionNum==3) {
+        return CGSizeMake(ScreenWidth, HeightRateCommon(160));
+    }else if (sectionNum ==2) {
         return CGSizeMake(ScreenWidth/3.0, HeightRateCommon(54));
         
     }else if (sectionNum ==1) {
@@ -737,7 +640,7 @@
     }
 }
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section{
-    if (section ==1 || section == 2) {
+    if (section ==1 || section == 2 || section ==3) {
         return 0;
     }else
     {
@@ -747,24 +650,141 @@
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section{
  
     if (section ==1 || section == 2) {
-        return HeightRateCommon(13);
+        return HeightRateCommon(5);
     }else
     {
-        return HeightRateCommon(13);
+        return HeightRateCommon(5);
     }
 }
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section{
-    if (section ==1 || section == 2) {
-        return UIEdgeInsetsMake(HeightRate(0), WidthRate(0), HeightRate(0), WidthRate(0));;
+    if (section ==1 || section == 2 || section==3) {
+        return UIEdgeInsetsMake(HeightRate(5), WidthRate(0), HeightRate(-5), WidthRate(0));;
     }else
     {
-        return UIEdgeInsetsMake(HeightRateCommon(1), WidthRate(10), HeightRate(10), WidthRate(20));
+        return UIEdgeInsetsMake(HeightRateCommon(5), WidthRate(10), HeightRate(5), WidthRate(20));
     }
 }
-- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
-    NSInteger sectionNum = self.superGroupList.count>0?indexPath.section:(indexPath.section==1?indexPath.section+1:indexPath.section);
 
-    if (sectionNum == 2) {
+
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
+    
+    if([kind isEqualToString:UICollectionElementKindSectionHeader])
+    {
+        if (indexPath.section==0) {
+
+             UICollectionReusableView *view = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"Header11" forIndexPath:indexPath];
+//            for(id subView in view.subviews){
+//                if(subView){
+//                    [subView removeFromSuperview];
+//                }
+//            }
+            
+ 
+            NSMutableArray *arr = [NSMutableArray array];;
+            for (NSDictionary *dict in self.CatagorydictArray) {
+                [arr addObject: dict[@"CategoryBName"]];
+            }
+            
+//            UIImageView*itemTopImage = [[UIImageView alloc]init];
+////            itemTopImage.contentMode = UIViewContentModeScaleAspectFill;
+//            itemTopImage.backgroundColor = ColorWithHexString(@"f2f2f2");
+//            itemTopImage.image = [UIImage imageNamed:@"chaojituantitle"];
+//            [view addSubview:itemTopImage];
+//            [itemTopImage mas_makeConstraints:^(MASConstraintMaker *make) {
+//                make.left.mas_equalTo(0);
+//                make.width.mas_equalTo(ScreenWidth);
+//                make.height.mas_equalTo(HeightRateCommon(30));
+//                make.top.mas_equalTo(0);
+//            }];
+//
+//            UILabel *cloudLabel = [[UILabel alloc]init];
+//            cloudLabel.text =@"云工厂";
+//            cloudLabel.textColor = ColorWithHexString(@"ffffff");
+//            cloudLabel.font = [UIFont systemFontOfSize:AdaptFont(14)];
+//            [view addSubview:cloudLabel];
+//            [cloudLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+//                make.left.mas_equalTo(WidthRate(10));
+//                make.width.mas_equalTo(70);
+//                make.height.mas_equalTo(HeightRateCommon(30));
+//                make.top.mas_equalTo(0);
+//            }];
+            
+
+            view.backgroundColor = ColorWithHexString(@"ffffff");
+            if (arr.count>0) {
+                if (title==nil) {
+                
+                    title  =  [[YHTitleView alloc] initWithTitleFont:AdaptFont(14) delegate:self andTitleArray:arr andTitleHeight:HeightRateCommon(45) andScrolweight:ScreenWidth];
+                    title.backgroundColor = [UIColor clearColor];
+                    [view addSubview:title];
+                    [title mas_makeConstraints:^(MASConstraintMaker *make) {
+                        make.top.mas_equalTo(0);
+                        make.width.mas_equalTo(title.titleViewWidth);
+                        make.height.mas_equalTo(HeightRateCommon(45));
+                        make.left.mas_equalTo(WidthRate(0));
+                        
+                    }];
+                    UILabel *line = [[UILabel alloc] init];
+                    line.backgroundColor =SepratorLineColor;
+                    [view addSubview:line];
+                    [line mas_makeConstraints:^(MASConstraintMaker *make) {
+                        make.top.mas_equalTo(title.mas_bottom).offset(HeightRate(0));
+                        make.width.mas_equalTo(ScreenWidth);
+                        make.height.mas_equalTo(HeightRateCommon(1));
+                        make.left.mas_equalTo(WidthRate(0));
+                        
+                    }];
+                }else
+                {
+//            if (arr.count>0) {
+            
+                    [title ChageItemWithIndex:self.recordIndex<arr.count?self.recordIndex:0];
+
+              }
+            
+                }
+        
+//            }
+            
+            
+//            [title hidenBottonline];
+            
+//            cloudTitleScrollView.contentSize = CGSizeMake(title.titleViewWidth,HeightRateCommon(30));
+
+           
+            
+            
+            return view;
+
+        }
+        
+        return nil;
+        
+    }else
+    {
+        return nil;
+    }
+    
+}
+-(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section{
+    if (section == 0)
+    {
+        return CGSizeMake(ScreenWidth, HeightRateCommon(45));
+    }
+    else
+    {
+        return CGSizeZero;
+        
+    }
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    NSInteger sectionNum = self.superGroupList.count>0?indexPath.section:(indexPath.section>=1?indexPath.section+1:indexPath.section);
+
+    if (sectionNum==3) {
+        
+        
+    }else if (sectionNum == 2) {
         
         YHCommpanyServersModel *model = self.commpanyServersArray[indexPath.row];
         [self goCommmpanyServersVC:model.ServiceType];
@@ -780,11 +800,11 @@
         YHProductCloudsViewController *vc = [[YHProductCloudsViewController alloc] init];
 
     NSDictionary *dict;
-    if (self.CatagoryDataArray.count <= 10 && indexPath.row <=self.CatagoryDataArray.count) {
-        dict = self.CatagoryDataArray[indexPath.row];
+    if (self.CatagoryDataArray.count <= 9 ) {
+        dict = indexPath.row ==self.CatagoryDataArray.count-1?self.CatagoryDataArray.firstObject: self.CatagoryDataArray[indexPath.row];
     }else
     {
-        dict =indexPath.row!=9?self.CatagoryDataArray[indexPath.row]:self.CatagoryDataArray.lastObject ;
+        dict =indexPath.row ==9?self.CatagoryDataArray.firstObject:self.CatagoryDataArray[indexPath.row] ;
         
     }
         
@@ -793,9 +813,8 @@
         vc.catagory = dict[@"CategoryCId"];
         vc.catagoryDic = dict;
         vc.recordIndex = self.recordIndex;
-        vc.recordItemIndex = indexPath.row;
+        vc.recordItemIndex =self.CatagoryDataArray.count<9?( indexPath.row==self.CatagoryDataArray.count-1?0:indexPath.row):( indexPath.row==9?0:indexPath.row);
         [self.navigationController pushViewController:vc animated:YES];
-//        [self getStoreID:dict[@"CategoryId"]];
 
     }
 }
@@ -816,14 +835,20 @@
 #pragma  mark -----YHTitleDelegate
 -(void)titleView:(id)titleView selectItemWithIndex:(NSInteger)index
 {
-    self.recordIndex = index;
     if (index <self.CatagorydictArray.count) {
         
         [self getCateGoryData:self.CatagorydictArray[index]];
         [self getCommpanyServerData:self.CatagorydictArray[index]];
         [self getSuperGroupList:self.CatagorydictArray[index]];
+        self.recordIndex = index;
 
+    }else
+    {
+        self.recordIndex = 0;
+
+        
     }
+    [[NSUserDefaults standardUserDefaults] setObject:@(self.recordIndex) forKey:TitleIndex];
 }
 
 #pragma  mark -----SDCycleScrollViewDelegate
@@ -952,6 +977,7 @@
             [self getCateGoryData:success.firstObject];
             [self getCommpanyServerData:self.CatagorydictArray.firstObject];
             [self getSuperGroupList:self.CatagorydictArray.firstObject];
+            
 
         }else
         {

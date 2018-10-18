@@ -34,7 +34,7 @@
         CGFloat width =ScreenWidth/3.0-10;   //(ScreenWidth-WidthRate(32))/3;
         [backView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.width.mas_equalTo(width);
-            make.height.mas_equalTo(HeightRate(42));
+            make.height.mas_equalTo(HeightRateCommon(42));
             make.centerX.mas_equalTo(self.mas_centerX);
             make.centerY.mas_equalTo(self.mas_centerY);
         }];

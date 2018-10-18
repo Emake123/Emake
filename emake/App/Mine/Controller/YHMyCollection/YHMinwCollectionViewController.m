@@ -25,7 +25,6 @@
 @property(nonatomic,strong)NSMutableArray *collectionGoodsArr;
 
 @property(nonatomic,strong)UIView *EmptyView;
-@property(nonatomic,assign)BOOL isStore;
 @property(nonatomic,assign)BOOL isShowStoreCollections;
 @property(nonatomic,strong)NSMutableArray *TopTitleArray;
 @property(nonatomic,strong)YHTitleView *TitleView;
@@ -48,8 +47,6 @@
     self.view.backgroundColor = ColorWithHexString(@"ffffff");
     self.extendedLayoutIncludesOpaqueBars = YES;
     
-    NSString *isStoreString = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    self.isStore = [isStoreString isEqualToString:@"1"];
     self.TopTitleArray = [NSMutableArray array];
     CGFloat TopHeight =0;
    
@@ -73,7 +70,7 @@
         
     }else
     {
-        CGFloat Height = self.isStore == YES?(TOP_BAR_HEIGHT):TOP_BAR_HEIGHT;
+        CGFloat Height = TOP_BAR_HEIGHT;
         self.EmptyView = [[UIView alloc]init];
         self.EmptyView.backgroundColor = [UIColor whiteColor];
         [self.view addSubview:self.EmptyView];
@@ -123,15 +120,10 @@
         {
             self.EmptyView.hidden = YES;
             self.collectionGoodsArr = [NSMutableArray arrayWithArray:Success];
-//            self.collectionArr = [NSMutableArray arrayWithArray:self.collectionGoodsArr];
             self.isShowStoreCollections = false;
         }
-//        if (self.isStore == false) {
             [mytable reloadData];
-//        }else
-//        {
-////            [self getStoreCollectionData];
-//        }
+
     } fialureBlock:^(NSString *errorMessages) {
         [self.view makeToast:errorMessages duration:1.5 position:CSToastPositionCenter];
     }];
@@ -159,13 +151,8 @@
 }
 #pragma mark--tabble delegate
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    if (self.isStore==YES) {
-        return HeightRate(0.1);
 
-    }else
-    {
         return 0.001;
-    }
 }
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -196,43 +183,22 @@
             return cell;
         
 
-//
-////    } else {
-//        YHMainSearchTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-//
-//        if (cell==nil) {
-//            cell = [[YHMainSearchTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
-//        }
-//        YhSearchModel *model = self.collectionGoodsArr[indexPath.row];
-//        [cell.productImage sd_setImageWithURL:[NSURL URLWithString: model.GoodsSeriesIcon]];
-//
-//        cell.productName.text = model.GoodsSeriesName;
-//        cell.productPrice.text =[NSString stringWithFormat:@"%@",model.PriceRange];
-//
-//        return cell;
-//
-////    }
-
 }
 
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    if (self.isStore == YES) {
         UIView *headView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, HeightRate(35))];
         headView.backgroundColor = [UIColor whiteColor];
         if(self.TitleView ==nil){
         self.TitleView= [[YHTitleView alloc]initWithFrame:CGRectMake(0, 0, WidthRate(180), HeightRate(35)) titleFont:14 delegate:self andTitleArray:self.TopTitleArray];
-        [headView addSubview:self.TitleView] ;
+        [headView addSubview:self.TitleView];
             
         }
         
         
         return headView;
-    } else {
-        
-        return nil;
-    }
+   
   
     
 }

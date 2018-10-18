@@ -55,41 +55,41 @@
 -(void)getLeftListData{
     
     [self.view showWait:@"加载中" viewType:CurrentView];
-    [[YHJsonRequest shared] getShoppingGoodCategoriesSeriesId:self.CategoryId  SuccessBlock:^(NSDictionary *successMessage) {
-        [self.view hideWait:CurrentView];
-        if (successMessage.count ==0) {
-            [self configEmptyViewleftSpace:0];
-
-        }else{
-            [_emptyView removeFromSuperview];
-            self.leftClassArray = [NSMutableArray arrayWithCapacity:0];
-            self.ProductSeriesArray = [NSMutableArray arrayWithCapacity:0];
-            for (NSDictionary *dict in successMessage) {
-                if (dict) {
-                    YHProductSeriesModel *model = [YHProductSeriesModel mj_objectWithKeyValues:dict];
-                    if (model) {
-                        [self.leftClassArray addObject:model];
-                        [self.ProductSeriesArray addObject:model.CategoryId];
-                    }
-                 
-                }
-            }
-            [self.leftTableView reloadData];
-            NSInteger selectIndex = 0;
-            if (self.serriesCode) {
-                selectIndex = [self.ProductSeriesArray indexOfObject:self.serriesCode];
-            }
-            [self tableView:self.leftTableView didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:selectIndex inSection:0]];
-            [self.rightCollectionView reloadData];
-        }
-    } fialureBlock:^(NSString *errorMessages) {
-        [self.leftClassArray removeAllObjects];
-        [self.dataArray removeAllObjects];
-        [self.leftTableView reloadData];
-        [self.rightCollectionView reloadData];
-        [self.view hideWait:CurrentView];
-        [self.view makeToast:errorMessages duration:1.0 position:CSToastPositionCenter];
-    }];
+//    [[YHJsonRequest shared] getShoppingGoodCategoriesSeriesId:self.CategoryId  SuccessBlock:^(NSDictionary *successMessage) {
+//        [self.view hideWait:CurrentView];
+//        if (successMessage.count ==0) {
+//            [self configEmptyViewleftSpace:0];
+//
+//        }else{
+//            [_emptyView removeFromSuperview];
+//            self.leftClassArray = [NSMutableArray arrayWithCapacity:0];
+//            self.ProductSeriesArray = [NSMutableArray arrayWithCapacity:0];
+//            for (NSDictionary *dict in successMessage) {
+//                if (dict) {
+//                    YHProductSeriesModel *model = [YHProductSeriesModel mj_objectWithKeyValues:dict];
+//                    if (model) {
+//                        [self.leftClassArray addObject:model];
+//                        [self.ProductSeriesArray addObject:model.CategoryId];
+//                    }
+//
+//                }
+//            }
+//            [self.leftTableView reloadData];
+//            NSInteger selectIndex = 0;
+//            if (self.serriesCode) {
+//                selectIndex = [self.ProductSeriesArray indexOfObject:self.serriesCode];
+//            }
+//            [self tableView:self.leftTableView didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:selectIndex inSection:0]];
+//            [self.rightCollectionView reloadData];
+//        }
+//    } fialureBlock:^(NSString *errorMessages) {
+//        [self.leftClassArray removeAllObjects];
+//        [self.dataArray removeAllObjects];
+//        [self.leftTableView reloadData];
+//        [self.rightCollectionView reloadData];
+//        [self.view hideWait:CurrentView];
+//        [self.view makeToast:errorMessages duration:1.0 position:CSToastPositionCenter];
+//    }];
 }
 -(void)getData:(NSString *)serriesCode{
     

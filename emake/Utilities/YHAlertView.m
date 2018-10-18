@@ -691,6 +691,69 @@
 }
 
 
+- (instancetype)initWithDelegete:(id)delegate  bottomTitle:(NSString *)Title ButtonTitle:(NSString *)ButtonTitle {
+    self = [super init];
+    if (self) {
+        
+        self.maskView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
+        
+        UIColor *color = [UIColor blackColor];
+        
+        self.maskView.backgroundColor = [color colorWithAlphaComponent:0.5];
+        
+        
+        self.backgroundColor = [UIColor whiteColor];
+        
+        self.delegate = delegate;
+        
+        self.layer.cornerRadius = 5;
+        
+        self.frame = CGRectMake(0, 0, WidthRate(270), HeightRateCommon(140));
+        
+        self.center = self.maskView.center;
+        
+        UILabel * label2 = [[UILabel alloc]initWithFrame:CGRectMake(0, HeightRateCommon(25), self.bounds.size.width, HeightRateCommon(40))];
+        
+        label2.textColor = ColorWithHexString(@"333333");
+        
+        label2.text = Title;
+        
+        label2.numberOfLines = 0;
+        
+        label2.font = SYSTEM_FONT(AdaptFont(14));
+        
+        label2.textAlignment = NSTextAlignmentCenter;
+        
+        [self addSubview:label2];
+       
+        
+        UIButton *rigthBtn = [[UIButton alloc]initWithFrame:CGRectMake(self.centerX-WidthRate(120), HeightRateCommon(80), WidthRate(120), HeightRateCommon(30))];
+        rigthBtn.center = CGPointMake(label2.centerX, HeightRateCommon(95));
+        rigthBtn.clipsToBounds= YES;
+        rigthBtn.layer.cornerRadius= 6;
+        rigthBtn.titleLabel.font = SYSTEM_FONT(AdaptFont(14));
+        rigthBtn.backgroundColor = ColorWithHexString(StandardBlueColor);
+        [rigthBtn setTitleColor:ColorWithHexString(@"ffffff") forState:UIControlStateNormal];
+        
+        [rigthBtn setTitle:ButtonTitle forState:UIControlStateNormal];
+        
+        [rigthBtn addTarget:self action:@selector(right:) forControlEvents:UIControlEventTouchUpInside];
+        
+        [self addSubview:rigthBtn];
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    }
+    return self;
+}
+
+
 - (instancetype)initWithDelegate:(id)delegate TopButtonTitle:(NSString *)topTitle BottomButtonTitle:(NSString *)bottomTitle
 {
     self = [super init];

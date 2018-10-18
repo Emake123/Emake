@@ -290,7 +290,7 @@ static CGFloat const ferentFont = 12;
         
 //        self.commBtn = paymentVoucher;
         
-        YHButton *customerServiceButton = [YHButton initBorderStyleWithTitle:@"客服"  color:StandardBlueColor cornerRadius:HeightRate(15)];
+        YHButton *customerServiceButton = [YHButton initBorderStyleWithTitle:@"小二"  color:StandardBlueColor cornerRadius:HeightRate(15)];
         customerServiceButton.translatesAutoresizingMaskIntoConstraints = NO;
         [customerServiceButton setImage:[UIImage imageNamed:@"kufu3030"] forState:UIControlStateNormal];
         [customerServiceButton setImageEdgeInsets:UIEdgeInsetsMake(0, WidthRate(-5), 0, 0)];
@@ -311,7 +311,7 @@ static CGFloat const ferentFont = 12;
 
 -(void)setData:(YHOrderContract *)contract withIsStore:(BOOL)isStore
 {
-    if (isStore ==YES || contract.InsuraceModel.InsurdAmount.floatValue<=0) {
+    if ( contract.InsuraceModel.InsurdAmount.floatValue<=0) {
         self.addInsuranceview.hidden = YES;
         [self.addInsuranceview mas_updateConstraints:^(MASConstraintMaker *make) {
             make.height.mas_equalTo(0);
@@ -336,27 +336,7 @@ static CGFloat const ferentFont = 12;
     }
     
     
-//    if (contract.TaxPrice.doubleValue>0) {
-//        self.tipsRightLable.textColor = [UIColor blackColor];
-//        NSString *str = @"增值税";
-//
-//        NSString *priceStr =   [NSString stringWithFormat:@"%@:¥%@",str,[Tools getHaveNum:contract.TaxPrice.doubleValue]];//orders.GoodsAddValue
-//
-//        NSMutableAttributedString *att = [[NSMutableAttributedString alloc] initWithString:priceStr];
-//        [att addAttribute:NSForegroundColorAttributeName value:ColorWithHexString(SymbolTopColor) range:NSMakeRange(str.length+1, priceStr.length-str.length-1)];
-//
-//
-//        self.tipsRightLableTop.attributedText = att;
-//        [self.tipsRightLableTop mas_updateConstraints:^(MASConstraintMaker *make) {
-//            make.height.mas_equalTo(HeightRate(20));
-//        }];
-//        [self.tipsRightLable mas_updateConstraints:^(MASConstraintMaker *make) {
-//            make.height.mas_equalTo(HeightRate(0.01));
-//        }];
-//        self.tipsRightLable.hidden = YES;
-//        self.tipsRightLableTop.hidden = false;
-//
-//    } else {
+
         self.tipsRightLableTop.hidden = YES;
         self.tipsRightLable.hidden = false;
 

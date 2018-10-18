@@ -303,9 +303,9 @@
     }
     NSString *isStore = [model.CategoryName isEqualToString:@"工业品"]?@"1":@"1";
     [[NSUserDefaults standardUserDefaults]setObject:model.CategoryId forKey:USERSELECCATEGORY];
-    [[NSUserDefaults standardUserDefaults]setBool:[model.CategoryName isEqualToString:@"工业品"] forKey:IsIndustryCatagory];
-
-    [[NSUserDefaults standardUserDefaults]setObject:isStore forKey:LOGIN_ISSTORE];
+//    [[NSUserDefaults standardUserDefaults]setBool:[model.CategoryName isEqualToString:@"工业品"] forKey:IsIndustryCatagory];
+//
+//    [[NSUserDefaults standardUserDefaults]setObject:isStore forKey:LOGIN_ISSTORE];
 
     [self.navigationController popViewControllerAnimated:YES];
     

@@ -78,14 +78,10 @@
         
         NSArray *CatagorydictArray = Userdefault(CatagoryIDs);
         NSArray *array;
-        if (CatagorydictArray.count == 2) {
             NSDictionary *dict = CatagorydictArray[0];
             NSDictionary *dict1 = CatagorydictArray[1];
             array = @[dict[@"CategoryBName"],dict1[@"CategoryBName"] ];
-        }else
-        {
-            array = @[@"输配电云工厂",@"休闲食品云工厂"];
-        }
+       
         YHTitleView *title  =  [[YHTitleView alloc] initWithFrame:CGRectMake( WidthRate(68),TOP_BAR_HEIGHT, WidthRate(240), HeightRate(45)) titleFont:14 delegate:self andTitleArray:array];
         [self.view addSubview:title];
         if (@available(iOS 11.0, *)) {

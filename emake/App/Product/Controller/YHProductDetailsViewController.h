@@ -20,6 +20,7 @@
 @property(nonatomic,copy)NSString *storePhoneNumber;
 @property(nonatomic,copy)NSString *SuperGroupDetailId;
 @property(nonatomic,copy)NSString *CouponNumberStr;
+@property(nonatomic,copy)NSString *CategoryBId;
 
 @property(nonatomic,assign)BOOL isChat;
 

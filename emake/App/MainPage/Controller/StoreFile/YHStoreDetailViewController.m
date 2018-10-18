@@ -546,6 +546,7 @@
     vc.StoreName = self.model.StoreName;
     vc.storeAvata = self.model.StorePhoto;
     vc.storePhoneNumber = self.model.StoreOwner[@"MobileNumber"];
+    
 //    [Tools jumpIntoOnlyVC:self.navigationController destnationViewController:vc];
     [self.navigationController pushViewController:vc animated:YES];
 }

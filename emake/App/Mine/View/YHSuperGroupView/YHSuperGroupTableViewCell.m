@@ -114,7 +114,7 @@
         productTip.text =@"含税，不含运费";
         productTip.numberOfLines = 0;
         productTip.textColor = ColorWithHexString(@"FF9900");
-        productTip.font = [UIFont systemFontOfSize:AdaptFont(13)];
+        productTip.font = [UIFont systemFontOfSize:AdaptFont(11)];
         [self addSubview:productTip];
         [productTip mas_makeConstraints:^(MASConstraintMaker *make) {
             make.left.mas_equalTo(itemImage.mas_right).offset(WidthRate(5));
@@ -198,9 +198,14 @@
     if (imageArr.count>0) {
         [self.itemImage sd_setImageWithURL:[NSURL URLWithString:imageArr.firstObject]];
     }
-    self.freightPrice.text =[NSString stringWithFormat:@"¥%@ 起",[Tools getHaveNum:model.infoModel.GroupPrice.doubleValue]] ;
+    NSString *freightStr =  [NSString stringWithFormat:@"¥%@ 起",[Tools getHaveNum:model.GroupPrice.doubleValue]];
+    NSMutableAttributedString *attrStr1 = [[NSMutableAttributedString alloc] initWithString:freightStr];
+    [attrStr1 addAttribute:NSFontAttributeName
+                     value:[UIFont systemFontOfSize:AdaptFont(14)]
+                     range:NSMakeRange(freightStr.length-2, 2)];
+    self.freightPrice.attributedText =attrStr1 ;
     
-    NSString *origianPrice =[NSString stringWithFormat:@"%@ 原价",[Tools getHaveNum:model.OldPrice.doubleValue]];
+    NSString *origianPrice =[NSString stringWithFormat:@"¥%@ 原价",[Tools getHaveNum:model.OldPrice.doubleValue]];
     NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:origianPrice];
     [attrStr addAttribute:NSStrikethroughStyleAttributeName
                     value:[NSNumber numberWithInteger:NSUnderlineStyleSingle]
@@ -211,11 +216,11 @@
  
     NSString *str;
 //    self.dateEnd.text = [NSString stringWithFormat:@"距离结束%@天 %@时%@分%@秒",model.Day,model.Hour,@"0",@"0"];
-    if (model.GroupState.integerValue==0) {
+    if (model.GroupState.integerValue==1) {
         self.togetherButton.backgroundColor = ColorWithHexString(StandardBlueColor);
         [self.togetherButton setTitle:@"即将开始" forState:UIControlStateNormal];
         str = @"距离开始";
-    }else if(model.GroupState.integerValue==1)
+    }else if(model.GroupState.integerValue==0)
     {
         self.togetherButton.backgroundColor = ColorWithHexString(@"F8695D");
         [self.togetherButton setTitle:@"去拼团" forState:UIControlStateNormal];

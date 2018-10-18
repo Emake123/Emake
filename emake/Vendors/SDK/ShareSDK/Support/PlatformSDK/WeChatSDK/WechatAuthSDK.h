@@ -24,7 +24,7 @@ enum  AuthErrCode {
 - (void)onAuthGotQrcode:(UIImage *)image;  //得到二维码
 - (void)onQrcodeScanned;    //二维码被扫描
 - (void)onAuthFinish:(int)errCode AuthCode:(NSString *)authCode;    //成功登录
-
+/Users/zhangshichao/Desktop/emake.zip
 @end
 
 @interface WechatAuthSDK : NSObject{

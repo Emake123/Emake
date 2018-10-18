@@ -53,7 +53,8 @@
     [self addRigthDetailButtonIsShowCart:YES];
     
     self.myVipState = Userdefault(VipState);
-    self.mySection = self.myVipState.integerValue==0 ?1:2;
+    NSString * HidenVip =Userdefault(HidenCatagoryVip);
+    self.mySection = HidenVip.integerValue==0?1:( self.myVipState.integerValue==0 ?1:2);
     
     [self getUserInfo];
     [self configUI];
@@ -275,7 +276,7 @@
                     [[YHJsonRequest shared]upDateNickName:nickName AndHeadImage:urlString SuccessBlock:^(NSString *data) {
                         [[NSUserDefaults standardUserDefaults] setObject:nickName forKey:LOGIN_USERNICKNAME];
                         [[NSUserDefaults standardUserDefaults] synchronize];
-                        [myTableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:2 inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+                        [myTableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:1 inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
                         
                     } fialureBlock:^(NSString *error) {
                         
@@ -303,7 +304,7 @@
                 
                 [[YHJsonRequest shared]putUserInfo:userInfo SuccessBlock:^(NSDictionary *successMessage) {
                     [self getUserInfo];
-                    [myTableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:3 inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+//                    [myTableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:2 inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
                 } fialureBlock:^(NSString *errorMessages) {
                     [self.view makeToast:errorMessages];
                 }];

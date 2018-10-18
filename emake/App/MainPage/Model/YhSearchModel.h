@@ -31,5 +31,7 @@
 @property(nonatomic,copy)NSDictionary *Store;
 @property(nonatomic,copy)NSString *StorePhoto;
 @property(nonatomic,copy)NSString *StoreNum;
+@property(nonatomic,copy)NSString *CategoryBId;
+
 
 @end

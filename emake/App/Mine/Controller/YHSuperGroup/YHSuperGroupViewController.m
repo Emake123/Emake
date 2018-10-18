@@ -65,6 +65,7 @@
 -(void)getSuperGroupList:(NSDictionary *)dic
 {
     [self.view showWait:@"加载中" viewType:CurrentView];
+    [[NSUserDefaults standardUserDefaults] setObject:dic[@"CategoryBId"] forKey:USERSELECCATEGORY];
 
     [[YHJsonRequest shared] getAppSuperGroup:@{@"CategoryBId":dic[@"CategoryBId"]} SuccessBlock:^(NSArray *success) {
         [self.view hideWait:CurrentView];
@@ -101,6 +102,8 @@
 
 -(void)getMYSuperGroupList:(NSDictionary *)dic
 {
+    [[NSUserDefaults standardUserDefaults] setObject:dic[@"CategoryBId"] forKey:USERSELECCATEGORY];
+
     [self.view showWait:@"加载中" viewType:CurrentView];
     [[YHJsonRequest shared] getAppMYSuperGroup:@{@"CategoryBId":dic[@"CategoryBId"]} SuccessBlock:^(NSArray *success) {
         [self.view hideWait:CurrentView];
@@ -115,6 +118,12 @@
             self.emptyView.hidden = YES;
             [self.superTable reloadData];
             
+        }
+        
+        if (self.isShowPayAlert == YES) {
+            
+//            YHAlertView *alert =  [[YHAlertView alloc] initWithDelegete:vc Title:@"支付成功" bottomTitle:@"客服热线：400-867-0211" ButtonTitle:@"查看详情"];
+//            [alert showAnimated];
         }
         
     } fialureBlock:^(NSString *errorMessages) {
@@ -188,25 +197,34 @@
     [self.view addSubview: self.superTable];
     
     NSArray *CatagorydictArray = Userdefault(CatagoryIDs);
-    NSArray *array;
-    if (CatagorydictArray.count == 2) {
-    NSDictionary *dict = CatagorydictArray[0];
-    NSDictionary *dict1 = CatagorydictArray[1];
-    array = @[dict[@"CategoryBName"],dict1[@"CategoryBName"] ];
-  }else
-  {
-      array = @[@"输配电云工厂",@"休闲食品云工厂"];
-  }
-    self.myTitle  =  [[YHTitleView alloc] initWithFrame:CGRectMake( WidthRate(0),TOP_BAR_HEIGHT, ScreenWidth, HeightRate(45)) titleFont:14 delegate:self andTitleArray:array];
-    [self.view addSubview: self.myTitle];
+    NSMutableArray *titleArr = [NSMutableArray array];
+    for (NSDictionary *cataDic in CatagorydictArray) {
+        NSString *catagoryname =  cataDic[@"CategoryBName"];
+        [titleArr addObject:catagoryname];
+        
+    }
+
+    
+    self.myTitle = [[YHTitleView alloc] initWithTitleFont:AdaptFont(14) delegate:self andTitleArray:titleArr andTitleHeight:HeightRate(45) andScrolweight:ScreenWidth];
+    [self.view addSubview:self.myTitle];
+    
+    [self.myTitle mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(0);
+        make.right.mas_equalTo(self.myTitle.titleViewWidth);
+        make.top.mas_equalTo(TOP_BAR_HEIGHT);
+        make.height.mas_equalTo(HeightRate(39));
+    }];
     if (@available(iOS 11.0, *)) {
          self.superTable.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     }else {
         self.automaticallyAdjustsScrollViewInsets = NO;
     }
     
-    
-    [ self.myTitle selectItemWithIndex:self.index];
+    self.index = self.isFromMine?self.index:[Userdefault(TitleIndex) integerValue];
+//    [ self.myTitle selectItemWithIndex:self.index];
+//    [self.myTitle ChageItemWithIndex:2];
+    [self.myTitle selectTitleItemWithIndex:self.index];
+
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
@@ -275,7 +293,7 @@
         
         YHSuperGroupModel *model = self.groupList[indexPath.row];
         
-        if (model.GroupState.integerValue==0) {
+        if (model.GroupState.integerValue==1) {
             [self.view makeToast:@"该团还未开始" duration:1.5 position:CSToastPositionCenter];
 
         } else if(model.GroupState.integerValue==2) {
@@ -283,7 +301,7 @@
         }else
         {
             YHSuperGroupDetailViewController *vc = [[YHSuperGroupDetailViewController alloc] init];
-
+            vc.recordIdex =self.index;
             
             vc.model  = [self lessSecondToDay:self.time model:model];
             vc.isFromMine = self.isFromMine;
@@ -323,6 +341,8 @@
         }else
         {
             [self getSuperGroupList:self.CatagorydictArray[index]];
+            [[NSUserDefaults standardUserDefaults] setObject:@(index) forKey:TitleIndex];
+
         }
 
     }
@@ -353,10 +373,10 @@
         model.Day = [NSString stringWithFormat:@"%ld",day] ;
         model.Hour = [NSString stringWithFormat:@"%ld:%ld:%ld",hour,min,second];
         if (time==0) {
-            model.GroupState = model.GroupState.integerValue==2?@"2":(model.GroupState.integerValue==1?@"2":@"1");
+            model.GroupState = model.GroupState.integerValue==2?@"2":(model.GroupState.integerValue==1?@"2":@"0");
 
         }
-        NSString *str = model.GroupState.integerValue==0?@"距离开始":@"距离结束";
+        NSString *str = model.GroupState.integerValue==1?@"距离开始":@"距离结束";
         dispatch_async(dispatch_get_main_queue(), ^{
             NSAttributedString *att = [Tools getFrontStr:str day:model.Day time:model.Hour isShowSecond:YES ];
             NSIndexPath *indexPath = [NSIndexPath indexPathForItem:i inSection:0];
@@ -412,7 +432,21 @@
     _activeTimer = nil;
 
 }
-
+-(void)alertViewRightBtnClick:(id )alertView  currentTitle:(NSString *)currentTitle
+{
+    //    @"查看详情":@"重新支付"
+    if ([currentTitle isEqualToString:@"查看详情"]) {
+        YHSuperGroupCollageViewController *vc = [[YHSuperGroupCollageViewController alloc] init];
+        vc.SuperGroupDetailId = self.mySuperid;
+        vc.OrderNo = self.orderNo;
+        [self.navigationController pushViewController:vc animated:YES];
+    }else
+    {
+        YHAlertView *alertViewS = (YHAlertView *)alertView;
+        [alertViewS closeAnimated];
+    }
+    
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

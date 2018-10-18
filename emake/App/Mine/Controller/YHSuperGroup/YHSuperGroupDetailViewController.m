@@ -50,6 +50,7 @@
 @property(nonatomic,assign)NSInteger recoderJoinRow;
 @property(nonatomic,assign)BOOL isNOtStartTimer;
 @property(nonatomic,strong)NSString * orderNO;
+@property(nonatomic,strong)NSString * mySuperId;
 
 @end
 
@@ -76,14 +77,16 @@
     self.orderNO = notify.userInfo[@"OrderNo"];
     
     YHSuperGroupViewController *vc = [[YHSuperGroupViewController alloc] init];
-    YHAlertView *alert =  [[YHAlertView alloc] initWithDelegete:vc Title:SuccessState.integerValue==2?@"支付成功":@"支付失败" bottomTitle:@"客服热线：400-867-0211" ButtonTitle:SuccessState.integerValue==2?@"查看详情":@"重新支付"];
-    
+    YHAlertView *alert =  [[YHAlertView alloc] initWithDelegete:vc Title:@"支付成功" bottomTitle:@"客服热线：400-867-0211" ButtonTitle:@"查看详情"];
+    [alert showAnimated];
+    vc.orderNo = notify.userInfo[@"OrderNo"];
+    vc.mySuperid = self.mySuperId;
     self.isNOtStartTimer = YES;
     [self getSuperGroupDetailData];
     
-  
-    [alert showAnimated];
+    vc.isShowPayAlert = YES;
     vc.isFromMine = YES;
+    vc.index = self.recordIdex;
     [self.navigationController  pushViewController:vc animated:YES];
     
     
@@ -104,22 +107,7 @@
 
     
 }
--(void)alertViewRightBtnClick:(id )alertView  currentTitle:(NSString *)currentTitle
-{
-    //    @"查看详情":@"重新支付"
-    if ([currentTitle isEqualToString:@"查看详情"]) {
-        YHSuperGroupInfoModel *infomodel = self.groupArr[self.recoderJoinRow];
-        YHSuperGroupCollageViewController *vc = [[YHSuperGroupCollageViewController alloc] init];
-        vc.SuperGroupDetailId = infomodel.SuperGroupDetailId;
-        vc.OrderNo = self.orderNO;
-        [self.navigationController pushViewController:vc animated:YES];
-    }else
-    {
-        YHAlertView *alertViewS = (YHAlertView *)alertView;
-        [alertViewS closeAnimated];
-    }
-    
-}
+
 -(void)getSuperGroupDetailData
 {
     [[YHJsonRequest shared] getAppSuperGroupDetailWithSuperGroupIdS:@{@"SuperGroupId":self.model.SuperGroupId} SuccessBlock:^(NSArray *success) {
@@ -137,7 +125,7 @@
             [arr addObject:[NSString stringWithFormat:@"%ld",secondsCountDown]];
         }
         titleTimeArr =[NSMutableArray arrayWithArray:arr] ;
-        if (self.isNOtStartTimer) {
+        if (self.isNOtStartTimer==false) {
             [self startTimer];
 
         }
@@ -291,7 +279,7 @@
   
     
     UILabel *labelFreightPrice = [[UILabel alloc] init];
-    labelFreightPrice.text = [NSString stringWithFormat:@"¥%@",[Tools getHaveNum:self.model.GroupPrice.doubleValue]];
+//    labelFreightPrice.text = [NSString stringWithFormat:@"¥%@",[Tools getHaveNum:self.model.GroupPrice.doubleValue]];
     labelFreightPrice.font = [UIFont systemFontOfSize:AdaptFont(28)];
     labelFreightPrice.textColor = ColorWithHexString(@"F8695D");
 //    labelFreightPrice.hidden = true;
@@ -302,15 +290,21 @@
         make.left.mas_equalTo(HeightRate(10));
     }];
     self.labelFreightPrice = labelFreightPrice;
+    NSString *freightStr =  [NSString stringWithFormat:@"¥%@ 起",[Tools getHaveNum:self.model.GroupPrice.doubleValue]];
+    NSMutableAttributedString *attrStr1 = [[NSMutableAttributedString alloc] initWithString:freightStr];
+    [attrStr1 addAttribute:NSFontAttributeName
+                     value:[UIFont systemFontOfSize:AdaptFont(16)]
+                     range:NSMakeRange(freightStr.length-1, 1)];
+    self.labelFreightPrice.attributedText = attrStr1 ;
     
     UILabel *labelpriceTip = [[UILabel alloc] init];
-    labelpriceTip.text = @"起   拼团价";
+    labelpriceTip.text = @"拼团价";
     labelpriceTip.font = [UIFont systemFontOfSize:AdaptFont(12)];
     labelpriceTip.textColor = ColorWithHexString(@"F8695D");
     labelpriceTip.textAlignment = NSTextAlignmentLeft;
     [self.leftView addSubview:labelpriceTip];
     [labelpriceTip mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerY.mas_equalTo(labelFreightPrice.mas_centerY);
+        make.bottom.mas_equalTo(labelFreightPrice.mas_bottom);
         make.left.mas_equalTo(labelFreightPrice.mas_right).offset(10);
         make.height.mas_equalTo(HeightRate(24));
     }];
@@ -485,7 +479,8 @@
     self.recoderJoinRow = index;
     vc.supermodel = self.model;
     vc.infomodel =model11;
-
+    self.mySuperId = model11.SuperGroupDetailId;
+    vc.recordIdex = self.recordIdex;
     [self.navigationController pushViewController:vc animated:YES];
     
 }
@@ -613,7 +608,7 @@
 {
     
     NSString *userID = Userdefault(LOGIN_USERID);
-    YHShareView *share = [[YHShareView alloc] initShareWithContentTitle:@"易智造" theOtherTitle:@"超级团" image:nil url:[NSString stringWithFormat:@"%@%@/%@",UserSuperGroupIDShareURL,self.model.SuperGroupId,userID] withCancleTitle:@"取消"];
+    YHShareView *share = [[YHShareView alloc] initShareWithContentTitle:@"易智造" theOtherTitle:self.model.GroupName image:nil url:[NSString stringWithFormat:@"%@%@/%@",UserSuperGroupIDShareURL,self.model.SuperGroupId,userID] withCancleTitle:@"取消"];
     [share showAnimated];
 
 }

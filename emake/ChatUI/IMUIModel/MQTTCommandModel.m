@@ -23,7 +23,7 @@
     return self;
 }
 //请求客服服务
-- (instancetype)creatRequestServiceCMD:(NSString *)userId andStoreId:(NSString *)storeID lastMessageId:(NSInteger)messageId{
+- (instancetype)creatRequestServiceCMD:(NSString *)userId andStoreId:(NSString *)storeID lastMessageId:(NSInteger)messageId catagoryParams:(NSDictionary *)dic{
     if (storeID == nil) {
         self.cmd = @"RequestService";
         self.chatroom_id = userId;
@@ -37,22 +37,23 @@
     NSString *phone = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_MOBILEPHONE];
     NSString *userType = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERTYPE];
     NSString *nickName = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERNICKNAME];
+    NSString *userName = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERNAME];
+
     
     NSString *clientId = [NSString stringWithFormat:@"user/%@",userID];
     NSString *commonNameStr = [NSString stringWithFormat:@"用户%@",[phone substringFromIndex:7]];
-    NSString *ChatName = nickName.length>0?nickName:commonNameStr;
-    
+    NSString *ChatName =nickName.length>0?nickName:userName.length>0?userName:commonNameStr;
+
     NSString *headImage = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_HeadImageURLString];
-    
-    NSInteger Catagorynum = self.isCatagory+1;//1,2
+    NSInteger vipStatess =  [Tools SaveLocalVipstateWithCatagory:nil];
     NSNumber *catagoryState = Userdefault(CatagoryVipState);
-    NSString *vipStatestr = Userdefault(VipState);
-    NSString *Type;
-    if (catagoryState.integerValue ==Catagorynum || catagoryState.integerValue==3) {
-        Type = vipStatestr;
-    }else{
-        Type = @"0";
-    }
+//    NSString *vipStatestr = Userdefault(VipState);
+    NSString *Type = [NSString stringWithFormat:@"%ld",vipStatess];
+//    if (catagoryState.integerValue ==Catagorynum || catagoryState.integerValue==3) {
+//        Type = vipStatestr;
+//    }else{
+//        Type = @"0";
+//    }
     
     chatUserModel *model = [[chatUserModel alloc] initWith:headImage formId:userID displayName:ChatName phoneNumber:phone userType:Type clientID:clientId];
     NSArray *user_info_array = @[[model mj_keyValues]];

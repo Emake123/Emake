@@ -9,6 +9,7 @@
 #import "YHMemberExperienceViewController.h"
 #import "YHPayViewController.h"
 #import "YHMineMemberInterestViewController.h"
+#import "YHCommonWebViewController.h"
 @interface YHMemberExperienceViewController ()<YHAlertViewDelegete>
 
 @end
@@ -68,6 +69,8 @@
     memberExplainButton.titleLabel.font = [UIFont systemFontOfSize:AdaptFont(AdaptFont(10))];
     [memberExplainButton setTitle:@"会员说明" forState:UIControlStateNormal];
     [memberExplainButton setTitleColor:ColorWithHexString(@"ffffff") forState:UIControlStateNormal];
+    [memberExplainButton addTarget:self action:@selector(VipIntroductionButtonClick) forControlEvents:UIControlEventTouchUpInside];
+
     [topBackView addSubview:memberExplainButton];
     [memberExplainButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.mas_equalTo(HeightRate(6));
@@ -183,7 +186,14 @@
     [self.navigationController pushViewController:vc animated:YES];
 }
 
-
+-(void)VipIntroductionButtonClick
+{
+    YHCommonWebViewController *vc = [[YHCommonWebViewController alloc]init];
+    vc.hidesBottomBarWhenPushed = YES;
+    vc.titleName = @"会员说明";
+    vc.URLString = UserVipInstructionURL;
+    [self.navigationController pushViewController:vc animated:YES];
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

@@ -22,6 +22,7 @@ PODS:
     - SDWebImage
   - SVGKit (2.0.1):
     - CocoaLumberjack (~> 3.x)
+  - WechatOpenSDK (1.8.2)
 
 DEPENDENCIES:
   - Bugly
@@ -29,15 +30,7 @@ DEPENDENCIES:
   - Reachability (~> 3.2)
   - SKFPicPreview
   - SVGKit (from `https://github.com/SVGKit/SVGKit.git`, branch `2.x`)
-
-SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
-    - Bugly
-    - CocoaLumberjack
-    - MQTTClient
-    - Reachability
-    - SDWebImage
-    - SKFPicPreview
+  - WechatOpenSDK
 
 EXTERNAL SOURCES:
   SVGKit:
@@ -57,7 +50,8 @@ SPEC CHECKSUMS:
   SDWebImage: 791bb72962b3492327ddcac4b1880bd1b5458431
   SKFPicPreview: e142e5ce79b55e10587455431c7ca6d951e64b8a
   SVGKit: 4055d9e809b5db8633755979cfb3b02dc5a8c20d
+  WechatOpenSDK: 676feec516a11173eafd1fe64b10d27babf28701
 
-PODFILE CHECKSUM: eb44142ce80cbd1d2cc9a46f770a8718ea515836
+PODFILE CHECKSUM: 496edf733d982b53177bd05dcaedd6e9d146d881
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.4.0

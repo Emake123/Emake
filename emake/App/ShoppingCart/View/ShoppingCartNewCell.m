@@ -236,14 +236,18 @@ static CGFloat const itemFont = 14.0f;
     return self;
 }
 - (void)setData:(YHShoppingCartModel *)model{
+    
+    CGFloat parameterheight = [model.GoodsExplain boundingRectWithSize:CGSizeMake(ScreenWidth-WidthRate(100), 1000) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:AdaptFont(itemFont)]} context:nil].size.height ;
+    if (parameterheight>50) {
+        [self.parameter mas_updateConstraints:^(MASConstraintMaker *make) {
+            make.height.mas_equalTo(HeightRate(parameterheight));
+        }];
+        
+    }
+     self.parameter.text = model.GoodsExplain;
     self.taxTipsLable.text = [NSString stringWithFormat:@"(%@)",model.GoodsAddValue];
     self.itemNameLabel.text =  [NSString stringWithFormat:@"%@",model.GoodsTitle] ;
-//    self.itemSize.text =  model.GoodsSize;
-//    self.itemWeight.text =[NSString stringWithFormat:@"重量:%dkg",[model.GoodsWeight intValue]];
-    self.parameter.text = model.GoodsExplain;
-//    self.WeightStandard.text = [NSString stringWithFormat:@"%@%@",model.AddSeriesName,model.AuxiliaryName];
-
-//    self.sizeAndWeight.text = [NSString stringWithFormat:@"%@   重量:%dkg",model.GoodsSize,[model.GoodsWeight intValue]];
+   
     self.salePrice.text = [NSString stringWithFormat:@"￥%@", [Tools getHaveNum:model.MainProductPrice.doubleValue]];;
     [self.itemImage sd_setImageWithURL:[NSURL URLWithString:model.GoodsSeriesIcon] ];
     self.itemNumber.text = [NSString stringWithFormat:@"X%@",model.GoodsNumber];

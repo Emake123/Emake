@@ -22,6 +22,7 @@
 #import "YHMineMemberInterestViewController.h"
 #import "YHMineCityDelegateSuccessViewController.h"
 #import "YHMemberExperienceViewController.h"
+#import "YHMainViewController.h"
 @interface YHSettingViewController ()<UITableViewDataSource,UITableViewDelegate,UIActionSheetDelegate,YHAlertViewDelegete,YHActionSheetViewDelegete>{
     
     UITableView * myTableView;
@@ -265,7 +266,8 @@
                 [[YHMQTTClient sharedClient].messageCountDic removeObjectForKey:nameStr];
 
             }
-
+            [defaults removeObjectForKey:TitleIndex];
+            [defaults setObject:@"1" forKey:ISRegisterUser];
             [defaults synchronize];
             [[YHMQTTClient sharedClient] disConnect];
             [self.navigationController popViewControllerAnimated:YES];

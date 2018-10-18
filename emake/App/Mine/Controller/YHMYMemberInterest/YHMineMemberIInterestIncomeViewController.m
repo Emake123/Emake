@@ -125,7 +125,7 @@
     cell.catagoryLable.text = model.CategoryBName;
     cell.dateLable.text = model.BeginAt;
     cell.phoneNumberLable.text = model.MobileNumber;
-    cell.moneyLable.text  = model.BonusAmount;
+    cell.moneyLable.text  =[NSString stringWithFormat:@"%@元",[Tools getHaveNum:model.BonusAmount.doubleValue]] ;
     return cell;
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{

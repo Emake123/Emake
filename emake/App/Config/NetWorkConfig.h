@@ -8,16 +8,17 @@
 #ifndef NetWorkConfig_h
 #define NetWorkConfig_h
 //请求地址
-//#define CLOUD_URL(res)  [NSString stringWithFormat:@"https://api.emake.cn/%@",res]//正式服务器mallapi.emake.cn
-//#define CLOUD_URL(res)  [NSString stringWithFormat:@"http://mallapi.emake.cn/%@",res]//正式服务器
-#define CLOUD_URL(res)  [NSString stringWithFormat:@"http://mallapitest.emake.cn/%@",res]//测试服务器
-//#define CLOUD_URL(res)  [NSString stringWithFormat:@"http://git.emake.cn:3100/%@",res]//旧 测试服务器
 
+#define CLOUD_URL(res)  [NSString stringWithFormat:@"http://mallapi.emake.cn/%@",res]//正式服务器mallapi.emake.cn
+//#define CLOUD_URL(res)  [NSString stringWithFormat:@"http://mallapitest.emake.cn/%@",res]//测试服务器
+
+//#define CLOUD_URL(res)  [NSString stringWithFormat:@"https://api.emake.cn/%@",res]// 旧 正式服务器mallapi.emake.cn
+//#define CLOUD_URL(res)  [NSString stringWithFormat:@"http://git.emake.cn:3100/%@",res]//旧 测试服务器
 //#define CLOUDTest_URL(res)  [NSString stringWithFormat:@"http://192.168.0.149:3100/%@",res]//测试服务器
 //#define CLOUD_URL(res)  [NSString stringWithFormat:@"http://192.168.0.149:3100/%@",res]//测试服务器
 
-#define CLOUD_ConmmonTestURL(res)  [NSString stringWithFormat:@"http://malldev.emake.cn:8004/%@",res]//测试服务器
-#define CLOUD_ConmmonURL(res)  [NSString stringWithFormat:@"http://mall.emake.cn/%@",res]//测试服务器
+#define CLOUD_ConmmonTestURL(res)  [NSString stringWithFormat:@"http://webtest.emake.cn/%@",res]//测试服务器
+#define CLOUD_ConmmonURL(res)  [NSString stringWithFormat:@"https://web.emake.cn/%@",res]//正试服务器http://mall.emake.cn
 
 
 //服务器统一返回字段
@@ -40,62 +41,74 @@
 //易智造 APPID
 #define EmakeAppleID             @"1260429389"
 
-//MQTT
-//#define MQTT_IP                     @"192.168.0.56"
+//易智造 APPID
+#define EmakeWexinPayID             @"wx1d7605e5f166ac0a"
+//wx1d7605e5f166ac0a
 
-#define MQTT_IP                     URLWithTestAndInform(@"git.emake.cn",@"api.emake.cn")
+//MQTT
+//#define MQTT_IP                     @"192.168.0.106"
+
+#define MQTT_IP                   URLWithTestAndInform(@"mallapitest.emake.cn",@"mallapi.emake.cn")  //git.emake.cn
 #define MQTT_PORT                   1883
 
 
 
 //分享app 下载地址
-#define ShareDownloURL                         @"http://www.emake.cn/download/"
+#define ShareDownloURL                      @"http://www.emake.cn/download/"
 
 //分享产品详情 test（测试） and inform（正式）
-#define ShareProductDetaiURL                     URLWithTestAndInform(@"http://malldev.emake.cn:8004/ngoodsdetails",@"http://mall.emake.cn/ngoodsdetails")
+#define ShareProductDetaiURL                     URLWithTestAndInform(@"http://webtest.emake.cn/ngoodsdetails", CLOUD_ConmmonURL(@"ngoodsdetails"))
 
 //分享店铺详情 test（测试） and inform（正式）
-#define ShareStoreDetaiURL                     URLWithTestAndInform(@"http://malldev.emake.cn:8004/shopdetail",@"http://mall.emake.cn/shopdetail")
+#define ShareStoreDetaiURL                     URLWithTestAndInform(@"http://webtest.emake.cn/shopdetail",CLOUD_ConmmonURL(@"shopdetail"))
+
+
+
+//使用许可、用户隐私、服务条款
+#define RegisterProtcolURL  URLWithTestAndInform(CLOUD_ConmmonTestURL(@"servicepact/"),CLOUD_ConmmonURL(@"servicepact/"))
+//@"http://mall.emake.cn/servicepact/" //@"https://price.emake.cn/servicepact/"
+
+#define InsurancesInstructionURL           URLWithTestAndInform(CLOUD_ConmmonTestURL(@"user/insurance/content/"),CLOUD_ConmmonURL(@"user/insurance/content/"))
+//@"http://mall.emake.cn/user/insurance/content/" // @"https://price.emake.cn/user/insurance/content/"
+
+//订购须知
+#define UserOrderinginfoURL     URLWithTestAndInform(CLOUD_ConmmonTestURL(@"orderinfo"), CLOUD_ConmmonURL(@"orderinfo"))
+//订购流程
+#define UserOrderingproURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"orderprocedure"), CLOUD_ConmmonURL(@"orderprocedure"))
+//使用说明
+#define UserInstructionURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"usinghelp/user"),CLOUD_ConmmonURL(@"usinghelp/user"))
+
+
+
+
+
+//超级团使用说明
+#define UserSuperGroupInstructionURL          URLWithTestAndInform(CLOUD_ConmmonTestURL(@"supergroup"), CLOUD_ConmmonURL(@"supergroup"))
+
+//城市代理商规则
+#define UserCityAgentRulerURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"cityagentrule"), CLOUD_ConmmonURL(@"cityagentrule"))
+//会员说明
+#define UserVipInstructionURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"vipinfo"), CLOUD_ConmmonURL(@"vipinfo"))
+//提现规则
+#define UserWithDrawRulerURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"withdrawrule"),CLOUD_ConmmonURL(@"withdrawrule"))
+//城市代理商领取优惠码（代理商分享页面） +代理商userId
+#define CityAgentCouponShareURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"cityagent/"), CLOUD_ConmmonURL(@"cityagent/"))
+//超级团（大团 分享 :supergroupId/:userId
+#define UserSuperGroupIDShareURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"supergroupshare/"), CLOUD_ConmmonURL(@"supergroupshare/"))
+//我的超级团（小团）分享 :supergroupdetailId/:userId
+#define UserSuperGroupInfoSahreURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"mygroupshare/"), CLOUD_ConmmonURL(@"mygroupshare/"))
+
+//当日售价 要拼接的地址 test（测试） and inform（正式）
+#define TodayPriceUrl                   URLWithTestAndInform(CLOUD_ConmmonTestURL(@"pricelist"),@"https://web.emake.cn/pricelist")
+//http://web.emake.cn/pricelist CLOUD_ConmmonURL(@"pricelist")
+
+/*-------------------------------web链接 暂时不用的---------------------------------------*/
 
 //合同展示URL test（测试） and inform（正式）
 #define ContractDisplayURL                     URLWithTestAndInform( @"http://git.emake.cn:5000/contract", @"http://www.emake.cn:5100/contract")
 
-//使用许可、用户隐私、服务条款
-#define RegisterProtcolURL                       @"https://price.emake.cn/servicepact/"
-#define InsurancesInstructionURL                 @"https://price.emake.cn/user/insurance/content/"
-
-//订购须知
-#define UserOrderinginfoURL     URLWithTestAndInform(CLOUD_ConmmonTestURL(@"orderinfo"), @"http://price.emake.cn/orderingpro")
-//订购流程
-#define UserOrderingproURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"orderprocedure"), @"http://price.emake.cn/orderinginfo")
-//使用说明
-#define UserInstructionURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"usinghelp/user"), @"http://mall.emake.cn/companies/user")
-
-
 //合同pdf文件 test（测试） and inform（正式）
-#define UserContractPDFURL                     URLWithTestAndInform(@"http://git.emake.cn:3000/static/contractpdf", @"http://api.emake.cn/static/contractpdf")
-
-
-//超级团使用说明
-#define UserSuperGroupInstructionURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"supergroup"), @"http://mall.emake.cn/companies/user")
-
-//城市代理商规则
-#define UserCityAgentRulerURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"cityagentrule"), @"http://mall.emake.cn/companies/user")
-//会员说明
-#define UserVipInstructionURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"vipinfo"), @"http://mall.emake.cn/companies/user")
-//提现规则
-#define UserWithDrawRulerURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"withdrawrule"), @"http://mall.emake.cn/companies/user")
-//城市代理商领取优惠码（代理商分享页面） +代理商userId
-#define CityAgentCouponShareURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"cityagent/"), @"http://mall.emake.cn/companies/user")
-//超级团（大团 分享 :supergroupId/:userId
-#define UserSuperGroupIDShareURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"supergroupshare/"), @"http://mall.emake.cn/companies/user")
-//我的超级团（小团）分享 :supergroupdetailId/:userId
-#define UserSuperGroupInfoSahreURL             URLWithTestAndInform(CLOUD_ConmmonTestURL(@"mygroupshare/"), @"http://mall.emake.cn/companies/user")
-//当日售价 要拼接的地址 test（测试） and inform（正式）
-#define TodayPriceUrl                     URLWithTestAndInform(@"http://pricedev.emake.cn/serieslist",@"http://price.emake.cn/serieslist")
-
-
-/*-------------------------------web链接 暂时不用的---------------------------------------*/
+#define UserContractPDFURL                     URLWithTestAndInform(@"http://git.emake.cn:3000/static/contractpdf", @"http://mall.emake.cn/static/contractpdf")
 //资讯发现
 #define DiscoverUrl                            @"http://price.emake.cn/infor"
 
@@ -159,17 +172,16 @@
 #define URL_MainPageImage CLOUD_URL(@"home/banner")
 
 //购物车
-#define URL_UserFindingShoppingCart              CLOUD_URL(@"app/make/shopping")
-#define URL_StoreUserFindingShoppingCart         CLOUD_URL(@"app/make/shopping")
+#define URL_UserFindingShoppingCart              CLOUD_URL(@"app/user/shopping")
 
 //购物车删除
-#define URL_UserDeleteShoppingCart CLOUD_URL(@"app/make/shopping")
+#define URL_UserDeleteShoppingCart CLOUD_URL(@"app/user/shopping")
 
 //购物车数量改变
 #define URL_UserShoppingCartNumberChange CLOUD_URL(@"user/shopping")
 
 //订单
-#define URL_UserOrderManage CLOUD_URL(@"app/make/order")
+#define URL_UserOrderManage CLOUD_URL(@"app/user/order")
 
 //产品参数
 #define URL_GoodsParams CLOUD_URL(@"goods/params")
@@ -185,26 +197,23 @@
 
 //获取<产品系列CODE>下的所有可选属性名字，，，，下拉列表
 #define URL_PropertyProductList CLOUD_URL(@"app/make/series/goodsall")
-#define URL_StorePropertyProductList CLOUD_URL(@"app/make/series/goodsall")
 
 //增值服务
 #define URL_PropertyAddSevice                CLOUD_URL(@"app/make/addservice")
-#define URL_StorePropertyAddSevice           CLOUD_URL(@"app/make/addservice")
+//#define URL_StorePropertyAddSevice           CLOUD_URL(@"app/make/addservice")
 
 
 //商品详情
 #define URL_ShoppingDetail                CLOUD_URL(@"app/make/series/detail")
-#define URL_StoreShoppingDetail           CLOUD_URL(@"app/make/series/detail")
 
 //添加购物车
-#define URL_AddShopping              CLOUD_URL(@"app/make/shopping")
+#define URL_AddShopping              CLOUD_URL(@"app/user/shopping")
 
 //获取产品价格
 #define URL_ShoppingPrice            CLOUD_URL(@"shopping/price")
 
 //生成订单
-#define URL_ContractOder            CLOUD_URL(@"app/make/order")
-#define URL_StoreContractOder            CLOUD_URL(@"app/make/order")
+#define URL_ContractOder            CLOUD_URL(@"app/user/order")
 
 //合同是否签订
 #define URL_ContractIsSigh            CLOUD_URL(@"web/make/contract/chat")
@@ -228,8 +237,8 @@
 #define URL_InvoiceRemainAmount            CLOUD_URL(@"user/remaininvoiceamount")
 
 //品牌
-#define URL_Brand            CLOUD_URL(@"brand")
-#define URL_StoreBrand            CLOUD_URL(@"app/brand")
+#define URL_Brand            CLOUD_URL(@"app/user/brand")
+//#define URL_StoreBrand            CLOUD_URL(@"app/brand")
 
 //保险
 #define URL_UserInsurance           CLOUD_URL(@"user/insurance")
@@ -244,7 +253,7 @@
 #define URL_UserBusinessCategory           CLOUD_URL(@"user/business/category")
 
 //首页获取上周订单
-#define URL_LastWeekOrder           CLOUD_URL(@"user/lastweek/order")
+#define URL_LastWeekOrder           CLOUD_URL(@"console/setlastweekorderstatistics?CallID=2")/// app/lastweek/order
 
 //生成订单
 #define URL_MakeOrder           CLOUD_URL(@"web/contract/sign")
@@ -427,6 +436,9 @@
 //支付宝
 #define URL_AppSuperGroupPay      CLOUD_URL(@"app/alipay/order")
 
+//微信支付
+#define URL_AppSuperGroupWechatPay      CLOUD_URL(@"app/wechat/order")
+
 //支付宝
 #define URL_AppPostSuperGroupPay      CLOUD_URL(@"app/super/group/pay")
 
@@ -440,5 +452,6 @@
 
 //查看合同PDF
 #define URL_AppContractPDF     CLOUD_URL(@"app/contractpdf")
-
+//提交超级团订单
+#define URL_AppSuperGroupSubmit     CLOUD_URL(@"app/super/group/submit")
 #endif /* NetWorkConfig_h */

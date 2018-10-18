@@ -25,8 +25,8 @@
 }
 @property(nonatomic,strong)UITableView *mytable;
 @property(nonatomic,assign)BOOL isShowInsuranceView;
-@property(nonatomic,assign)BOOL isStore;
-@property(nonatomic,assign)BOOL isIndustry;
+//@property(nonatomic,assign)BOOL isStore;
+//@property(nonatomic,assign)BOOL isIndustry;
 @property(nonatomic,assign)BOOL isShowAdress;
 @property(nonatomic,assign)CGFloat orderStateHeight;
 
@@ -41,18 +41,15 @@
     self.title = @"订单详情";
     [self addRigthDetailButtonIsShowCart:false];
     
-    NSString *catagory = [[NSUserDefaults standardUserDefaults]objectForKey:USERSELECCATEGORY];
-    self.isIndustry = [[NSUserDefaults standardUserDefaults] boolForKey:IsIndustryCatagory];
     self.isShowAdress = self.contract.Address.length;
-    self.isShowInsuranceView =   self.isIndustry == YES && self.contract.InsurdAmount.floatValue > @"2000".floatValue;
+    self.isShowInsuranceView =   self.contract.InsurdAmount.floatValue > @"2000".floatValue;
     self.isShowAdress = self.contract.Address.length>0?YES:(self.contract.ShippingInfo.count>0?YES:false);
     self.orderStateHeight = (self.contract.OrderState.integerValue>-2&&self.contract.OrderState.integerValue<3)?40:0;
     
-    NSString *isstoreStr = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    self.isStore = [isstoreStr isEqualToString:@"1"];
+//    NSString *isstoreStr = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
+//    self.isStore = [isstoreStr isEqualToString:@"1"];
     self.view.backgroundColor = SepratorLineColor;
     
-    if (self.isStore == YES) {
         if ([self.contract.OrderState isEqualToString:@"-2"] || self.contract.RemainInvoiceAmount.doubleValue<=0 || [self.contract.IsIncludeTax isEqualToString:@"0"]) {
             self.bottomHeight = 120;
         } else {
@@ -60,12 +57,7 @@
             self.bottomHeight = 170;
         }
         [self confinStoreBottomView];
-    } else {
-        self.bottomHeight =150;
-
-        [self confinBottomView];
-        
-    }
+   
  
     CGFloat tableHeight = (ScreenHeight)-(TOP_BAR_HEIGHT)-(HeightRate(self.bottomHeight));
     UITableView *table = [[UITableView alloc] initWithFrame:CGRectMake(0,TOP_BAR_HEIGHT, ScreenWidth, tableHeight) style:UITableViewStyleGrouped];
@@ -141,14 +133,10 @@
     }
     UIView *adressView = [self getCustomTopAdressView:Model];
     [backView addSubview:adressView];
-    if (self.isStore == YES) {
+    
+    [self TitleHeadView:backView item:adressView];
         
-        [self TitleHeadView:backView item:adressView];
-        
-    }else
-    {
-        [self getheadView:backView item:adressView];
-    }
+    
         
    
 
@@ -559,7 +547,7 @@
     {
         YHOrder *order = self.contract.goodsModelArr.firstObject;
         vc.isFromCartConfirm = YES;
-        YHChatOrderContract *chatOrder = [YHChatOrderContract initWithContractNo:self.contract.ContractNo GoodsTitle:order.GoodsTitle ContractAmount:self.contract.ContractAmount ContractQuantity:self.contract.ContractQuantity GoodsSeriesIcon:order.GoodsSeriesIcon GoodsExplain:order.GoodsExplain IsStore:[NSString stringWithFormat:@"%d",(!Userdefault(IsIndustryCatagory))]];
+        YHChatOrderContract *chatOrder = [YHChatOrderContract initWithContractNo:self.contract.ContractNo GoodsTitle:order.GoodsTitle ContractAmount:self.contract.ContractAmount ContractQuantity:self.contract.ContractQuantity GoodsSeriesIcon:order.GoodsSeriesIcon GoodsExplain:order.GoodsExplain IsStore:[NSString stringWithFormat:@"%d",(![self.contract.CategoryBName isEqualToString:@"输配电"])]];
         NSString *jsonstr = [chatOrder mj_JSONString];
         vc.isPostOrder = true;
         vc.jsonStr = jsonstr;
@@ -596,7 +584,7 @@
         vc.isFromCartConfirm = YES;
         vc.isCatagory =![_contract.CategoryBName containsString:@"输配电"];
 
-        YHChatOrderContract *chatOrder = [YHChatOrderContract initWithContractNo:self.contract.ContractNo GoodsTitle:order.GoodsTitle ContractAmount:self.contract.ContractAmount ContractQuantity:self.contract.ContractQuantity GoodsSeriesIcon:order.GoodsSeriesIcon GoodsExplain:order.GoodsExplain IsStore:[NSString stringWithFormat:@"%d",(!Userdefault(IsIndustryCatagory))]];
+        YHChatOrderContract *chatOrder = [YHChatOrderContract initWithContractNo:self.contract.ContractNo GoodsTitle:order.GoodsTitle ContractAmount:self.contract.ContractAmount ContractQuantity:self.contract.ContractQuantity GoodsSeriesIcon:order.GoodsSeriesIcon GoodsExplain:order.GoodsExplain IsStore:[NSString stringWithFormat:@"%d",(![self.contract.CategoryBName isEqualToString:@"输配电"])]];
         NSString *jsonstr = [chatOrder mj_JSONString];
         vc.storeName = self.contract.StoreName;
         vc.storeAvata = self.contract.StorePhoto;
@@ -819,7 +807,7 @@
     myCustomsBtn.titleLabel.font = [UIFont systemFontOfSize:AdaptFont(13)];
     [myCustomsBtn addTarget:self action:@selector(customerServiceButtonClick:) forControlEvents:UIControlEventTouchUpInside];
     [myCustomsBtn setImage:[UIImage imageNamed:@"dingdankefu"] forState:UIControlStateNormal];
-    [myCustomsBtn setTitle:@"  客服" forState:UIControlStateNormal];
+    [myCustomsBtn setTitle:@"  小二" forState:UIControlStateNormal];
     [bottomView addSubview:myCustomsBtn];
     [myCustomsBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.right.mas_equalTo(WidthRate(-10));
@@ -861,7 +849,7 @@
     
     UILabel *contractNo = [[UILabel alloc] init];
     contractNo.textColor = ColorWithHexString(@"666666") ;
-    contractNo.text = [NSString stringWithFormat:@"合同号：%@",self.contract.ContractNo];
+    contractNo.text = [NSString stringWithFormat:@"订单号：%@",self.contract.ContractNo];
     contractNo.font = [UIFont systemFontOfSize:AdaptFont(12)];
     [bottomView addSubview:contractNo];
     [contractNo mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -1035,7 +1023,7 @@
 //        }else
 //        {
             [myCustomsBtn setImage:[UIImage imageNamed:@"kufu3030"] forState:UIControlStateNormal];
-            [myCustomsBtn setTitle:@"  客服" forState:UIControlStateNormal];
+            [myCustomsBtn setTitle:@"  小二" forState:UIControlStateNormal];
 //        }
         
         [bottomView addSubview:myCustomsBtn];
@@ -1153,7 +1141,7 @@
         shopGoodsInvoiceLable.translatesAutoresizingMaskIntoConstraints= NO;
         [shopGoodsInvoiceLable PSSetRightAtItem:companyLabelName Length:WidthRate(5)];
         [shopGoodsInvoiceLable PSSetSize:WidthRate(33) Height:HeightRate(17)];
-        shopGoodsInvoiceLable.hidden = boolUserdefault(IsIndustryCatagory)==YES?YES:[self.contract.IsIncludeTax isEqualToString:@"0"];
+    shopGoodsInvoiceLable.hidden = !self.contract.IsIncludeTax.boolValue;
     if (shopGoodsInvoiceLable.hidden==false ) {
         [shopGoodsInvoiceLable PSSetSize:WidthRate(33) Height:HeightRate(17)];
         
@@ -1175,7 +1163,7 @@
     superGroupLable.translatesAutoresizingMaskIntoConstraints= NO;
     [superGroupLable PSSetRightAtItem:shopGoodsInvoiceLable Length:WidthRate(5)];
     [superGroupLable PSSetSize:WidthRate(14) Height:HeightRate(17)];
-    bool ishiden = self.contract.OrderState.integerValue <= 0?(self.contract.SuperGroupDetailId.length>0?false:YES):YES;
+    bool ishiden =self.contract.SuperGroupDetailId.length>0?false:YES;
     superGroupLable.hidden = ishiden;
     
     UILabel *superOrder = [[UILabel alloc] init];
@@ -1193,7 +1181,7 @@
     superOrder.translatesAutoresizingMaskIntoConstraints= NO;
     [superOrder PSSetRightAtItem:superGroupLable Length:WidthRate(5)];
     [superOrder PSSetSize:WidthRate(55) Height:HeightRate(17)];
-    superOrder.hidden =self.contract.OrderState.integerValue <= 0?(self.contract.SuperGroupDetailId.length>0?false:YES):YES;
+    superOrder.hidden =self.contract.SuperGroupDetailId.length>0?false:YES;
 
     
     //订单状态
@@ -1326,7 +1314,7 @@
     [broderView addSubview:appearslabel];
     [appearslabel PSSetLeft:0];
     [appearslabel PSSetTop:0];
-    [appearslabel PSSetHeight:30];
+    [appearslabel PSSetHeight:HeightRate(30)];
 //    [appearslabel PSSetCenterHorizontalAtItem:progressView];
     [broderView PSSetSize:WidthRate(240) Height:HeightRate(30)];
 

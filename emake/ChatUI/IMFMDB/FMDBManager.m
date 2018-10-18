@@ -154,7 +154,13 @@
     
     NSString *sqlExeString = [NSString stringWithFormat:@"INSERT INTO %@(msgID,msg,sender,sendTime,msgType,serversName,serversAvata,recordMessageID) VALUES('%@','%@','%@','%@','%@','%@','%@','%@')",filterSqlName,message.msgID,message.msg,message.sender,message.sendTime,message.msgType,message.staffName,message.staffAvata,messageId];
     [self.addtionalQueue inDatabase:^(FMDatabase *db){
-        [db executeUpdate:sqlExeString];
+        BOOL isSuccess = [db executeUpdate:sqlExeString];
+        if (isSuccess) {
+            NSLog(@"添加成功");
+        }else{
+            NSLog(@"添加失败");
+        }
+ 
     }];
 }
 
@@ -173,6 +179,7 @@
         }else{
             NSLog(@"添加失败");
         }
+//        [db close];
     }];
     
 }
@@ -205,6 +212,7 @@
             Message.msgType = [res stringForColumn:@"msgType"];
             Message.staffAvata = [res stringForColumn:@"serversAvata"];
             Message.staffName = [res stringForColumn:@"serversName"];
+            NSLog(@"msgID 历史消息=%@",[res stringForColumn:@"msg"]);
             if ([messageIdArray containsObject:Message.msgID]) {
                 [totalArray addObject:Message];
             }
@@ -269,6 +277,7 @@
             Message.staffName = [res stringForColumn:@"serversName"];
             Message.recordMessageID = [res stringForColumn:@"recordMessageID"];
             NSString *messageIdStr = [res stringForColumn:@"recordMessageID"];
+            NSLog(@"历史消息---tip--%@",[res stringForColumn:@"msg"]);
             if ([messageIDArray containsObject:messageIdStr]) {
                 [insertArray addObject:Message];
             }
@@ -479,9 +488,9 @@
             Message.messageCount = [res stringForColumn:@"messageCount"];
             Message.userId = [res stringForColumn:@"userId"];
             Message.Group = [res stringForColumn:@"storeInfo"];
-            if (![Message.userId isEqualToString:userID]) {
+//            if (![Message.userId isEqualToString:userID]) {
                 [totalArray addObject:Message];
-            }
+//            }
         }
         [res close];
 
@@ -544,9 +553,9 @@
     [self.queue inDatabase:^(FMDatabase *db) {
         
         if ([db executeUpdate:sqlExeString]) {
-            NSLog(@"更新成功!");
+            NSLog(@"聊天更新消息个数更新成功!个数=%ld",count);
         }else{
-            NSLog(@"更新失败!");
+            NSLog(@"聊天更新消息个数更新失败!");
         }
     }];
 }
@@ -558,10 +567,15 @@
     NSString *sqlName = [NSString stringWithFormat:@"UserChatListNew_%@",userID];
     //过滤‘-’字符
     NSString *filterSqlName = [sqlName stringByReplacingOccurrencesOfString:@"-" withString:@""];
-    //确定执行语句
+    //确定执行语句 //,messageCount ,'%@' ,[NSString stringWithFormat:@"%ld",count]
     NSString *sqlExeString = [NSString stringWithFormat:@"INSERT INTO %@(userId,userName,userPhone,userAvata,userType,sendTime,message,messageType,messageCount,storeInfo) VALUES('%@','%@','%@','%@','%@','%@','%@','%@','%@','%@')",filterSqlName,listId,message.staffName,message.phoneNumber,message.staffAvata,message.staffType,message.sendTime,message.msg,message.msgType,[NSString stringWithFormat:@"%ld",count],message.Group];
     [self.queue inDatabase:^(FMDatabase *db){
-        [db executeUpdate:sqlExeString];
+    
+        if ([db executeUpdate:sqlExeString]) {
+            NSLog(@"更新成功!");
+        }else{
+            NSLog(@"更新失败!");
+        }
     }];
 }
 
@@ -647,7 +661,7 @@
         if ([res next]) {
             serverList = [res stringForColumn:@"serverList"];
         }
-//        [res close];
+        [res close];
 
     }];
     return serverList;
@@ -661,17 +675,21 @@
     //过滤‘-’字符
     NSString *filterSqlName = [sqlName stringByReplacingOccurrencesOfString:@"-" withString:@""];
     __block NSInteger count = 0;
-    NSString *sqlExeString = [NSString stringWithFormat:@"SELECT * FROM %@ where userId= '%@'",filterSqlName,listId];
+    __block NSInteger Totalcount = 0;
+
+    NSString *sqlExeString = listId.length==0?  [NSString stringWithFormat:@"SELECT * FROM %@",filterSqlName]:[NSString stringWithFormat:@"SELECT * FROM %@ where userId= '%@'",filterSqlName,listId];
     [self.queue inDatabase:^(FMDatabase *db){
         
         FMResultSet *rs = [db executeQuery:sqlExeString];
         if ([rs next]) {
             count = [[rs stringForColumn:@"messageCount"] integerValue];
+            Totalcount = Totalcount+count;
+            NSLog(@"fmdb消息list%@个数==%ld,Totalcount=%ld",listId, count,Totalcount);
         }
         [rs close];
 
     }];
-    return count;
+    return (listId.length==0?Totalcount:count);
 }
 - (BOOL)isChatDataExistWith:(NSString *)listID{
     //确定表名称

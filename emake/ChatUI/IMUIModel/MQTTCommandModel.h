@@ -25,7 +25,7 @@
 //请求聊天记录
 - (instancetype)creatMessageListCMD:(NSString *)userId andStoreId:(NSString *)storeID lastMessageId:(NSInteger)messageId;
 //请求客服服务
-- (instancetype)creatRequestServiceCMD:(NSString *)userId andStoreId:(NSString *)storeID lastMessageId:(NSInteger)messageId;
+- (instancetype)creatRequestServiceCMD:(NSString *)userId andStoreId:(NSString *)storeID lastMessageId:(NSInteger)messageId catagoryParams:(NSDictionary *)dic;
 //请求聊天室人员列表
 - (instancetype)creatRequestChatroomCustomerList:(NSString *)userId andStoreId:(NSString *)storeID;
 @end

@@ -45,5 +45,6 @@
 @property (nonatomic,copy)NSString *VipNum;//城市代理商
 @property (nonatomic,copy)NSDictionary *UserAccount;//(key:)TotalBonus TotalCashIn  TotalCashOut
 @property (nonatomic,copy)NSArray *IdentityCategorys;//
+@property (nonatomic,copy)NSString *IsGetVip;//是否领取过会员
 
 @end

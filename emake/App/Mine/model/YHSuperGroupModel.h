@@ -56,7 +56,7 @@
 @property(nonatomic,strong)NSString *IsInvoice;
 @property(nonatomic,strong)NSString *ProductId;
 @property(nonatomic,strong)NSString *SuperGroupId;
-@property(nonatomic,strong)NSString *GroupState;//拼团状态 0即将开始 1进行中 2已结束
+@property(nonatomic,strong)NSString *GroupState;//拼团状态 0进行中 1即将开始 2已结束
 
 @property(nonatomic,strong)NSString *GoodsSeriesKeywords;
 @property(nonatomic,strong)NSString *TaxDesc;

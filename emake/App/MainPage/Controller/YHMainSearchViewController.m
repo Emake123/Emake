@@ -336,6 +336,8 @@
         detaiVC.storeAvata = model.StorePhoto;
         detaiVC.StoreID = model.StoreId;
         detaiVC.storePhoneNumber = model.StoreNum;
+        detaiVC.CategoryBId = model.CategoryBId;
+        
         [self.navigationController pushViewController:detaiVC animated:YES];
     }else{
         if (indexPath.section == 1) {

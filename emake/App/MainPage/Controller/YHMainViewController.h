@@ -12,4 +12,6 @@
 @property(nonatomic,retain)UIView *serverView;
 @property(nonatomic,retain)UIView *infomationView;
 -(void)RefreshMesssageCount;
+@property(nonatomic,assign)NSInteger recordIndex;
+
 @end

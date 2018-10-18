@@ -7,4 +7,6 @@ target ‘emake’ do
     pod 'MQTTClient'
     pod 'SVGKit', :git => 'https://github.com/SVGKit/SVGKit.git', :branch => '2.x'
     pod 'Reachability', '~> 3.2'
+    pod 'WechatOpenSDK'
 end
+ 

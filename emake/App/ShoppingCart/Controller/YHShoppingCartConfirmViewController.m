@@ -74,10 +74,10 @@
     }
 //    [self addRightNavBtnWithImage:@"shouyekefu"];
     [self addRigthDetailButtonIsShowCart:false];
-    NSString *isStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    self.isStore = [isStore isEqualToString:@"1"];
+//    NSString *isStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
+//    self.isStore = [isStore isEqualToString:@"1"];
     
-    self.isIndustry = [[NSUserDefaults standardUserDefaults] boolForKey:IsIndustryCatagory];
+//    self.isIndustry = [[NSUserDefaults standardUserDefaults] boolForKey:IsIndustryCatagory];
     
 
     [self getConculateResultTotalPriceWithIsSelectInsurance:false isChange:false];
@@ -304,17 +304,15 @@
 }
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
 
-    if (self.isStore) {
         if (section == 0) {
             return HeightRate(30)+TableviewAdressOfHeadHeight;
         }
         return HeightRate(30);
-    }
-    return TableviewAdressOfHeadHeight;
+   
 }
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    CGFloat Height  =self.isStore==YES?(section==0?(HeightRate(30)+TableviewAdressOfHeadHeight):HeightRate(30)):TableviewAdressOfHeadHeight;
+    CGFloat Height  =section==0?(HeightRate(30)+TableviewAdressOfHeadHeight):HeightRate(30);
     UIView *customHeadView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, HeightRate(Height))];
     customHeadView.backgroundColor = ColorWithHexString(@"FAFAFA");
     
@@ -325,7 +323,6 @@
     }
 
 
-    if (self.isStore == YES) {
         NSArray *shopArr = self.selectArray[section];
         YHShoppingCartModel *model = shopArr.firstObject;
         UIView *companyView = [[UIView alloc] init];//WithFrame:CGRectMake(0, 0, ScreenWidth, HeightRate(30))];
@@ -376,7 +373,6 @@
         [shopGoodsInvoiceLable PSSetSize:WidthRate(33) Height:HeightRate(17)];
         shopGoodsInvoiceLable.hidden = self.isIndustry==YES?YES:[model.IsInvoice isEqualToString:@"0"];
    
-    }
     return customHeadView;
     
 }
@@ -504,14 +500,9 @@
     
 }
 - (void)dicussBtnClick{
-    if (self.isStore == YES) {
-        [MobClick event:@"ContractNegotiation" label:@"合同洽谈-输配电"];
+//        [MobClick event:@"ContractNegotiation" label:@"合同洽谈-输配电"];
 
-    }else
-    {
-        [MobClick event:@"ContractNegotiationB" label:@"合同洽谈-休闲食品"];
-
-    }
+   
     
     
     NSString * price;
@@ -540,12 +531,10 @@
             
             num  = num + item.GoodsNumber.intValue;
         }
-        if (self.isStore==YES) {
             YHShoppingCartModel *model = class.firstObject;
 
             NSDictionary * paramsDic=@{@"OrderNos":addArr,@"IsInvoice":self.isIndustry==YES?@"1":model.IsInvoice,@"InsurdAmount":model.isSelectInsurance==YES?model.InsuranceNewMoney:@"0",@"StoreId":StoreId,@"Address":adressStr,@"SuperGroupDetailId":model.SuperGroupDetailId.length?model.SuperGroupDetailId:@"",@"CategoryBId":model.CategoryBId};
             [paramsdicArr addObject:paramsDic];
-        }
 
     }
 
@@ -565,14 +554,9 @@
 
     NSString *invoice  =[NSString stringWithFormat:@"%d",isInvoice];
     NSDictionary *dic;
-    if (self.isStore == YES) {
-        
-        dic =@{@"MakeOrders":paramsdicArr};
+    
+    dic =@{@"MakeOrders":paramsdicArr};
 
-    }else
-    {
-//         dic = @{@"OrderNos":addArr,@"IsInvoice":invoice,@"InsurdAmount":ParamPrice,@"Address":adressStr};//InsurdAmount 保额
-    }
     [self.view showWait:@"合同生成中..." viewType:CurrentView];
     
    

@@ -37,7 +37,7 @@
 #import "YHSuperGroupViewController.h"
 #import "YHMineCityDelegateSuccessViewController.h"
 #import "YHMemberExperienceViewController.h"
-
+#import "FMDBManager.h"
 @interface YHMineViewController () <UITableViewDataSource,UITableViewDelegate,YHFirsrRowDelegate,YHSecondRowDelegate>{
     
     UIView *headView;
@@ -52,7 +52,7 @@
     NSString *auditFailReason;
     NSString *successsDate;
     UserInfoModel *model;
-    BOOL isStore;
+//    BOOL isStore;
     UIImageView *MessageImageView;
     NSInteger messageCounts;
 
@@ -73,8 +73,8 @@
 - (void)viewWillAppear:(BOOL)animated{
     
     [super viewWillAppear:animated];
-    NSString *isStoreString = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    isStore = [isStoreString isEqualToString:@"1"];
+//    NSString *isStoreString = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
+//    isStore = [isStoreString isEqualToString:@"1"];
     userType = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERTYPE];
     [self.navigationController setNavigationBarHidden:YES animated:animated];
     NSString *tocken = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_Access_Token];
@@ -115,6 +115,8 @@
 -(void)refreshMesssageCount
 {
     NSDictionary *messageCountDic = [YHMQTTClient sharedClient].messageCountDic;
+//   messageCounts = [[FMDBManager sharedManager] getUserMessageCount:@""];
+
     messageCounts =[ messageCountDic[@"messageCount"] integerValue];
     [self.myTableView reloadData];
 }
@@ -230,7 +232,17 @@
             make.height.mas_equalTo(HeightRate(20));
             make.top.mas_equalTo(labelName.mas_bottom).offset(HeightRate(5));
         }];
-    vipButton.hidden = model.UserIdentity.integerValue==0?YES:false;
+    
+    NSString *HidenVip = Userdefault(HidenCatagoryVip);
+    if (HidenVip.integerValue==0) {
+        vipButton.hidden = YES;
+
+    }else
+    {
+        vipButton.hidden = model.UserIdentity.integerValue==0?YES:false;
+
+    }
+
 
     if (model.AgentState.integerValue != 1) {
         cityDelegateButton.hidden = YES;
@@ -307,10 +319,12 @@
         [userDefaults setObject:userInfo.AgentState forKey:LOGIN_USERCARDSTATE];
         [userDefaults setObject:userInfo.UserAccount[@"TotalCashIn"] forKey:DelegateMyMoney];
         [Tools SaveLocalVipstateWithCatagory:userInfo.IdentityCategorys];
-
+        [userDefaults setObject:userInfo.RealName forKey:LOGIN_USERNAME];
         [[NSUserDefaults standardUserDefaults] setObject:userInfo.AuditRemark forKey:USERSTATEFailReason];
         [[NSUserDefaults standardUserDefaults] setObject:userInfo.EditWhen forKey:USERSTATECommitDate];
         [[NSUserDefaults standardUserDefaults] setObject:userInfo.IsCheck forKey:USERSISCHECK];
+        [[NSUserDefaults standardUserDefaults] setObject:userInfo.IdentityCategorys forKey:UserVipIdentityCategorys];
+
 
         isCheck = userInfo.IsCheck;
         auditFailReason = userInfo.AuditRemark;
@@ -326,8 +340,14 @@
 }
 #pragma mark -- UITableViewDelagte  &  UITableViewDataSource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    
-  
+    NSString *HidenVip = Userdefault(HidenCatagoryVip);
+
+    if (HidenVip.integerValue == 0) {
+        
+        return 3;
+        
+    }else
+    {
         if (model.AgentState.integerValue ==1) {
             
             return 5;
@@ -336,15 +356,26 @@
             return 4;
             
         }
+    }
+  
+    
     
   
  
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    NSString *HidenVip = Userdefault(HidenCatagoryVip);
+    NSInteger rowCount;
+    if (HidenVip.integerValue==0) {
+        rowCount = 1;
 
-    NSInteger rowCount = model.AgentState.integerValue==1?3:2;
-    if (indexPath.row == 0) {
+    }else
+    {
+         rowCount = model.AgentState.integerValue==1?3:2;
+
+    }
+    if (indexPath.row == 0 && HidenVip.integerValue==1) {
         YHMineMemberAndCityDelegateTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"YHMineMemberAndCityDelegateTableViewCell"];
         if (cell== nil) {
             cell = [[YHMineMemberAndCityDelegateTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"YHMineMemberAndCityDelegateTableViewCell"];
@@ -356,9 +387,9 @@
         
         return cell;
     }else  if (indexPath.row <= rowCount) {
-        
-        NSInteger index = model.AgentState.integerValue==1? indexPath.row:indexPath.row+1;
-        if (index ==1) {
+       
+        NSInteger index = HidenVip.integerValue==0?indexPath.row+2: model.AgentState.integerValue==1? indexPath.row:indexPath.row+1;
+        if (index ==1 && HidenVip.integerValue==1 ) {
             YHMineAccountAndMembersTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"YHMineAccountAndMembersTableViewCell"];
             if (cell== nil) {
                 cell = [[YHMineAccountAndMembersTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"YHMineAccountAndMembersTableViewCell"];
@@ -406,7 +437,9 @@
     return HeightRate(238);
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    NSInteger index = model.AgentState.integerValue ==1?4:3;
+    NSString *HidenVip = Userdefault(HidenCatagoryVip);
+    NSInteger index =HidenVip.integerValue==0?2:model.AgentState.integerValue ==1?4:3;
+
     if (indexPath.row==index) {
         bool isvisitor = [self isVisitorLoginByPhoneNumberExits];
         if(isvisitor == false)
@@ -446,26 +479,27 @@
     {
         return;
     }
-    if (model.UserIdentity.integerValue ==3 ) {
-        NSString *date ;
-        if (model.IdentityCategorys.count>0) {
-           date = model.IdentityCategorys.firstObject[@"EndAt"];
-        }
-        
-        YHMemberExperienceViewController *vc = [[YHMemberExperienceViewController alloc] init];
-        vc.hidesBottomBarWhenPushed =YES;
-        vc.VipCount = model.VipCount;
-        vc.VipDate = date;
-        [self.navigationController pushViewController:vc animated:YES];
-
-    }else
-    {
+//    if (model.UserIdentity.integerValue ==3 ) {
+//        NSString *date ;
+//        if (model.IdentityCategorys.count>0) {
+//           date = model.IdentityCategorys.firstObject[@"EndAt"];
+//        }
+//
+//        YHMemberExperienceViewController *vc = [[YHMemberExperienceViewController alloc] init];
+//        vc.hidesBottomBarWhenPushed =YES;
+//        vc.VipCount = model.VipCount;
+//        vc.VipDate = date;
+//        [self.navigationController pushViewController:vc animated:YES];
+//
+//    }else
+//    {
         YHMineMemberInterestViewController *vc = [[YHMineMemberInterestViewController alloc] init];
         vc.hidesBottomBarWhenPushed =YES;
-        vc.isExperienceVip = model.UserIdentity.integerValue ==0?false:YES;
+//        vc.isExperienceVip = model.VipCount.integerValue==0?YES:( model.UserIdentity.integerValue ==0?false:YES);
+//        vc.vipcount = model.VipCount.integerValue;
         [self.navigationController pushViewController:vc animated:YES];
        
-    }
+//    }
  
 }
 -(void)nexttPageTeam{

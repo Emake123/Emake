@@ -368,10 +368,9 @@ DEFINE_SINGLETON_FOR_CLASS(YHJsonRequest);
 //购物车查询
 -(void)userUserShoppingFindSucceededBlock:(void (^)(NSArray < YHShoppingCartModel *>*shoppingCartArray))succeededBlock failedBlock:(void (^)(NSString *errorMessage))failedBlock
 {
-    NSString *isStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    NSString *urlStr = [isStore isEqualToString:@"1"]?URL_StoreUserFindingShoppingCart:URL_UserFindingShoppingCart;
+
     if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]) {
-        [[YHAFNetWorkingRequset sharedRequset] GET:urlStr parameters:nil finished:^(NSDictionary * responseObject, NSError *error){
+        [[YHAFNetWorkingRequset sharedRequset] GET:URL_UserFindingShoppingCart parameters:nil finished:^(NSDictionary * responseObject, NSError *error){
             if (!error) {
                 if (CONFIRM_NOT_NULL(responseObject))
                 {
@@ -441,10 +440,9 @@ DEFINE_SINGLETON_FOR_CLASS(YHJsonRequest);
 //订单查询
 -(void)userUseOrderManageParams:(NSDictionary *)params SucceededBlock:(void (^)(NSArray *orderArray))succeededBlock failedBlock:(void (^)(NSString *errorMessage))failedBlock
 {
-    NSString *isStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    NSString *urlStr = [isStore isEqualToString:@"1"]?URL_StoreContractOder:URL_ContractOder;
+//    NSString *urlStr = [isStore isEqualToString:@"1"]?URL_StoreContractOder:URL_ContractOder;
     if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]) {
-        [[YHAFNetWorkingRequset sharedRequset] GET:urlStr parameters:params finished:^(NSDictionary * responseObject, NSError *error){
+        [[YHAFNetWorkingRequset sharedRequset] GET:URL_ContractOder parameters:params finished:^(NSDictionary * responseObject, NSError *error){
             if (!error) {
                 if (CONFIRM_NOT_NULL(responseObject))
                 {
@@ -517,8 +515,8 @@ DEFINE_SINGLETON_FOR_CLASS(YHJsonRequest);
 //订单查询
 -(void)getUseOrderContractNoParams:(NSString *)OrderNo SucceededBlock:(void (^)(YHOrderContract *OrderContract))succeededBlock failedBlock:(void (^)(NSString *errorMessage))failedBlock
 {
-    NSString *isStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    NSString *urlStr = [NSString stringWithFormat:@"%@?RequestType=1&OrderNo=%@",URL_StoreContractOder,OrderNo];
+//    NSString *isStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
+    NSString *urlStr = [NSString stringWithFormat:@"%@?RequestType=1&OrderNo=%@",URL_ContractOder,OrderNo];
     if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]) {
         [[YHAFNetWorkingRequset sharedRequset] GET:urlStr parameters:nil finished:^(NSDictionary * responseObject, NSError *error){
             if (!error) {
@@ -680,8 +678,7 @@ DEFINE_SINGLETON_FOR_CLASS(YHJsonRequest);
 -(void)getProductAddServiceGoodcode:(NSString *)productId SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock
 {
 //    3190b870-88bb-11e8-ad44-3402866ed85d productId
-    NSString *isStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    NSString *URL = [NSString stringWithFormat:@"%@?ProductId=%@",[isStore isEqualToString:@"1"]?URL_StorePropertyAddSevice:URL_PropertyAddSevice,productId];
+    NSString *URL = [NSString stringWithFormat:@"%@?ProductId=%@",URL_PropertyAddSevice,productId];
     if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]) {
         [[YHAFNetWorkingRequset sharedRequset] request:GET urlString:URL parameters:nil finished:^(NSDictionary *responseObject, NSError *error) {
             if (!error){
@@ -746,8 +743,8 @@ DEFINE_SINGLETON_FOR_CLASS(YHJsonRequest);
 }
 -(void)getProductAllPropertyListGoodcode:(NSString *)params seriesCode:(NSString *)seriesCode SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock
 {
-    NSString *isStore =  [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    NSString *URL = [NSString stringWithFormat:@"%@?GoodsSeriesCode=%@",[isStore isEqualToString:@"1"]?URL_StorePropertyProductList:URL_PropertyProductList,params];
+//    NSString *isStore =  [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
+    NSString *URL = [NSString stringWithFormat:@"%@?GoodsSeriesCode=%@",URL_PropertyProductList,params];
     if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]){
         [[YHAFNetWorkingRequset sharedRequset] request:GET urlString:URL parameters:nil finished:^(NSDictionary *responseObject, NSError *error) {
             if (!error){
@@ -826,10 +823,8 @@ DEFINE_SINGLETON_FOR_CLASS(YHJsonRequest);
 
 -(void)addShoppinCartWithParams:(NSDictionary *)Params SuccessBlock:(void(^)(NSString *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock
 {
-    NSString *isStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    NSString *urlStr = [isStore isEqualToString:@"1"]?URL_StoreUserFindingShoppingCart:URL_UserFindingShoppingCart;
     if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]){
-        [[YHAFNetWorkingRequset sharedRequset] request:POST urlString:urlStr parameters:Params finished:^(NSDictionary *result, NSError *error) {
+        [[YHAFNetWorkingRequset sharedRequset] request:POST urlString:URL_UserFindingShoppingCart parameters:Params finished:^(NSDictionary *result, NSError *error) {
             if (!error){
                 if (CONFIRM_NOT_NULL(result))
                 {
@@ -956,10 +951,8 @@ DEFINE_SINGLETON_FOR_CLASS(YHJsonRequest);
 
 -(void)makeShoppingCartOderParams:(NSDictionary *)params SuccessBlock:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
     
-    NSString *isStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    NSString *urlStr = [isStore isEqualToString:@"1"]?URL_StoreContractOder:URL_ContractOder;
     if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]){
-        [[YHAFNetWorkingRequset sharedRequset] request:POST urlString:urlStr parameters:params finished:^(NSDictionary *result, NSError *error) {
+        [[YHAFNetWorkingRequset sharedRequset] request:POST urlString:URL_ContractOder parameters:params finished:^(NSDictionary *result, NSError *error) {
             if (!error){
                 if (CONFIRM_NOT_NULL(result))
                 {
@@ -980,31 +973,7 @@ DEFINE_SINGLETON_FOR_CLASS(YHJsonRequest);
         filaedBlock(@"网络异常，请检查网络");
     }
 }
-- (void)updateShoppingCartNumberParams:(NSDictionary *)params SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
-    NSString *isStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    NSString *urlStr = [isStore isEqualToString:@"1"]?URL_StoreContractOder:URL_ContractOder;
-    if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]){
-        [[YHAFNetWorkingRequset sharedRequset] request:PUT urlString:urlStr parameters:params finished:^(NSDictionary *result, NSError *error) {
-            if (!error){
-                if (CONFIRM_NOT_NULL(result))
-                {
-                    NSNumber *flag = [result objectForKey:RESPONSE_RESULT_CODE];
-                    if ([flag intValue] == 0){
-                        NSDictionary *dic = [result objectForKey:RESPONSE_RESULT_DATA];
-                        successBLock(dic);
-                    }else{
-                        NSString *failStr = [NSString stringWithFormat:@"%@%@",[result objectForKey:RESPONSE_RESULT_INFO],Tips_RESULT_INFO];
-                        filaedBlock(failStr);
-                    }
-                }
-            }else{
-                filaedBlock([self dealWithError:error.code]);
-            }
-        }];
-    }else{
-        filaedBlock(@"网络异常，请检查网络");
-    }
-}
+
 -(void)getUserAdressType:(NSString *)type SuccessBlock:(void(^)(NSArray *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
     
     NSString *URL =[NSString stringWithFormat:@"%@?AddressType=%@",URL_UserAdress,type];
@@ -1162,10 +1131,9 @@ DEFINE_SINGLETON_FOR_CLASS(YHJsonRequest);
 - (void)shoppingCartDeleteOderNumber:(NSArray *)order Sucess:(void(^)(NSString *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
     
     NSString *arrayStr = [[order mj_JSONString] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    NSString *isStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    NSString *paraStr = [isStore isEqualToString:@"1"]?URL_StoreUserFindingShoppingCart:URL_UserFindingShoppingCart;
+ 
 
-    NSString *urlStr = [NSString stringWithFormat:@"%@?OrderNos=%@",paraStr,arrayStr];
+    NSString *urlStr = [NSString stringWithFormat:@"%@?OrderNos=%@",URL_UserFindingShoppingCart,arrayStr];
     if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]){
         [[YHAFNetWorkingRequset sharedRequset] request:DELETE urlString:urlStr parameters:nil finished:^(NSDictionary *result, NSError *error){
             if (!error){
@@ -1189,10 +1157,9 @@ DEFINE_SINGLETON_FOR_CLASS(YHJsonRequest);
     }
 }
 - (void)shoppingCartChangeOderNumber:(NSDictionary *)order Sucess:(void(^)(NSString *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
-    NSString *isStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    NSString *urlStr = [isStore isEqualToString:@"1"]?URL_StoreUserFindingShoppingCart:URL_UserFindingShoppingCart;
+
     if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]){
-        [[YHAFNetWorkingRequset sharedRequset] request:PUT urlString:urlStr parameters:order finished:^(NSDictionary *result, NSError *error){
+        [[YHAFNetWorkingRequset sharedRequset] request:PUT urlString:URL_UserFindingShoppingCart parameters:order finished:^(NSDictionary *result, NSError *error){
             if (!error){
                 if (CONFIRM_NOT_NULL(result))
                 {
@@ -1348,14 +1315,11 @@ NSString *URL =[NSString stringWithFormat:@"%@?ContractNo=%@",URL_LogisticsInfo,
         }];
 }
 
-- (void)getuserBrand:(void(^)(NSArray*shoppingCartArray))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
+- (void)getuserBrandParams:(NSDictionary *)dic success:(void(^)(NSArray*shoppingCartArray))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
 
-    NSString *isStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    NSString *urlForwordStr = [isStore isEqualToString:@"1"]?URL_StoreBrand:URL_Brand;
-    NSString *CATEGORY = [[NSUserDefaults standardUserDefaults] objectForKey:USERSELECCATEGORY];
-    NSString *urlStr = [NSString stringWithFormat:@"%@?BusinessCategory=%@",urlForwordStr,CATEGORY];
+
     if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]){
-        [[YHAFNetWorkingRequset sharedRequset] request:GET urlString:urlStr parameters:nil finished:^(NSDictionary *result, NSError *error){
+        [[YHAFNetWorkingRequset sharedRequset] request:GET urlString:URL_Brand parameters:dic finished:^(NSDictionary *result, NSError *error){
             if (!error){
                 if (CONFIRM_NOT_NULL(result))
                 {
@@ -1435,8 +1399,7 @@ NSString *URL =[NSString stringWithFormat:@"%@?ContractNo=%@",URL_LogisticsInfo,
 }
 
 - (void)getuserLastweekOrder:(void(^)(NSDictionary*shoppingCartDict))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
-    NSString * Category = [[NSUserDefaults standardUserDefaults] objectForKey:USERSELECCATEGORY];
-//    NSString *str = [NSString stringWithFormat:@"%@?BusinessCategory=%@",URL_LastWeekOrder,Category];
+
         [[YHAFNetWorkingRequset sharedRequset] GET:URL_LastWeekOrder parameters:nil finished:^(NSDictionary * responseObject, NSError *error) {
             if (!error) {
                 if (CONFIRM_NOT_NULL(responseObject))
@@ -1459,9 +1422,8 @@ NSString *URL =[NSString stringWithFormat:@"%@?ContractNo=%@",URL_LogisticsInfo,
 }
 - (void)getProductDetailsInfoWith:(NSString *)CategoryId seriesCode:(NSString *)seriesCode successBlock:(void(^)(NSDictionary *ProductDetailsDict))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
     
-    NSString *isStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
     NSString *userId = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERID];
-    NSString *storeurl = userId.length>0?[NSString stringWithFormat:@"%@?GoodsSeriesCode=%@&UserId=%@",[isStore isEqualToString:@"1"]?URL_StoreShoppingDetail:URL_ShoppingDetail,CategoryId,userId]:[NSString stringWithFormat:@"%@?GoodsSeriesCode=%@",[isStore isEqualToString:@"1"]?URL_StoreShoppingDetail:URL_ShoppingDetail,CategoryId];
+    NSString *storeurl = userId.length>0?[NSString stringWithFormat:@"%@?GoodsSeriesCode=%@&UserId=%@",URL_ShoppingDetail,CategoryId,userId]:[NSString stringWithFormat:@"%@?GoodsSeriesCode=%@",URL_ShoppingDetail,CategoryId];
 //    NSString *Url = [NSString stringWithFormat:@"%@?GoodsSeriesCode=%@",[isStore isEqualToString:@"1"]?URL_StoreShoppingDetail:URL_ShoppingDetail,CategoryId];
     if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]) {
         [[YHAFNetWorkingRequset sharedRequset] GET:storeurl parameters:nil finished:^(NSDictionary * responseObject, NSError *error) {
@@ -1512,46 +1474,7 @@ NSString *URL =[NSString stringWithFormat:@"%@?ContractNo=%@",URL_LogisticsInfo,
         filaedBlock(@"网络异常，请检查网络");
     }
 }
-- (void)getShoppingGoodCategoriesSeriesId:(NSString *)SeriesId SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
-    NSString *isStore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    NSString *userId = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_USERID];
-    NSString *url11 = userId.length==0?[NSString stringWithFormat:@"%@?CategoryId=%@",URL_StoreShoppingGoodCategories,SeriesId]:[NSString stringWithFormat:@"%@?CategoryId=%@&UserId=%@",URL_StoreShoppingGoodCategories,SeriesId,userId];
-//    NSString *urlStr = [isStore isEqualToString:@"1"]?url11:URL_ShoppingGoodCategories;
-//    NSString *url = [NSString stringWithFormat:@"%@?CategoryId=%@",URL_StoreShoppingGoodCategories,SeriesId];
-    if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]) {
-        [[YHAFNetWorkingRequset sharedRequset] GET:url11 parameters:nil finished:^(NSDictionary * responseObject, NSError *error) {
-            if (!error) {
-                if (CONFIRM_NOT_NULL(responseObject))
-                {
-                    NSNumber *flag = [responseObject objectForKey:RESPONSE_RESULT_CODE];
-                    if ([flag intValue] == 0){
-                        NSDictionary *data = [responseObject objectForKey:RESPONSE_RESULT_DATA];
-                        if ([data isKindOfClass:[NSNull class]]) {
-                            filaedBlock(@"暂无商品");
-                        }else{
-                            
-                            if ([isStore isEqualToString:@"1"]) {
-                                NSArray *data1 = [responseObject objectForKey:RESPONSE_RESULT_DATA];
 
-                                successBLock(@{@"消费品":data1});
-
-                            }else
-                                successBLock(data);
-                            }
-                        }
-                    }else{
-                        NSString *failStr = [NSString stringWithFormat:@"%@%@",[responseObject objectForKey:RESPONSE_RESULT_INFO],Tips_RESULT_INFO];
-                        filaedBlock(failStr);
-                    }
-                
-            }else{
-                filaedBlock([self dealWithError:error.code]);
-            }
-        }];
-    }else{
-        filaedBlock(@"网络异常，请检查网络");
-    }
-}
 - (void)getUserPrizedraw:(NSString *)MobileNumber SuccessBlock:(void(^)(NSDictionary *successMessage))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
     
     if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]) {
@@ -2448,11 +2371,7 @@ NSString *URL =[NSString stringWithFormat:@"%@?ContractNo=%@",URL_LogisticsInfo,
 }
 - (void)getMainPageCategory:(NSDictionary *)catagoryDic SuccessBlock:(void(^)(NSArray *categoryDict))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
     
-//    NSString * Category = [[NSUserDefaults standardUserDefaults] objectForKey:USERSELECCATEGORY];
-//    NSString * isstore = [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
 
-//    NSLog(@"isstore----==%@",ISstore);
-//    NSString *str = [NSString stringWithFormat:@"%@?BusinessCategory=%@",[isstore isEqualToString:@"1"]?URL_StoreMainPageCategory:URL_MainPageCategory,Category];
     [[YHAFNetWorkingRequset sharedRequset] request:GET urlString:URL_StoreMainPageCategory parameters:catagoryDic finished:^(NSDictionary *result, NSError *error){
         if (!error){
             if (CONFIRM_NOT_NULL(result)){
@@ -2863,10 +2782,10 @@ NSString *URL =[NSString stringWithFormat:@"%@?ContractNo=%@",URL_LogisticsInfo,
 -(void)userCollectionProductWithParameter:(NSDictionary *)param SuccessBlock:(void(^)(NSString *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
     
     
-    NSString *isStore =  [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    NSString *URL = [isStore isEqualToString:@"1"]?URL_StoreUserCollection:URL_UserCollection;
+//    NSString *isStore =  [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
+//    NSString *URL = [isStore isEqualToString:@"1"]?URL_StoreUserCollection:URL_UserCollection;
     if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]){
-        [[YHAFNetWorkingRequset sharedRequset] request:POST urlString:URL parameters:param finished:^(NSDictionary *result, NSError *error) {
+        [[YHAFNetWorkingRequset sharedRequset] request:POST urlString:URL_StoreUserCollection parameters:param finished:^(NSDictionary *result, NSError *error) {
             if (!error){
                 if (CONFIRM_NOT_NULL(result))
                 {
@@ -2891,10 +2810,10 @@ NSString *URL =[NSString stringWithFormat:@"%@?ContractNo=%@",URL_LogisticsInfo,
 
 -(void)userCancelCollectionProductWithParameter:(NSString *)refNo SuccessBlock:(void(^)(NSString *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
 //    URL_StoreUserCollection
-    NSString *isStore =  [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    NSString *URL = [isStore isEqualToString:@"1"]?URL_StoreUserCollection:URL_UserCollection;
+//    NSString *isStore =  [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
+//    NSString *URL = [isStore isEqualToString:@"1"]?URL_StoreUserCollection:URL_UserCollection;
 
-    NSString *url = [NSString stringWithFormat:@"%@?RefNo=%@",URL,refNo];
+    NSString *url = [NSString stringWithFormat:@"%@?RefNo=%@",URL_StoreUserCollection,refNo];
     if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]){
         [[YHAFNetWorkingRequset sharedRequset] request:DELETE urlString:url parameters:nil finished:^(NSDictionary *result, NSError *error) {
             if (!error){
@@ -2957,13 +2876,13 @@ NSString *URL =[NSString stringWithFormat:@"%@?ContractNo=%@",URL_LogisticsInfo,
     }
 }
 -(void)getUserCollectionProductSuccessBlock:(void(^)(NSArray *Success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
-    NSString *isStore =  [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
-    NSString *URL = [isStore isEqualToString:@"1"]?URL_StoreUserCollection:URL_UserCollection;
+//    NSString *isStore =  [[NSUserDefaults standardUserDefaults] objectForKey:LOGIN_ISSTORE];
+//    NSString *URL = [isStore isEqualToString:@"1"]?URL_StoreUserCollection:URL_UserCollection;
     
 //    NSString *url = [NSString stringWithFormat:@"%@?RefNo=%@",URL,refNo];
 
     if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]){
-        [[YHAFNetWorkingRequset sharedRequset] request:GET urlString:URL parameters:nil finished:^(NSDictionary *result, NSError *error) {
+        [[YHAFNetWorkingRequset sharedRequset] request:GET urlString:URL_StoreUserCollection parameters:nil finished:^(NSDictionary *result, NSError *error) {
             if (!error){
                 if (CONFIRM_NOT_NULL(result))
                 {
@@ -3518,8 +3437,44 @@ NSString *URL =[NSString stringWithFormat:@"%@?ContractNo=%@",URL_LogisticsInfo,
                         successBLock(dataStr);
                         
                     }else{
-                        NSString *failStr = [NSString stringWithFormat:@"%@%@",[result objectForKey:RESPONSE_RESULT_INFO],Tips_RESULT_INFO];
-                        filaedBlock(failStr);
+                        if (flag.integerValue==-1) {
+                            NSString *failStr = [NSString stringWithFormat:@"%d%@",-1,[result objectForKey:RESPONSE_RESULT_INFO] ];
+                            filaedBlock(failStr);
+                        } else {
+                            NSString *failStr = [NSString stringWithFormat:@"%@%@",[result objectForKey:RESPONSE_RESULT_INFO],Tips_RESULT_INFO];
+                            filaedBlock(failStr);
+                        }
+                       
+                    }
+                }
+            }else{
+                filaedBlock([self dealWithError:error.code]);
+            }
+        }];
+    }else{
+        filaedBlock(@"网络异常，请检查网络");
+    }
+}
+- (void)getSuperGroupWechatPay:(NSDictionary *)params SuccessBlock:(void(^)(NSDictionary *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
+    if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]){
+        [[YHAFNetWorkingRequset sharedRequset] request:POST urlString:URL_AppSuperGroupWechatPay parameters:params finished:^(NSDictionary *result, NSError *error){
+            if (!error){
+                if (CONFIRM_NOT_NULL(result))
+                {
+                    NSNumber *flag = [result objectForKey:RESPONSE_RESULT_CODE];
+                    if ([flag intValue] == 0){
+                        NSDictionary *dataStr = [result objectForKey:RESPONSE_RESULT_DATA];
+                        //                        NSArray *arr  = [YHDepositModel mj_objectArrayWithKeyValuesArray:data];
+                        successBLock(dataStr);
+                        
+                    }else{
+                        if (flag.integerValue==-1) {
+                            NSString *failStr = [NSString stringWithFormat:@"%d%@",-1,[result objectForKey:RESPONSE_RESULT_INFO] ];
+                            filaedBlock(failStr);
+                        } else {
+                            NSString *failStr = [NSString stringWithFormat:@"%@%@",[result objectForKey:RESPONSE_RESULT_INFO],Tips_RESULT_INFO];
+                            filaedBlock(failStr);
+                        }
                     }
                 }
             }else{
@@ -3593,18 +3548,31 @@ NSString *URL =[NSString stringWithFormat:@"%@?ContractNo=%@",URL_LogisticsInfo,
                     if ([flag intValue] == 0){
                         NSArray *dataArr = [result objectForKey:RESPONSE_RESULT_DATA];
                         NSMutableDictionary *dictionnary = [NSMutableDictionary dictionary];
-                        if (dataArr.count==2) {
+//                        if (dataArr.count==2) {
                             NSDictionary *dic = dataArr.firstObject;
-                            NSDictionary*dic1 = dataArr[1];
-                            
-                            [dictionnary setObject:[NSString stringWithFormat:@"%@/%@",dic[@"CategoryBName"],dic1[@"CategoryBName"]] forKey:@"CategoryBName"];
+                        NSString *str = @"";
+                        NSString *recordStr = @"";
+
+                            for (NSDictionary *dicttt in dataArr) {
+                                NSString *str11 = dicttt[@"CategoryBName"];
+                                if (dataArr.count==1) {
+                                    str = [NSString stringWithFormat:@"%@",str11];
+
+                                }else
+                                {
+                                    str = [NSString stringWithFormat:@"%@%@%@",recordStr,recordStr.length>0?@"/":@"",str11];
+
+                                }
+                                recordStr= str;
+                            }
+                         [dictionnary setObject:str forKey:@"CategoryBName"];
                             [dictionnary setObject:[Tools getHaveNum:([dic[@"CouponPrice"] doubleValue])] forKey:@"CouponPrice"];
                             [dictionnary setObject:dic[@"CouponCode"] forKey:@"CouponCode"];
 
-                        }else if(dataArr.count==1)
-                        {
-                            dictionnary =dataArr.firstObject;
-                        }
+//                        }else if(dataArr.count==1)
+//                        {
+//                            dictionnary =dataArr.firstObject;
+//                        }
                        
                         successBLock(dictionnary);
                         
@@ -3638,6 +3606,38 @@ NSString *URL =[NSString stringWithFormat:@"%@?ContractNo=%@",URL_LogisticsInfo,
                     }else{
                         NSString *failStr = [NSString stringWithFormat:@"%@%@",[result objectForKey:RESPONSE_RESULT_INFO],Tips_RESULT_INFO];
                         filaedBlock(failStr);
+                    }
+                }
+            }else{
+                filaedBlock([self dealWithError:error.code]);
+            }
+        }];
+    }else{
+        filaedBlock(@"网络异常，请检查网络");
+    }
+}
+- (void)getAppSuperGroupSubmitWithparams:(NSDictionary *)params  SuccessBlock:(void(^)(NSString *success))successBLock fialureBlock:(void(^)(NSString *errorMessages))filaedBlock{
+    if ([[YHAFNetWorkingRequset sharedRequset] isNetworkAvailable]){
+        [[YHAFNetWorkingRequset sharedRequset] request:GET urlString:URL_AppSuperGroupSubmit parameters:params finished:^(NSDictionary *result, NSError *error){
+            if (!error){
+                if (CONFIRM_NOT_NULL(result))
+                {
+                    NSNumber *flag = [result objectForKey:RESPONSE_RESULT_CODE];
+                    if ([flag intValue] == 0){
+                        NSString *dicstr = [result objectForKey:RESPONSE_RESULT_DATA];
+                        
+                        
+                        successBLock(dicstr);
+                        
+                    }else{
+                        if (flag.integerValue==-1) {
+                            NSString *failStr = [NSString stringWithFormat:@"%@%@",@"-1",[result objectForKey:RESPONSE_RESULT_INFO]];
+                            filaedBlock(failStr);
+                        } else {
+                            NSString *failStr = [NSString stringWithFormat:@"%@",[result objectForKey:RESPONSE_RESULT_INFO]];
+                            filaedBlock(failStr);
+                        }
+                  
                     }
                 }
             }else{

@@ -11,5 +11,6 @@
 @interface YHSuperGroupDetailViewController : PSVCBase
 @property(nonatomic,assign)BOOL isFromMine;//YHSuperGroupModel *)model
 @property(nonatomic,strong)YHSuperGroupModel *model;//YHSuperGroupModel *)model
+@property(nonatomic,assign)NSInteger recordIdex;//
 
 @end

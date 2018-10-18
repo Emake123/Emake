@@ -84,31 +84,28 @@
         [userDefaults setObject:loginUser.UserType forKey:LOGIN_USERTYPE];
         [userDefaults setObject:loginUser.HeadImageUrl forKey:LOGIN_HeadImageURLString];
         [userDefaults setObject:loginUser.RealName forKey:LOGIN_USERREALNAME];
-        
         [userDefaults setObject:loginUser.AuditRemark forKey:USERSTATEFailReason];
         [userDefaults setObject:loginUser.ApplyTime forKey:USERSTATECommitDate];
         [userDefaults setObject:loginUser.UserIdentity forKey:VipState];
         [userDefaults setObject:loginUser.AgentState forKey:LOGIN_USERCARDSTATE];
-
-        
         [userDefaults setObject:loginUser.PSPDId forKey:USERSTATECommitDate];
-        [userDefaults setObject:loginUser.BusinessCategory forKey:USERSELECCATEGORY];
+//        [userDefaults setObject:loginUser.BusinessCategory forKey:USERSELECCATEGORY];
         [userDefaults setObject:loginUser.refresh_token forKey:LOGIN_Refresh_Token];//
         [userDefaults setObject:loginUser.access_token forKey:LOGIN_Access_Token];
         [userDefaults setObject:loginUser.UserStyle forKey:LOGIN_UserStyle];
-        [userDefaults setObject:loginUser.StoreId forKey:LOGIN_UserStoreID];
-        [userDefaults setBool:[loginUser.BusinessCategoryName isEqualToString:@"工业品"] forKey:IsIndustryCatagory];
-        if ([loginUser.BusinessCategoryName isEqualToString:@"工业品"]) {
-            [userDefaults setObject:@"1" forKey:LOGIN_ISSTORE];
-        }else{
-            [userDefaults setObject:@"1" forKey:LOGIN_ISSTORE];
-        }
+//        [userDefaults setObject:loginUser.StoreId forKey:LOGIN_UserStoreID];
+//        [userDefaults setBool:[loginUser.BusinessCategoryName isEqualToString:@"工业品"] forKey:IsIndustryCatagory];
+//        if ([loginUser.BusinessCategoryName isEqualToString:@"工业品"]) {
+//            [userDefaults setObject:@"1" forKey:LOGIN_ISSTORE];
+//        }else{
+//            [userDefaults setObject:@"1" forKey:LOGIN_ISSTORE];
+//        }
         if ((!loginUser.NickName)||(loginUser.NickName.length<=0) ){
             [userDefaults setObject:nil forKey:LOGIN_USERNICKNAME];
         }else{
             [userDefaults setObject:loginUser.NickName forKey:LOGIN_USERNICKNAME];
         }
-        
+         [[NSUserDefaults standardUserDefaults] setObject:loginUser.IdentityCategorys forKey:UserVipIdentityCategorys];
         [Tools SaveLocalVipstateWithCatagory:loginUser.IdentityCategorys];
         
         [userDefaults setObject:loginUser.PrizeState forKey:LOGIN_UserDrawState];

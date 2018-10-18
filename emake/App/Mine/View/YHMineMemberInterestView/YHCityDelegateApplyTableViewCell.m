@@ -38,38 +38,45 @@
         [textField PSSetSize:WidthRate(130) Height:HeightRate(30)];
         self.nameTextField = textField;
         
-    
+        UIView *catagoryView = [[UIView alloc] init];
+        [self addSubview:catagoryView];
+        catagoryView.translatesAutoresizingMaskIntoConstraints = false;
+        [catagoryView PSSetLeft:WidthRate(18)];
+        [catagoryView PSSetCenterHorizontalAtItem:self];
+        [catagoryView PSSetSize:ScreenWidth Height:HeightRate(30)];
+        self.catagoryView = catagoryView;
 
-        UIButton *button = [[UIButton alloc] init];
-        [button setTitle:@"输配电" forState:UIControlStateNormal];
-        button.translatesAutoresizingMaskIntoConstraints = false;
-        button.layer.borderWidth = 1;
-        button.layer.cornerRadius = 6;
-        button.clipsToBounds = YES;
-        button.layer.borderColor = ColorWithHexString(@"E4E4E4").CGColor ;
-        [button setTitleColor:ColorWithHexString(@"333333") forState:UIControlStateNormal];
-        [self addSubview:button];
-        [button PSSetLeft:WidthRate(18)];
-        [button PSSetCenterHorizontalAtItem:self];
-        [button PSSetSize:WidthRate(100) Height:HeightRate(30)];
-        self.leftButton = button;
-        
-        
-      
-        
-        UIButton *button1 = [[UIButton alloc] init];
-        [button1 setTitle:@"休闲食品" forState:UIControlStateNormal];
-//        [button1 setTitleColor:ColorWithHexString(@"E4E4E4") forState:UIControlStateNormal];
-        button1.translatesAutoresizingMaskIntoConstraints = false;
-        button1.layer.borderColor = ColorWithHexString(@"E4E4E4").CGColor ;
-        [button1 setTitleColor:ColorWithHexString(@"333333") forState:UIControlStateNormal];        button1.layer.borderWidth = 1;
-        button1.layer.cornerRadius = 6;
-        button1.clipsToBounds = YES;
-        [self addSubview:button1];
-        [button1 PSSetRightAtItem:button Length:WidthRate(10)];
-        [button1 PSSetSize:WidthRate(100) Height:HeightRate(30)];
-        self.rightButton = button1;
-        
+//        UIButton *button = [[UIButton alloc] init];
+//        [button setTitle:@"输配电" forState:UIControlStateNormal];
+//        button.translatesAutoresizingMaskIntoConstraints = false;
+//        button.layer.borderWidth = 1;
+//        button.layer.cornerRadius = 6;
+//        button.clipsToBounds = YES;
+//        button.layer.borderColor = ColorWithHexString(@"E4E4E4").CGColor ;
+//        [button setTitleColor:ColorWithHexString(@"333333") forState:UIControlStateNormal];
+//        [self addSubview:button];
+//        [button PSSetLeft:WidthRate(18)];
+//        [button PSSetCenterHorizontalAtItem:self];
+//        [button PSSetSize:WidthRate(100) Height:HeightRate(30)];
+//        self.leftButton = button;
+//        
+//        
+//      
+//        
+//        UIButton *button1 = [[UIButton alloc] init];
+//        [button1 setTitle:@"休闲食品" forState:UIControlStateNormal];
+////        [button1 setTitleColor:ColorWithHexString(@"E4E4E4") forState:UIControlStateNormal];
+//        button1.translatesAutoresizingMaskIntoConstraints = false;
+//        button1.layer.borderColor = ColorWithHexString(@"E4E4E4").CGColor ;
+//        [button1 setTitleColor:ColorWithHexString(@"333333") forState:UIControlStateNormal];
+//        button1.layer.borderWidth = 1;
+//        button1.layer.cornerRadius = 6;
+//        button1.clipsToBounds = YES;
+//        [self addSubview:button1];
+//        [button1 PSSetRightAtItem:button Length:WidthRate(10)];
+//        [button1 PSSetSize:WidthRate(100) Height:HeightRate(30)];
+//        self.rightButton = button1;
+//        
         
         UIImageView *imagedown = [[UIImageView alloc] init];
                 imagedown.image = [UIImage imageNamed:@"direction_down"];
