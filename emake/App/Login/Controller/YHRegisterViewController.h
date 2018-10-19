@@ -11,4 +11,7 @@
 
 @interface YHRegisterViewController : PSVCBase
 
+// 是否是微信授权登录进来来绑定界面的
+@property (nonatomic,assign)BOOL isBinding;
+
 @end

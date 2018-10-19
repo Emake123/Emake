@@ -42,12 +42,24 @@
             _passwordView.textMobilPhone.text = phone;
         }
     }
-    [self.navigationController setNavigationBarHidden:YES animated:NO];
+    if (self.isBinding) {
+         [self.navigationController setNavigationBarHidden:NO animated:NO];
+         UIBarButtonItem *barBtn = [[UIBarButtonItem alloc]init];
+         barBtn.title=@"";
+         self.navigationItem.leftBarButtonItem = barBtn;
+        [self.navigationController.navigationBar setTitleTextAttributes:
+         @{NSFontAttributeName:[UIFont systemFontOfSize:17],
+         NSForegroundColorAttributeName:[UIColor colorWithHexString:@"333333"]}];
+         self.title = @"绑定手机号";
+    }else{
+        [self.navigationController setNavigationBarHidden:YES animated:NO];
+    }
     
 }
 - (void)viewDidLoad {
     
     [super viewDidLoad];
+   
     TPKeyboardAvoidingScrollView *containerScrollView = [[TPKeyboardAvoidingScrollView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, ScreenHeight)];
 //    containerScrollView.backgroundColor = APP_THEME_MAIN_GRAY;
     [self.view addSubview:containerScrollView];
@@ -80,6 +92,10 @@
     }
     [back PSSetLeft:WidthRate(10)];
     [back PSSetSize:WidthRate(34) Height:HeightRate(18)];
+    
+    if (self.isBinding) {
+        back.hidden = YES;
+    }
     
     [self configProtocolView];
 

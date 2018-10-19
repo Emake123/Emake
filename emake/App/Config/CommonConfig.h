@@ -17,8 +17,10 @@
 //sharedSDK
 #define  SharedSDKQQAppId             @"1106385272"
 #define  SharedSDKQQAppKey            @"FbXFGgeitjutXnGk"
-#define  SharedSDKWeiXinAppId         @"wx5cf643ea19645e5c"
-#define  SharedSDKWeiXinAppKey        @"7e7c876e879ed27f09036764ffbd28b2"
+//#define  SharedSDKWeiXinAppId         @"wx5cf643ea19645e5c"
+//#define  SharedSDKWeiXinAppKey        @"7e7c876e879ed27f09036764ffbd28b2"
+#define  SharedSDKWeiXinAppId         @"wx1d7605e5f166ac0a"
+#define  SharedSDKWeiXinAppKey        @"09ea044936509fb5c766f725b31ecf22"
 
 // 阿里推送
 #define ALIPushAppKey       @"24922550"

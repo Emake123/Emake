@@ -18,5 +18,7 @@
 @property (nonatomic, strong)  UIButton *showPasswordBtn;
 @property (nonatomic, strong) UITextField *textPhone;
 @property (nonatomic, strong) UITextField *textPassword;
+// 微信登录
+@property (nonatomic, strong)  UIButton *weChatLoginBtn;
 
 @end

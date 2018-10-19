@@ -12,11 +12,14 @@
 #import "YHLoginViewController.h"
 #import "TPKeyboardAvoidingScrollView.h"
 #import "YHLoginView.h"
+#import "WXApi.h"
 #import "YHRegisterViewController.h"
 #import "YHPasswordViewController.h"
+#import <ShareSDK/ShareSDK.h>
+#import <ShareSDKExtension/ShareSDK+Extension.h>
 #import "YHMQTTClient.h"
 #import "FMDBManager.h"
-@interface YHLoginViewController ()<UITextFieldDelegate>{
+@interface YHLoginViewController ()<UITextFieldDelegate,WXApiDelegate>{
     NSString *phone;
 }
 @property (nonatomic, weak) UIButton *getCaptchaButton;
@@ -165,13 +168,57 @@
         
     } fialureBlock:^(NSString *errorMessages) {
         [self.view makeToast:errorMessages duration:1.5 position:CSToastPositionCenter];
-        
     }];
-    
 }
 
-#pragma mark - Private
+#pragma mark -- weaChatLogin
+- (void)weaChatLoginClick{
+    // 判断用户是否装微信App
+   /* if ([WXApi isWXAppInstalled]) {
+        SendAuthReq *req = [[SendAuthReq alloc]init];
+        req.scope = @"snsapi_userinfo";
+        req.state = @"wx_oauth2_authorization_state";
+        [WXApi sendReq:req];
+    }else {
+       [self.view makeToast:@"没有检测到微信客户端" duration:1.5 position:CSToastPositionCenter];
+        return;
+    }*/
+    
+    if (![ShareSDK isClientInstalled:SSDKPlatformTypeWechat]) {
+        [self.view makeToast:@"没有检测到微信客户端" duration:1.5 position:CSToastPositionCenter];
+        return;
+    }
+    [ShareSDK getUserInfo:SSDKPlatformTypeWechat onStateChanged:^(SSDKResponseState state, SSDKUser *user, NSError *error) {
+        if (state == SSDKResponseStateSuccess)
+        {
+            NSLog(@"uid=%@",user.uid);
+            NSLog(@"%@",user.credential);
+            NSLog(@"token=%@",user.credential.token);
+            NSLog(@"nickname=%@",user.nickname);
+            
+            // 进行调接口,判断这个授权的用户在不在公司的用户表里
+            YHRegisterViewController *registervc = [[YHRegisterViewController alloc] init];
+            registervc.isBinding = YES;
+            registervc.modalTransitionStyle = UIModalTransitionStylePartialCurl;
+            [self.navigationController pushViewController:registervc animated:YES ];
+        }
+        else
+        {
+            NSLog(@"%@",error);
+        }
+    }];
+}
 
+#pragma mark --WXApiDelegate
+/*-(void)onResp:(BaseResp *)resp{
+    // 向微信请求授权后,得到响应结果
+    if ([resp isKindOfClass:[SendAuthResp class]]) {
+        SendAuthResp *temp = (SendAuthResp *)resp;
+        
+    }
+}*/
+
+#pragma mark - Private
 - (void)configUI{
     
     _loginView  = [[YHLoginView alloc] init];
@@ -185,5 +232,6 @@
     [_loginView.registerBtn addTarget:self action:@selector(registerPhone) forControlEvents:UIControlEventTouchUpInside];
     [_loginView.fogetBtn addTarget:self action:@selector(forgetPassword) forControlEvents:UIControlEventTouchUpInside];
     [_loginView.showPasswordBtn addTarget:self action:@selector(showPassword) forControlEvents:UIControlEventTouchUpInside];
+    [_loginView.weChatLoginBtn addTarget:self action:@selector(weaChatLoginClick) forControlEvents:UIControlEventTouchUpInside];
 }
 @end

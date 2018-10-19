@@ -44,12 +44,27 @@
     _loginBtn  = [UIButton buttonWithType:UIButtonTypeSystem] ;
     [_loginBtn setTitle:@"登录" forState:UIControlStateNormal];
     [_loginBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal ];
-    _loginBtn.frame = CGRectMake(WidthRate(37),HeightRate(474), WidthRate(300), HeightRate(45));
+    _loginBtn.frame = CGRectMake(WidthRate(37),HeightRate(474), WidthRate(300), HeightRate(40));
     _loginBtn.backgroundColor = ColorWithHexString(@"4DBECD");
     _loginBtn.layer.cornerRadius =6;
     _loginBtn.clipsToBounds =YES;
     [BackgroudView addSubview:_loginBtn];
 
+    _weChatLoginBtn = [UIButton buttonWithType:(UIButtonTypeCustom)];
+    [_weChatLoginBtn setTitle:@"微信登录" forState:UIControlStateNormal];
+    [_weChatLoginBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal ];
+    [_weChatLoginBtn setImage:[UIImage imageNamed:@"weixin.png"] forState:UIControlStateNormal];
+    _weChatLoginBtn.titleEdgeInsets = UIEdgeInsetsMake(0, 5, 0, 0);
+    _weChatLoginBtn.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 5);
+    _weChatLoginBtn.left   = _loginBtn.left;
+    _weChatLoginBtn.width  = _loginBtn.width;
+    _weChatLoginBtn.height = _loginBtn.height;
+    _weChatLoginBtn.top = CGRectGetMaxY(_loginBtn.frame)+20;
+    _weChatLoginBtn.backgroundColor = ColorWithHexString(@"07B906");
+    _weChatLoginBtn.layer.cornerRadius = HeightRate(20);
+    _weChatLoginBtn.clipsToBounds =YES;
+    [BackgroudView addSubview:_weChatLoginBtn];
+    
     _registerBtn  = [UIButton buttonWithType:UIButtonTypeSystem] ;
     [_registerBtn setTitle:@"快速注册" forState:UIControlStateNormal];
     [_registerBtn setTitleColor:ColorWithHexString(@"4DBECD") forState:UIControlStateNormal ];
@@ -57,14 +72,14 @@
 
     _registerBtn.backgroundColor = BackgroudView.backgroundColor;
     [BackgroudView addSubview:_registerBtn];
-    _registerBtn.frame = CGRectMake(WidthRate(116),HeightRate(535), WidthRate(65), HeightRate(25));
+    _registerBtn.frame = CGRectMake(WidthRate(116),HeightRate(575), WidthRate(65), HeightRate(25));
 
 
    _fogetBtn  = [UIButton buttonWithType:UIButtonTypeSystem] ;
     [_fogetBtn setTitle:@"忘记密码？" forState:UIControlStateNormal];
     _fogetBtn.titleLabel.font = [UIFont systemFontOfSize:AdaptFont(13)];
     [_fogetBtn.titleLabel sizeToFit];
-    _fogetBtn.frame = CGRectMake(WidthRate(197),HeightRate(535), WidthRate(80), HeightRate(25));
+    _fogetBtn.frame = CGRectMake(WidthRate(197),HeightRate(575), WidthRate(80), HeightRate(25));
 
     [_fogetBtn setTitleColor:ColorWithHexString(LOGIN_VIEW_TIP_BUTTON_COLOR) forState:UIControlStateNormal];
     
@@ -75,7 +90,7 @@
     
     UILabel *lineV = [[UILabel alloc]init];
     lineV.backgroundColor = SepratorLineColor;
-    lineV.frame = CGRectMake(ScreenWidth/2,HeightRate(540), 2.0, HeightRate(15));
+    lineV.frame = CGRectMake(ScreenWidth/2,HeightRate(580), 2.0, HeightRate(15));
     [BackgroudView addSubview:lineV];
 
     

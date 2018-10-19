@@ -58,7 +58,7 @@ static NSUserDefaults * _Nonnull extracted() {
     //监测网络连接状态
     [[YHAFNetWorkingRequset sharedRequset] monitorNetworkStatus];
     
-    //shareSDK
+    //shareSDK 和 第三方登录
     [self registerShareSDK];
     
     [[NSUserDefaults standardUserDefaults] setObject:@(0) forKey:TitleIndex];
@@ -278,8 +278,8 @@ static NSUserDefaults * _Nonnull extracted() {
 // NOTE:9.0以后使用新API接口
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<NSString*, id> *)options{
     NSLog(@"appde==host=%@",url.host);
+    UIViewController *vc = [Tools currentViewController];
     if ([url.host isEqualToString:@"pay"]) {
-        UIViewController *vc = [Tools currentViewController];
         return [WXApi handleOpenURL:url delegate:vc];
     }
     if ([url.host isEqualToString:@"safepay"]) {
@@ -421,6 +421,7 @@ static NSUserDefaults * _Nonnull extracted() {
                 break;
         }
     }];
+    
 }
 
 #pragma mark-------UITabBarControllerDelegate
